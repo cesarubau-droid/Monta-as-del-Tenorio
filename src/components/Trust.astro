@@ -1,0 +1,60 @@
+---
+/**
+ * Trust section. Only verified items are shown (see src/data/content.ts).
+ * Ratings, ICT and Tripadvisor appear automatically once enabled there.
+ */
+import Icon from './Icon.astro';
+import SectionHead from './Sections.astro';
+import { trustBadges, trustFacts } from '../data/content';
+import { useT, fmt } from '../i18n/ui';
+import type { Lang } from '../i18n/routes';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+const badges = trustBadges.filter((b) => b.enabled);
+---
+<section class="section" aria-labelledby="trust-title">
+  <div class="container">
+    <SectionHead kicker={t.trust.kicker} title={t.trust.title} center id="trust-title" />
+    <ul class="trust" role="list">
+      {badges.map((b) => (
+        <li class="trust__badge">
+          <span class="trust__text">
+            {b.kind === 'listing' ? t.trust.listedOn : ''}
+            <span class="trust__logo">{b.label}</span>
+            {b.rating !== null && (
+              <span class="trust__stars" role="img" aria-label={fmt(t.testimonials.rating, { n: b.rating })}>
+                {Array.from({ length: 5 }, () => <Icon name="star" size={16} />)}
+              </span>
+            )}
+          </span>
+          {b.url && (
+            <a href={b.url} target="_blank" rel="noopener noreferrer" class="trust__link">
+              {t.trust.viewListing}<span class="sr-only"> ({b.label}) {t.newTab}</span>
+            </a>
+          )}
+        </li>
+      ))}
+      {trustFacts.map((f) => (
+        <li class="trust__badge">
+          <span class="icon-circle"><Icon name={f.icon as 'home'} /></span>
+          <span class="trust__text">{f.text[lang]}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+<style>
+  .trust { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-md); list-style: none; padding: 0; }
+  @media (min-width: 640px) { .trust { grid-template-columns: repeat(3, 1fr); gap: var(--space-lg); } }
+  @media (min-width: 1024px) { .trust { grid-template-columns: repeat(6, 1fr); } }
+  .trust__badge {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center;
+    padding: var(--space-md); min-height: 140px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md);
+  }
+  .trust__logo { font-weight: 700; font-size: 1.05rem; color: var(--text); font-family: var(--font-serif); min-height: 48px; display: grid; place-items: center; }
+  .trust__text { font-size: var(--fs-sm); font-weight: 600; color: var(--text); display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .trust__stars { display: inline-flex; color: #b8860b; }
+  .trust__link { font-size: var(--fs-sm); text-decoration: underline; min-height: 44px; display: inline-flex; align-items: center; }
+</style>

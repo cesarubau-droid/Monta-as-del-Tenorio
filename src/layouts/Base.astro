@@ -1,0 +1,132 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import WhatsAppFloat from '../components/WhatsAppFloat.astro';
+import { useT } from '../i18n/ui';
+import { switchLangPath, type Lang, type RouteKey } from '../i18n/routes';
+import { site } from '../data/site';
+
+interface Props {
+  lang: Lang;
+  page: keyof ReturnType<typeof useT>['meta'];
+  current?: RouteKey;
+  title?: string;
+  description?: string;
+  noindex?: boolean;
+  jsonLd?: Record<string, unknown>[];
+}
+const { lang, page, current, title, description, noindex = false, jsonLd = [] } = Astro.props;
+const t = useT(lang);
+const meta = t.meta[page];
+const pageTitle = title ?? meta.title;
+const pageDescription = description ?? meta.description;
+
+const siteUrl = Astro.site ?? new URL(Astro.url.origin);
+const path = Astro.url.pathname.replace(/\/+$/, '') || '/';
+const canonical = new URL(path, siteUrl).href;
+const enHref = new URL(switchLangPath(path, 'en'), siteUrl).href;
+const esHref = new URL(switchLangPath(path, 'es'), siteUrl).href;
+const ogImage = new URL('/og-default.jpg', siteUrl).href;
+
+const sameAs = [site.social.instagram, site.social.facebook, site.social.tiktok, site.listings.booking, site.listings.airbnb].filter(Boolean);
+const business = {
+  '@context': 'https://schema.org',
+  '@type': 'LodgingBusiness',
+  name: site.name,
+  description: t.meta.home.description,
+  url: new URL(lang === 'es' ? '/es' : '/', siteUrl).href,
+  image: ogImage,
+  address: { '@type': 'PostalAddress', addressLocality: 'Río Celeste', addressCountry: 'CR' },
+  ...(site.whatsappNumber ? { telephone: `+${site.whatsappNumber}` } : {}),
+  ...(site.email ? { email: site.email } : {}),
+  ...(sameAs.length ? { sameAs } : {}),
+  numberOfRooms: 3,
+  availableLanguage: ['en', 'es'],
+};
+const structured = page === 'home' ? [business, ...jsonLd] : jsonLd;
+const ga4 = site.ga4Id;
+---
+<!doctype html>
+<html lang={lang === 'es' ? 'es' : 'en'} data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={pageDescription} />
+    {noindex ? <meta name="robots" content="noindex, follow" /> : <link rel="canonical" href={canonical} />}
+    {!noindex && <link rel="alternate" hreflang="en" href={enHref} />}
+    {!noindex && <link rel="alternate" hreflang="es" href={esHref} />}
+    {!noindex && <link rel="alternate" hreflang="x-default" href={enHref} />}
+    <meta name="theme-color" content="#0A7266" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#1A1A1A" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDescription} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content={lang === 'es' ? 'es_CR' : 'en_US'} />
+    <meta property="og:locale:alternate" content={lang === 'es' ? 'en_US' : 'es_CR'} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <script is:inline>
+      (function () {
+        var d = document.documentElement, s = null;
+        try { s = localStorage.getItem('theme'); } catch (e) {}
+        d.dataset.theme = s || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        d.classList.add('js');
+      })();
+    </script>
+    {structured.map((s) => <script type="application/ld+json" set:html={JSON.stringify(s)} />)}
+    {
+      ga4 && (
+        <>
+          <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${ga4}`} />
+          <script is:inline define:vars={{ ga4 }}>
+            window.dataLayer = window.dataLayer || [];
+            window.gtag = function () { window.dataLayer.push(arguments); };
+            window.gtag('js', new Date());
+            window.gtag('config', ga4, { anonymize_ip: true });
+          </script>
+        </>
+      )
+    }
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{t.skip}</a>
+    <Header lang={lang} current={current} />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <Footer lang={lang} />
+    <WhatsAppFloat lang={lang} />
+    <script>
+      import { initClickTracking } from '../scripts/analytics';
+      initClickTracking();
+
+      // Fade-in on scroll (skipped when reduced motion is requested)
+      const els = document.querySelectorAll('.reveal');
+      if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const io = new IntersectionObserver(
+          (entries) => entries.forEach((en) => {
+            if (en.isIntersecting) { en.target.classList.add('is-visible'); io.unobserve(en.target); }
+          }),
+          { rootMargin: '0px 0px -10% 0px' },
+        );
+        els.forEach((el) => io.observe(el));
+      } else {
+        els.forEach((el) => el.classList.add('is-visible'));
+      }
+    </script>
+  </body>
+</html>
+<style is:global>
+  main:focus { outline: none; }
+</style>

@@ -1,0 +1,49 @@
+---
+/** Deposit page widget: /deposit?ref=MT-…&amount=120 → PayPal.me link. */
+import Icon from './Icon.astro';
+import { site } from '../data/site';
+import { useT } from '../i18n/ui';
+import { url, type Lang } from '../i18n/routes';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+---
+<div class="deposit" data-deposit data-paypal={site.paypalMeUrl ?? ''}>
+  <dl class="deposit__facts" hidden data-deposit-facts>
+    <div><dt>{t.deposit.reference}</dt><dd data-ref>—</dd></div>
+    <div><dt>{t.deposit.amount}</dt><dd data-amount>—</dd></div>
+  </dl>
+  <p class="deposit__note"><Icon name="shield" size={20} />{t.deposit.note}</p>
+  <a class="btn btn--lg" href="#" hidden data-pay target="_blank" rel="noopener noreferrer" data-track="deposit_click">{t.deposit.pay}<span class="sr-only"> {t.newTab}</span></a>
+  <p class="muted" data-not-ready>{t.deposit.notReady}</p>
+  <p class="small"><a class="text-link" href={url(lang, 'policy')}>{t.reserve.policyLink}</a></p>
+</div>
+<script>
+  // /deposit?ref=MT-…&amount=120 → PayPal.me/<user>/120USD (amount set by the owners on WhatsApp)
+  const box = document.querySelector<HTMLElement>('[data-deposit]');
+  if (box) {
+    const q = new URLSearchParams(location.search);
+    const ref = (q.get('ref') || '').replace(/[^\w-]/g, '').slice(0, 30);
+    const amount = Number(q.get('amount'));
+    const base = box.dataset.paypal;
+    if (base && amount > 0 && amount < 100000) {
+      box.querySelector('[data-deposit-facts]')?.removeAttribute('hidden');
+      box.querySelector('[data-ref]')!.textContent = ref || '—';
+      box.querySelector('[data-amount]')!.textContent = `US$${amount.toFixed(2)}`;
+      const pay = box.querySelector<HTMLAnchorElement>('[data-pay]')!;
+      pay.href = `${base.replace(/\/+$/, '')}/${amount.toFixed(2)}USD`;
+      pay.hidden = false;
+      box.querySelector('[data-not-ready]')?.setAttribute('hidden', '');
+    }
+  }
+</script>
+<style>
+  .deposit { display: grid; gap: var(--space-md); justify-items: start; }
+  .deposit__facts { display: grid; gap: 8px; width: 100%; padding: var(--space-md); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); }
+  .deposit__facts div { display: flex; justify-content: space-between; gap: 16px; }
+  .deposit__facts dt { font-weight: 600; }
+  .deposit__facts dd { margin: 0; }
+  .deposit__note { display: flex; gap: 8px; align-items: flex-start; }
+  .deposit__note :global(.icon) { color: var(--accent); margin-top: 3px; flex: none; }
+</style>

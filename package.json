@@ -1,0 +1,38 @@
+{
+  "name": "montanas-del-tenorio",
+  "version": "1.0.0",
+  "description": "Sitio web oficial de Montañas del Tenorio — cabañas y tours en Río Celeste, Costa Rica",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "node scripts/generate-placeholders.mjs && node scripts/build-assets.mjs && astro build && node scripts/vercel-headers.mjs",
+    "placeholders": "node scripts/generate-placeholders.mjs",
+    "optimize-photos": "node scripts/optimize-photos.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cesarubau-droid/Monta-as-del-Tenorio.git"
+  },
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/cesarubau-droid/Monta-as-del-Tenorio/issues"
+  },
+  "homepage": "https://github.com/cesarubau-droid/Monta-as-del-Tenorio#readme",
+  "dependencies": {
+    "@astrojs/sitemap": "3.7.4",
+    "@astrojs/vercel": "11.0.11",
+    "astro": "7.3.5"
+  },
+  "devDependencies": {
+    "sharp": "0.35.5"
+  },
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "overrides": {
+    "@vercel/routing-utils": {
+      "path-to-regexp": "6.3.0"
+    }
+  }
+}

@@ -1,0 +1,56 @@
+---
+/**
+ * Renders an image from the registry (src/data/media.ts).
+ * - Reserves space with width/height (no layout shift).
+ * - Uses <picture> with WebP variants once a final photo is optimized.
+ * - Adds a visible "Provisional image" tag while placeholder: true.
+ */
+import { getMedia } from '../data/media';
+import { useT } from '../i18n/ui';
+import type { Lang } from '../i18n/routes';
+
+interface Props {
+  id: string;
+  lang: Lang;
+  sizes?: string;
+  eager?: boolean;
+  class?: string;
+  tag?: boolean;
+  alt?: string;
+}
+const { id, lang, sizes = '(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw', eager = false, class: cls, tag = false, alt } = Astro.props;
+const m = getMedia(id);
+const t = useT(lang);
+const base = m.src.replace(/\.[a-z]+$/i, '');
+const altText = alt ?? m.alt[lang];
+---
+{m.placeholder && tag && <span class="placeholder-tag" aria-hidden="true">{t.placeholderBadge}</span>}
+{
+  m.optimized ? (
+    <picture>
+      <source type="image/webp" srcset={`${base}-800.webp 800w, ${base}-1600.webp 1600w`} sizes={sizes} />
+      <img
+        class={cls}
+        src={m.src}
+        width={m.width}
+        height={m.height}
+        alt={altText}
+        loading={eager ? 'eager' : 'lazy'}
+        decoding={eager ? 'sync' : 'async'}
+        fetchpriority={eager ? 'high' : undefined}
+      />
+    </picture>
+  ) : (
+    <img
+      class={cls}
+      src={m.src}
+      width={m.width}
+      height={m.height}
+      alt={altText}
+      loading={eager ? 'eager' : 'lazy'}
+      decoding={eager ? 'sync' : 'async'}
+      fetchpriority={eager ? 'high' : undefined}
+      data-placeholder={m.placeholder ? 'true' : undefined}
+    />
+  )
+}

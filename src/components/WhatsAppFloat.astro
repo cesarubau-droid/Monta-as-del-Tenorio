@@ -1,0 +1,39 @@
+---
+import Icon from './Icon.astro';
+import { whatsappUrl } from '../data/site';
+import { useT } from '../i18n/ui';
+import type { Lang } from '../i18n/routes';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+const href = whatsappUrl(t.whatsappGreeting);
+---
+{
+  href && (
+    <aside aria-label={t.whatsappFloat}>
+    <a
+      class="wa-float"
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={`${t.whatsappFloat} ${t.newTab}`}
+      data-track="whatsapp_click"
+      data-track-location="floating"
+    >
+      <Icon name="whatsapp" size={28} />
+    </a>
+    </aside>
+  )
+}
+<style>
+  .wa-float {
+    position: fixed; right: 16px; bottom: 16px; z-index: 90;
+    display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%;
+    background: var(--teal-ink); color: #fff; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+    transition: transform 200ms var(--ease), background-color 200ms ease;
+  }
+  .wa-float:hover { background: var(--teal-deep); }
+  @media (prefers-reduced-motion: no-preference) { .wa-float:hover { transform: scale(1.06); } }
+  @media (min-width: 1024px) { .wa-float { right: 24px; bottom: 24px; } }
+</style>

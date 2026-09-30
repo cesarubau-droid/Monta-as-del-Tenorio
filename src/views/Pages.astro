@@ -1,0 +1,211 @@
+---
+/**
+ * Secondary pages that share a simple layout:
+ * gallery, contact, reserve, faq, story, sustainability, deposit, legal.
+ */
+import PageHero from '../components/PageHero.astro';
+import Photo from '../components/Photo.astro';
+import Icon from '../components/Icon.astro';
+import GalleryTabs from '../components/GalleryTabs.astro';
+import FaqList from '../components/FaqList.astro';
+import ContactCta from '../components/ContactCta.astro';
+import ContactForm from '../components/ContactForm.astro';
+import ReservationForm from '../components/ReservationForm.astro';
+import Location from '../components/Location.astro';
+import DepositBox from '../components/DepositBox.astro';
+import { faqs, sustainability } from '../data/content';
+import { legal } from '../data/legal';
+import { site, whatsappUrl } from '../data/site';
+import { useT, fmt } from '../i18n/ui';
+import { url, type Lang } from '../i18n/routes';
+
+type Kind = 'gallery' | 'contact' | 'reserve' | 'faq' | 'story' | 'sustainability' | 'deposit' | 'privacy' | 'terms' | 'policy';
+interface Props { lang: Lang; kind: Kind }
+const { lang, kind } = Astro.props;
+const t = useT(lang);
+const wa = whatsappUrl(t.whatsappGreeting);
+const p = site.depositPercent;
+const legalTitles = { privacy: t.footer.privacy, terms: t.footer.terms, policy: t.footer.policy };
+const updatedLabel = lang === 'es' ? 'Última actualización' : 'Last updated';
+---
+{kind === 'gallery' && (
+  <>
+    <PageHero lang={lang} kicker={t.gallery.kicker} title={t.gallery.title} lead={t.gallery.lead} crumbs={[{ label: t.nav.gallery }]} />
+    <section class="section" aria-label={t.gallery.title}>
+      <div class="container"><GalleryTabs lang={lang} idPrefix="gal" /></div>
+    </section>
+    <ContactCta lang={lang} showLocation={false} />
+  </>
+)}
+
+{kind === 'contact' && (
+  <>
+    <PageHero lang={lang} kicker={t.contact.kicker} title={t.contact.title} lead={t.contact.quote} crumbs={[{ label: t.nav.contact }]} />
+    <section class="section">
+      <div class="container contact-grid">
+        <div>
+          <h2 id="contact-form" class="h-sub">{t.contact.formTitle}</h2>
+          <p class="muted form-lead">{t.contact.formLead}</p>
+          <ContactForm lang={lang} />
+        </div>
+        <aside class="contact-aside" aria-label={t.contact.kicker}>
+          <ul class="channel-list" role="list">
+            {wa && (
+              <li><a class="btn btn--lg btn--block" href={wa} target="_blank" rel="noopener noreferrer" data-track="whatsapp_click" data-track-location="contact_page"><Icon name="whatsapp" />{t.contact.whatsapp}<span class="sr-only"> {t.newTab}</span></a></li>
+            )}
+            {site.email && (
+              <li><a class="btn btn--lg btn--block btn--blue" href={`mailto:${site.email}`} data-track="email_click" data-track-location="contact_page"><Icon name="mail" />{site.email}</a></li>
+            )}
+            <li><a class="btn btn--lg btn--block btn--outline" href={url(lang, 'reserve')} data-track="reservation_start" data-track-location="contact_page"><Icon name="calendar" />{t.nav.reserve}</a></li>
+          </ul>
+          <Location lang={lang} />
+        </aside>
+      </div>
+    </section>
+  </>
+)}
+
+{kind === 'reserve' && (
+  <>
+    <PageHero lang={lang} kicker={t.reserve.kicker} title={t.reserve.title} lead={t.reserve.lead} crumbs={[{ label: t.nav.reserve }]} />
+    <section class="section">
+      <div class="container reserve-grid">
+        <div class="reserve-form">
+          <h2 class="sr-only">{t.reserve.title}</h2>
+          <ReservationForm lang={lang} />
+        </div>
+        <aside aria-labelledby="steps-title" class="steps">
+          <h2 id="steps-title" class="h-sub">{t.reserve.stepsTitle}</h2>
+          <ol class="steps__list">
+            {t.reserve.steps.map((s) => (
+              <li><strong>{fmt(s.title, { p })}</strong><span>{s.text}</span></li>
+            ))}
+          </ol>
+          <p class="small"><a class="text-link" href={url(lang, 'policy')}>{t.reserve.policyLink}</a></p>
+          {wa && <p class="small muted">{t.contact.quote} <a class="text-link" href={wa} target="_blank" rel="noopener noreferrer" data-track="whatsapp_click" data-track-location="reserve_aside">WhatsApp<span class="sr-only"> {t.newTab}</span></a></p>}
+        </aside>
+      </div>
+    </section>
+  </>
+)}
+
+{kind === 'faq' && (
+  <>
+    <PageHero lang={lang} kicker={t.faq.kicker} title={t.faq.title} crumbs={[{ label: t.footer.faq }]} />
+    <section class="section">
+      <div class="container"><FaqList items={faqs} lang={lang} headingLevel="h2" /></div>
+    </section>
+    <ContactCta lang={lang} showLocation={false} />
+  </>
+)}
+
+{kind === 'story' && (
+  <>
+    <PageHero lang={lang} kicker={t.about.kicker} title={t.about.title} crumbs={[{ label: t.footer.story }]} />
+    <section class="section">
+      <div class="container split">
+        <div class="media-43"><Photo id="founders" lang={lang} sizes="(min-width: 900px) 50vw, 100vw" eager /></div>
+        <div class="prose">
+          <h2>{lang === 'es' ? 'Por qué existe Montañas del Tenorio' : 'Why Montañas del Tenorio exists'}</h2>
+          {t.about.body.map((para) => <p>{para}</p>)}
+        </div>
+      </div>
+      <div class="container split split--reverse story-2">
+        <div class="media-43"><Photo id="lookout" lang={lang} sizes="(min-width: 900px) 50vw, 100vw" /></div>
+        <div>
+          <h2>{t.highlights.title}</h2>
+          <ul class="check-list" role="list">
+            {t.highlights.items.map((h) => <li><Icon name="check" size={22} /><span><strong>{h.title}.</strong> {h.text}</span></li>)}
+          </ul>
+          <div class="btn-row story-ctas">
+            <a class="btn btn--lg" href={url(lang, 'reserve')} data-track="reservation_start" data-track-location="story">{t.nav.reserve}</a>
+            <a class="btn btn--lg btn--outline" href={url(lang, 'cabins')}>{t.nav.cabins}</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </>
+)}
+
+{kind === 'sustainability' && (
+  <>
+    <PageHero lang={lang} kicker={t.sustainability.kicker} title={t.sustainability.title} lead={`“${t.sustainability.quote}”`} crumbs={[{ label: t.footer.sustainability }]} />
+    <section class="section">
+      <div class="container grid grid--3">
+        {sustainability.map((s) => (
+          <article class="pillar" id={s.id}>
+            <span class="icon-circle"><Icon name={s.icon as 'leaf'} /></span>
+            <h2>{s.title[lang]}</h2>
+            <p>{s.text[lang]}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+    <ContactCta lang={lang} showLocation={false} />
+  </>
+)}
+
+{kind === 'deposit' && (
+  <>
+    <PageHero lang={lang} kicker={t.reserve.kicker} title={t.deposit.title} lead={fmt(t.deposit.lead, { p })} crumbs={[{ label: t.deposit.title }]} />
+    <section class="section">
+      <div class="container narrow">
+        <DepositBox lang={lang} />
+      </div>
+    </section>
+  </>
+)}
+
+{(kind === 'privacy' || kind === 'terms' || kind === 'policy') && (
+  <>
+    <PageHero lang={lang} title={legalTitles[kind]} crumbs={[{ label: legalTitles[kind] }]}>
+      <p class="small muted">{updatedLabel}: {legal[kind][lang].updated}</p>
+    </PageHero>
+    <section class="section">
+      <div class="container narrow prose">
+        {legal[kind][lang].sections.map((s) => (
+          <>
+            <h2>{s.h}</h2>
+            {s.p.map((para) => <p>{para}</p>)}
+          </>
+        ))}
+        {kind === 'policy' && (
+          <p class="policy-cta"><a class="btn btn--lg" href={url(lang, 'reserve')} data-track="reservation_start" data-track-location="policy">{t.nav.reserve}</a></p>
+        )}
+      </div>
+    </section>
+  </>
+)}
+
+<style>
+  .narrow { max-width: 760px; }
+  .h-sub { font-size: var(--fs-h3); }
+  .form-lead { margin: 4px 0 var(--space-lg); }
+  .contact-grid, .reserve-grid { display: grid; gap: var(--space-2xl); }
+  @media (min-width: 1024px) {
+    .contact-grid { grid-template-columns: 1.4fr 1fr; }
+    .reserve-grid { grid-template-columns: 1.6fr 1fr; align-items: start; }
+    .steps { position: sticky; top: calc(var(--header-h) + 24px); }
+  }
+  .contact-aside :global(.loc) { grid-template-columns: 1fr; }
+  .contact-aside :global(.loc__title) { grid-column: auto; }
+  .channel-list { display: grid; gap: var(--space-sm); list-style: none; padding: 0; }
+  .steps { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: var(--space-lg); display: grid; gap: var(--space-md); }
+  .steps__list { list-style: none; padding: 0; counter-reset: s; display: grid; gap: var(--space-md); }
+  .steps__list li { counter-increment: s; display: grid; grid-template-columns: 36px 1fr; column-gap: 12px; }
+  .steps__list li::before {
+    content: counter(s); grid-row: span 2; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%;
+    background: var(--teal-ink); color: #fff; font-weight: 700;
+  }
+  .steps__list span { font-size: var(--fs-sm); color: var(--text-2); }
+  .media-43 { position: relative; aspect-ratio: 4 / 3; border-radius: var(--radius-md); overflow: hidden; background: var(--surface-2); }
+  .media-43 :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .story-2 { margin-top: var(--space-3xl); }
+  .check-list { list-style: none; padding: 0; display: grid; gap: var(--space-sm); margin-top: var(--space-md); }
+  .check-list li { display: flex; gap: 10px; }
+  .check-list :global(.icon) { color: var(--accent); flex: none; margin-top: 3px; }
+  .story-ctas { margin-top: var(--space-lg); }
+  .pillar { display: grid; gap: var(--space-sm); align-content: start; padding: var(--space-lg); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); }
+  .pillar h2 { font-size: var(--fs-h3); }
+  .policy-cta { margin-top: var(--space-xl); }
+</style>

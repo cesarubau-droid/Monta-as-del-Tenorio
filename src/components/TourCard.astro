@@ -1,0 +1,48 @@
+---
+import Photo from './Photo.astro';
+import Icon from './Icon.astro';
+import { formatHours, formatUSD, type Tour } from '../data/offer';
+import { useT, fmt } from '../i18n/ui';
+import { url, type Lang } from '../i18n/routes';
+
+interface Props { tour: Tour; lang: Lang }
+const { tour, lang } = Astro.props;
+const t = useT(lang);
+const name = tour.name[lang];
+---
+<article class="card">
+  <div class="card__media">
+    <Photo id={tour.image} lang={lang} />
+  </div>
+  <div class="card__body">
+    <h3 class="card__title">{name}</h3>
+    <ul class="card__meta" role="list">
+      <li><Icon name="clock" size={18} /><span class="sr-only">{t.tours.duration}:</span>{fmt(t.tours.hours, { n: formatHours(tour.hours, lang) })}</li>
+      <li><Icon name="compass" size={18} />{t.tours.guide}</li>
+    </ul>
+    <p class="card__text">{tour.summary[lang]}</p>
+    <p class="card__price">
+      {tour.priceUSD !== null ? (
+        <>{formatUSD(tour.priceUSD, lang)} <small>{t.tours.perPerson}</small></>
+      ) : (
+        <>{t.tours.priceOnRequest}</>
+      )}
+    </p>
+    <div class="card__actions">
+      <a
+        class="btn btn--outline"
+        href={url(lang, 'tours', tour.slug)}
+        data-track="tour_click"
+        data-track-tour={tour.slug}
+        data-track-action="details"
+      >{t.tours.details}<span class="sr-only">: {name}</span></a>
+      <a
+        class="btn"
+        href={`${url(lang, 'reserve')}?tour=${tour.slug}`}
+        data-track="tour_click"
+        data-track-tour={tour.slug}
+        data-track-action="add_to_trip"
+      >{t.tours.addToTrip}<span class="sr-only">: {name}</span></a>
+    </div>
+  </div>
+</article>

@@ -1,0 +1,140 @@
+---
+import Icon from './Icon.astro';
+import { cabins, tours, formatHours } from '../data/offer';
+import { useT, fmt } from '../i18n/ui';
+import { url, type Lang } from '../i18n/routes';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+const f = t.form;
+const msgs = { ...f.errors, summary: f.errorSummary, sending: f.sending };
+---
+<form
+  class="form"
+  action="/api/inquiry"
+  method="post"
+  novalidate
+  data-inquiry-form
+  data-success="reservation-success"
+  data-msgs={JSON.stringify(msgs)}
+  aria-describedby="res-required-note"
+>
+  <input type="hidden" name="type" value="reservation" />
+  <input type="hidden" name="lang" value={lang} />
+  <div class="hp" aria-hidden="true">
+    <label for="res-website">Website</label>
+    <input id="res-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+  </div>
+
+  <p id="res-required-note" class="small muted">* {f.required}</p>
+  <div class="form-status form-status--error" role="alert" tabindex="-1" data-form-status></div>
+
+  <div class="form-row form-row--2">
+    <div class="field">
+      <label for="res-checkin">{f.checkIn}<span class="req" aria-hidden="true"> *</span></label>
+      <input id="res-checkin" name="checkIn" type="date" required aria-describedby="res-checkin-err" />
+      <p class="error" id="res-checkin-err" data-error-for="checkIn"></p>
+    </div>
+    <div class="field">
+      <label for="res-checkout">{f.checkOut}<span class="req" aria-hidden="true"> *</span></label>
+      <input id="res-checkout" name="checkOut" type="date" required aria-describedby="res-checkout-err" />
+      <p class="error" id="res-checkout-err" data-error-for="checkOut"></p>
+    </div>
+  </div>
+
+  <div class="form-row form-row--2">
+    <div class="field">
+      <label for="res-adults">{f.adults}<span class="req" aria-hidden="true"> *</span></label>
+      <input id="res-adults" name="adults" type="number" inputmode="numeric" min="1" max="30" value="2" required aria-describedby="res-adults-err" />
+      <p class="error" id="res-adults-err" data-error-for="adults"></p>
+    </div>
+    <div class="field">
+      <label for="res-children">{f.children}</label>
+      <input id="res-children" name="children" type="number" inputmode="numeric" min="0" max="30" value="0" />
+    </div>
+  </div>
+
+  <div class="field">
+    <label for="res-cabin">{f.cabin}</label>
+    <select id="res-cabin" name="cabin">
+      <option value="any">{f.cabinAny}</option>
+      {cabins.map((c) => (
+        <option value={c.slug}>{c.name[lang]} — {fmt(t.cabins.capacity, { n: c.capacity })}</option>
+      ))}
+      <option value="none">{f.cabinNone}</option>
+    </select>
+  </div>
+
+  <fieldset class="field">
+    <legend>{f.tours}</legend>
+    <div class="checks checks--3">
+      {tours.map((tour) => (
+        <label class="check">
+          <input type="checkbox" name="tours" value={tour.slug} />
+          <span>{tour.name[lang]} <span class="muted small">({fmt(t.tours.hours, { n: formatHours(tour.hours, lang) })})</span></span>
+        </label>
+      ))}
+    </div>
+  </fieldset>
+
+  <label class="check">
+    <input type="checkbox" name="breakfast" />
+    <span>{f.breakfast}</span>
+  </label>
+
+  <div class="form-row form-row--2">
+    <div class="field">
+      <label for="res-name">{f.name}<span class="req" aria-hidden="true"> *</span></label>
+      <input id="res-name" name="name" type="text" autocomplete="name" required maxlength="100" aria-describedby="res-name-err" />
+      <p class="error" id="res-name-err" data-error-for="name"></p>
+    </div>
+    <div class="field">
+      <label for="res-email">{f.email}<span class="req" aria-hidden="true"> *</span></label>
+      <input id="res-email" name="email" type="email" autocomplete="email" required maxlength="200" aria-describedby="res-email-err" />
+      <p class="error" id="res-email-err" data-error-for="email"></p>
+    </div>
+  </div>
+
+  <div class="form-row form-row--2">
+    <div class="field">
+      <label for="res-phone">{f.phone}<span class="req" aria-hidden="true"> *</span></label>
+      <input id="res-phone" name="phone" type="tel" autocomplete="tel" required maxlength="40" aria-describedby="res-phone-hint res-phone-err" />
+      <p class="hint" id="res-phone-hint">{f.phoneHint}</p>
+      <p class="error" id="res-phone-err" data-error-for="phone"></p>
+    </div>
+    <div class="field">
+      <label for="res-country">{f.country}</label>
+      <input id="res-country" name="country" type="text" autocomplete="country-name" maxlength="60" />
+    </div>
+  </div>
+
+  <div class="field">
+    <label for="res-message">{f.messageOptional}</label>
+    <textarea id="res-message" name="message" rows="4" maxlength="2000"></textarea>
+  </div>
+
+  <div class="field">
+    <label class="check" for="res-consent">
+      <input id="res-consent" type="checkbox" name="consent" required aria-describedby="res-consent-err" />
+      <span>{f.consent} <a href={url(lang, 'privacy')} class="text-link">{f.privacy}</a>.<span class="req" aria-hidden="true"> *</span></span>
+    </label>
+    <p class="error" id="res-consent-err" data-error-for="consent"></p>
+  </div>
+
+  <button type="submit" class="btn btn--lg btn--block">{f.sendReservation}</button>
+</form>
+
+<div id="reservation-success" class="form-success" tabindex="-1" hidden>
+  <h3><Icon name="check" size={22} class="icon" /> {f.successTitle}</h3>
+  <p data-ref>{f.successReservation}</p>
+  <p data-no-wa hidden>{f.successReservationNoWa}</p>
+  <a class="btn btn--lg" data-wa href="#" target="_blank" rel="noopener noreferrer" hidden data-track="whatsapp_click" data-track-location="reservation_success">
+    <Icon name="whatsapp" />{f.continueWhatsapp}<span class="sr-only"> {t.newTab}</span>
+  </a>
+</div>
+
+<script>
+  import { initInquiryForms } from '../scripts/forms';
+  initInquiryForms();
+</script>

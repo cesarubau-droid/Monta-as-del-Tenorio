@@ -1,0 +1,47 @@
+---
+import Photo from './Photo.astro';
+import Icon from './Icon.astro';
+import { formatUSD, type Cabin } from '../data/offer';
+import { useT, fmt } from '../i18n/ui';
+import { url, type Lang } from '../i18n/routes';
+
+interface Props { cabin: Cabin; lang: Lang; headingLevel?: 'h3' | 'h2' }
+const { cabin, lang, headingLevel: H = 'h3' } = Astro.props;
+const t = useT(lang);
+const name = cabin.name[lang];
+---
+<article class="card">
+  <div class="card__media">
+    <Photo id={cabin.image} lang={lang} />
+  </div>
+  <div class="card__body">
+    <H class="card__title">{name}</H>
+    <ul class="card__meta" role="list">
+      <li><Icon name="users" size={18} />{fmt(t.cabins.capacity, { n: cabin.capacity })}{cabin.capacityNote && ` ${cabin.capacityNote[lang]}`}</li>
+    </ul>
+    <p class="card__text">{cabin.summary[lang]}</p>
+    <p class="card__price">
+      {cabin.priceUSD !== null ? (
+        <>{formatUSD(cabin.priceUSD, lang)} <small>{t.cabins.perNight}</small></>
+      ) : (
+        <>{t.cabins.priceOnRequest}</>
+      )}
+    </p>
+    <div class="card__actions">
+      <a
+        class="btn"
+        href={`${url(lang, 'reserve')}?cabin=${cabin.slug}`}
+        data-track="cabin_click"
+        data-track-cabin={cabin.slug}
+        data-track-action="book"
+      >{t.cabins.book}<span class="sr-only">: {name}</span></a>
+      <a
+        class="btn btn--outline"
+        href={`${url(lang, 'cabins')}#${cabin.slug}`}
+        data-track="cabin_click"
+        data-track-cabin={cabin.slug}
+        data-track-action="details"
+      >{t.cabins.learnMore}<span class="sr-only">: {name}</span></a>
+    </div>
+  </div>
+</article>

@@ -1,0 +1,32 @@
+---
+/** Static 404 (bilingual, since it is served for any missing URL). */
+import Base from '../layouts/Base.astro';
+import { ui } from '../i18n/ui';
+const en = ui.en.notFound;
+const es = ui.es.notFound;
+---
+<Base lang="en" page="home" title="Page not found · Página no encontrada | Montañas del Tenorio" description={en.text} noindex>
+  <section class="section nf">
+    <div class="container nf__grid">
+      <div>
+        <p class="kicker">404</p>
+        <h1>{en.title}</h1>
+        <p class="lead">{en.text}</p>
+        <a class="btn btn--lg" href="/">{en.home}</a>
+      </div>
+      <div lang="es">
+        <p class="kicker" aria-hidden="true">404</p>
+        <h2>{es.title}</h2>
+        <p class="lead">{es.text}</p>
+        <a class="btn btn--lg btn--outline" href="/es">{es.home}</a>
+      </div>
+    </div>
+  </section>
+</Base>
+<style>
+  .nf { min-height: 60vh; display: grid; align-items: center; }
+  .nf__grid { display: grid; gap: var(--space-2xl); }
+  @media (min-width: 900px) { .nf__grid { grid-template-columns: 1fr 1fr; } }
+  .nf h2 { font-family: var(--font-sans); font-size: var(--fs-h1); }
+  .nf .lead { margin: var(--space-sm) 0 var(--space-lg); }
+</style>

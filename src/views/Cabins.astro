@@ -1,0 +1,69 @@
+---
+import PageHero from '../components/PageHero.astro';
+import Photo from '../components/Photo.astro';
+import Icon from '../components/Icon.astro';
+import ContactCta from '../components/ContactCta.astro';
+import { cabins, formatUSD } from '../data/offer';
+import { useT, fmt } from '../i18n/ui';
+import { url, type Lang } from '../i18n/routes';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+---
+<PageHero lang={lang} kicker={t.cabins.kicker} title={t.cabins.title} lead={t.cabins.lead} crumbs={[{ label: t.nav.cabins }]} />
+
+<section class="section">
+  <div class="container detail-list">
+    {cabins.map((c, i) => (
+      <article class:list={['split', 'detail', { 'split--reverse': i % 2 === 1 }]} id={c.slug} aria-labelledby={`${c.slug}-title`}>
+        <div class="detail__media">
+          <Photo id={c.image} lang={lang} sizes="(min-width: 900px) 50vw, 100vw" eager={i === 0} />
+        </div>
+        <div class="detail__body">
+          <h2 id={`${c.slug}-title`}>{c.name[lang]}</h2>
+          <p class="detail__cap"><Icon name="users" size={20} />{fmt(t.cabins.capacity, { n: c.capacity })}{c.capacityNote && ` ${c.capacityNote[lang]}`}</p>
+          <p>{c.description[lang]}</p>
+          <h3 class="detail__sub">{t.cabins.amenities}</h3>
+          <ul class="chip-list" role="list">
+            {c.features[lang].map((f) => <li class="chip">{f}</li>)}
+          </ul>
+          <p class="card__price detail__price">
+            <span class="sr-only">{t.cabins.priceLabel}: </span>
+            {c.priceUSD !== null ? <>{formatUSD(c.priceUSD, lang)} <small>{t.cabins.perNight}</small></> : t.cabins.priceOnRequest}
+          </p>
+          <div class="btn-row">
+            <a class="btn btn--lg" href={`${url(lang, 'reserve')}?cabin=${c.slug}`} data-track="reservation_start" data-track-cabin={c.slug}>
+              {t.cabins.book}<span class="sr-only">: {c.name[lang]}</span>
+            </a>
+          </div>
+        </div>
+      </article>
+    ))}
+  </div>
+</section>
+
+<section class="section section--surface" aria-labelledby="common-title">
+  <div class="container">
+    <h2 id="common-title">{t.cabins.commonTitle}</h2>
+    <ul class="common grid grid--3" role="list">
+      {t.cabins.common.map((line) => <li><Icon name="check" size={22} />{line}</li>)}
+    </ul>
+  </div>
+</section>
+
+<ContactCta lang={lang} />
+
+<style>
+  .detail-list { display: grid; gap: var(--space-3xl); }
+  .detail__media { position: relative; aspect-ratio: 3 / 2; border-radius: var(--radius-md); overflow: hidden; background: var(--surface-2); }
+  .detail__media :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .detail__body { display: grid; gap: var(--space-md); justify-items: start; }
+  .detail__body h2 { font-size: var(--fs-h2); }
+  .detail__cap { display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--accent); }
+  .detail__sub { font-size: var(--fs-h4); font-family: var(--font-sans); }
+  .detail__price { margin-top: 0; }
+  .common { margin-top: var(--space-lg); list-style: none; padding: 0; }
+  .common li { display: flex; gap: 12px; align-items: flex-start; }
+  .common :global(.icon) { color: var(--accent); margin-top: 3px; }
+</style>

@@ -1,0 +1,63 @@
+---
+/**
+ * FAQ: accordion on mobile (<640px); all answers visible on tablet/desktop
+ * (per spec). Built on <details> so it works without JavaScript.
+ */
+import Icon from './Icon.astro';
+import type { Faq } from '../data/content';
+import type { Lang } from '../i18n/routes';
+
+interface Props { items: Faq[]; lang: Lang; headingLevel?: 'h3' | 'h2' }
+const { items, lang, headingLevel: H = 'h3' } = Astro.props;
+---
+<div class="faq" data-faq>
+  {items.map((f) => (
+    <details class="faq__item" id={`faq-${f.id}`}>
+      <summary class="faq__q">
+        <H class="faq__title">{f.q[lang]}</H>
+        <Icon name="chevron" size={22} class="icon faq__chev" />
+      </summary>
+      <div class="faq__a"><p>{f.a[lang]}</p></div>
+    </details>
+  ))}
+</div>
+
+<style>
+  .faq { display: grid; gap: 0; border-top: 1px solid var(--border); }
+  .faq__item { border-bottom: 1px solid var(--border); }
+  .faq__q {
+    display: flex; align-items: center; justify-content: space-between; gap: var(--space-md);
+    min-height: 56px; padding: var(--space-md) 0; cursor: pointer; list-style: none;
+  }
+  .faq__q::-webkit-details-marker { display: none; }
+  .faq__title { font-size: var(--fs-h4); font-family: var(--font-sans); font-weight: 600; }
+  :global(.faq__chev) { color: var(--accent); transition: transform 200ms ease; }
+  .faq__item[open] :global(.faq__chev) { transform: rotate(180deg); }
+  .faq__a { padding-bottom: var(--space-md); max-width: 90%; color: var(--text-2); }
+  @media (min-width: 640px) {
+    .faq { grid-template-columns: 1fr 1fr; column-gap: var(--space-2xl); border-top: 0; }
+    .faq__item { border-bottom: 0; padding-block: var(--space-sm); }
+    .faq__q { cursor: default; min-height: 0; padding-bottom: var(--space-xs); }
+    :global(.faq__chev) { display: none; }
+    .faq__a { max-width: none; padding-bottom: 0; }
+  }
+</style>
+
+<script>
+  // Tablet/desktop: answers always visible (no toggle). Mobile: accordion.
+  const mq = matchMedia('(min-width: 640px)');
+  const apply = () => {
+    document.querySelectorAll<HTMLDetailsElement>('[data-faq] details').forEach((d) => {
+      d.open = mq.matches;
+      const s = d.querySelector('summary');
+      if (mq.matches) s?.setAttribute('tabindex', '-1');
+      else s?.removeAttribute('tabindex');
+    });
+  };
+  document.addEventListener('click', (e) => {
+    const s = (e.target as Element).closest('[data-faq] summary');
+    if (s && mq.matches) e.preventDefault();
+  });
+  mq.addEventListener('change', apply);
+  apply();
+</script>

@@ -1,0 +1,19 @@
+node_modules/
+dist/
+.vercel/
+.astro/
+.env
+.env.*
+!.env.example
+.DS_Store
+*.log
+.lighthouse/
+photos/
+
+# Generated at build time (scripts/build-assets.mjs)
+public/og-default.jpg
+public/apple-touch-icon.png
+# Provisional illustrations are generated at build time (scripts/generate-placeholders.mjs)
+public/images/**/*.svg
+# Lockfile not versioned yet (exact versions pinned in package.json)
+package-lock.json

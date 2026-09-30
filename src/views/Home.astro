@@ -1,0 +1,107 @@
+---
+import Hero from '../components/Hero.astro';
+import Photo from '../components/Photo.astro';
+import Icon from '../components/Icon.astro';
+import SectionHead from '../components/Sections.astro';
+import CabinCard from '../components/CabinCard.astro';
+import TourCard from '../components/TourCard.astro';
+import GalleryTabs from '../components/GalleryTabs.astro';
+import Trust from '../components/Trust.astro';
+import FaqList from '../components/FaqList.astro';
+import Sustainability from '../components/Sustainability.astro';
+import Testimonials from '../components/Testimonials.astro';
+import ContactCta from '../components/ContactCta.astro';
+import { cabins, tours } from '../data/offer';
+import { faqs } from '../data/content';
+import { useT } from '../i18n/ui';
+import { url, type Lang } from '../i18n/routes';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+const highlightIcons = ['eye', 'lookout', 'leaf', 'compass'] as const;
+---
+<Hero lang={lang} />
+
+<!-- About / story -->
+<section class="section" aria-labelledby="about-title">
+  <div class="container split">
+    <div class="about__media reveal">
+      <Photo id="founders" lang={lang} sizes="(min-width: 900px) 50vw, 100vw" />
+    </div>
+    <div class="reveal">
+      <p class="kicker">{t.about.kicker}</p>
+      <h2 id="about-title">{t.about.title}</h2>
+      <div class="prose about__body">
+        {t.about.body.map((p) => <p>{p}</p>)}
+      </div>
+      <a href={url(lang, 'story')} class="btn btn--outline about__link">{t.about.link}<Icon name="arrow" size={18} /></a>
+    </div>
+  </div>
+  <div class="container">
+    <h3 class="sr-only">{t.highlights.title}</h3>
+    <ul class="highlights grid grid--4" role="list">
+      {t.highlights.items.map((h, i) => (
+        <li class="highlight reveal">
+          <span class="icon-circle"><Icon name={highlightIcons[i]} /></span>
+          <h4>{h.title}</h4>
+          <p class="small muted">{h.text}</p>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<!-- Cabins -->
+<section class="section section--surface" id="cabins" aria-labelledby="cabins-title">
+  <div class="container">
+    <SectionHead kicker={t.cabins.kicker} title={t.cabins.title} lead={t.cabins.lead} id="cabins-title" />
+    <div class="grid grid--3">
+      {cabins.map((c) => <CabinCard cabin={c} lang={lang} />)}
+    </div>
+  </div>
+</section>
+
+<!-- Tours -->
+<section class="section" id="tours" aria-labelledby="tours-title">
+  <div class="container">
+    <SectionHead kicker={t.tours.kicker} title={t.tours.title} lead={t.tours.lead} id="tours-title" />
+    <div class="grid grid--3">
+      {tours.map((tour) => <TourCard tour={tour} lang={lang} />)}
+    </div>
+  </div>
+</section>
+
+<!-- Gallery -->
+<section class="section section--surface" aria-labelledby="gallery-title">
+  <div class="container">
+    <SectionHead kicker={t.gallery.kicker} title={t.gallery.title} lead={t.gallery.lead} id="gallery-title" />
+    <GalleryTabs lang={lang} idPrefix="home-gal" />
+    <div class="section-foot"><a class="btn btn--outline" href={url(lang, 'gallery')}>{t.gallery.seeAll}</a></div>
+  </div>
+</section>
+
+<Trust lang={lang} />
+
+<!-- FAQ -->
+<section class="section section--surface" aria-labelledby="faq-title">
+  <div class="container">
+    <SectionHead kicker={t.faq.kicker} title={t.faq.title} id="faq-title" />
+    <FaqList items={faqs.filter((f) => f.home)} lang={lang} />
+    <div class="section-foot"><a class="btn btn--outline" href={url(lang, 'faq')}>{t.faq.viewAll}</a></div>
+  </div>
+</section>
+
+<Sustainability lang={lang} />
+<Testimonials lang={lang} />
+<ContactCta lang={lang} />
+
+<style>
+  .about__media { position: relative; aspect-ratio: 4 / 3; border-radius: var(--radius-md); overflow: hidden; background: var(--surface-2); }
+  .about__media :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .about__body { margin-top: var(--space-md); }
+  .about__link { margin-top: var(--space-lg); }
+  .highlights { margin-top: var(--space-2xl); list-style: none; padding: 0; }
+  .highlight { display: flex; flex-direction: column; gap: 8px; }
+  .highlight h4 { margin-top: 4px; }
+</style>

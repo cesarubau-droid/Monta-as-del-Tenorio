@@ -1,0 +1,26 @@
+---
+import PageHero from '../components/PageHero.astro';
+import TourCard from '../components/TourCard.astro';
+import ContactCta from '../components/ContactCta.astro';
+import { tours } from '../data/offer';
+import { useT } from '../i18n/ui';
+import type { Lang } from '../i18n/routes';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+---
+<PageHero lang={lang} kicker={t.tours.kicker} title={t.tours.title} lead={t.tours.lead} crumbs={[{ label: t.nav.tours }]} />
+<section class="section" aria-labelledby="tours-list-title">
+  <div class="container">
+    <h2 id="tours-list-title" class="sr-only">{t.nav.tours}</h2>
+    <div class="grid grid--3">
+      {tours.map((tour) => <TourCard tour={tour} lang={lang} />)}
+    </div>
+    <p class="muted tours-note">{t.tours.askUs}</p>
+  </div>
+</section>
+<ContactCta lang={lang} />
+<style>
+  .tours-note { margin-top: var(--space-xl); text-align: center; max-width: 60ch; margin-inline: auto; }
+</style>

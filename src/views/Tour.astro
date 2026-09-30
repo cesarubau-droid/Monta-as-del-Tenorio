@@ -1,0 +1,68 @@
+---
+import PageHero from '../components/PageHero.astro';
+import Photo from '../components/Photo.astro';
+import Icon from '../components/Icon.astro';
+import TourCard from '../components/TourCard.astro';
+import ContactCta from '../components/ContactCta.astro';
+import { tours, formatHours, formatUSD, type Tour } from '../data/offer';
+import { whatsappUrl } from '../data/site';
+import { useT, fmt } from '../i18n/ui';
+import { url, type Lang } from '../i18n/routes';
+
+interface Props { lang: Lang; tour: Tour }
+const { lang, tour } = Astro.props;
+const t = useT(lang);
+const name = tour.name[lang];
+const others = tours.filter((x) => x.slug !== tour.slug);
+const wa = whatsappUrl(lang === 'es' ? `¡Hola! Me interesa el tour: ${name}.` : `Hi! I'm interested in the ${name}.`);
+---
+<PageHero lang={lang} kicker={t.tours.kicker} title={name} lead={tour.summary[lang]} crumbs={[{ label: t.nav.tours, href: url(lang, 'tours') }, { label: name }]} />
+
+<section class="section">
+  <div class="container split">
+    <div class="tour__media">
+      <Photo id={tour.image} lang={lang} sizes="(min-width: 900px) 50vw, 100vw" eager />
+    </div>
+    <div class="tour__body">
+      <h2>{t.tours.whatToExpect}</h2>
+      <div class="prose">{tour.description[lang].map((p) => <p>{p}</p>)}</div>
+      <dl class="facts">
+        <div><dt><Icon name="clock" size={20} />{t.tours.duration}</dt><dd>{fmt(t.tours.hours, { n: formatHours(tour.hours, lang) })}</dd></div>
+        <div><dt><Icon name="compass" size={20} />{t.tours.guide}</dt><dd>{t.tours.included}</dd></div>
+        <div><dt><Icon name="calendar" size={20} />{t.tours.priceLabel}</dt><dd>{tour.priceUSD !== null ? `${formatUSD(tour.priceUSD, lang)} ${t.tours.perPerson}` : t.tours.priceOnRequest}</dd></div>
+      </dl>
+      <p class="muted">{t.tours.askUs}</p>
+      <div class="btn-row">
+        <a class="btn btn--lg" href={`${url(lang, 'reserve')}?tour=${tour.slug}`} data-track="tour_click" data-track-tour={tour.slug} data-track-action="add_to_trip">{t.tours.addToTrip}</a>
+        {wa && (
+          <a class="btn btn--lg btn--outline" href={wa} target="_blank" rel="noopener noreferrer" data-track="whatsapp_click" data-track-location="tour_page" data-track-tour={tour.slug}>
+            <Icon name="whatsapp" />WhatsApp<span class="sr-only"> {t.newTab}</span>
+          </a>
+        )}
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section--surface" aria-labelledby="other-tours">
+  <div class="container">
+    <h2 id="other-tours" class="other-title">{t.tours.otherTours}</h2>
+    <div class="grid grid--2">
+      {others.map((o) => <TourCard tour={o} lang={lang} />)}
+    </div>
+  </div>
+</section>
+
+<ContactCta lang={lang} showLocation={false} />
+
+<style>
+  .tour__media { position: relative; aspect-ratio: 3 / 2; border-radius: var(--radius-md); overflow: hidden; background: var(--surface-2); }
+  .tour__media :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .tour__body { display: grid; gap: var(--space-md); justify-items: start; }
+  .facts { display: grid; gap: var(--space-sm); width: 100%; padding: var(--space-md); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); }
+  .facts div { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 16px; }
+  .facts dt { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+  .facts dt :global(.icon) { color: var(--accent); }
+  .facts dd { margin: 0; color: var(--text-2); }
+  .other-title { margin-bottom: var(--space-lg); }
+</style>

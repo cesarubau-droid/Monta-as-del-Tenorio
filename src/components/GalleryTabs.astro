@@ -1,0 +1,92 @@
+---
+import Photo from './Photo.astro';
+import { gallery, getMedia, type GalleryCategory } from '../data/media';
+import { useT } from '../i18n/ui';
+import type { Lang } from '../i18n/routes';
+
+interface Props { lang: Lang; idPrefix?: string }
+const { lang, idPrefix = 'gal' } = Astro.props;
+const t = useT(lang);
+const cats = Object.keys(gallery) as GalleryCategory[];
+const provisional = cats.some((c) => gallery[c].some((id) => getMedia(id).placeholder));
+---
+<div class="gallery" data-tabs>
+  <div class="gallery__tabs" role="tablist" aria-label={t.gallery.tabsLabel}>
+    {cats.map((c, i) => (
+      <button
+        type="button"
+        role="tab"
+        id={`${idPrefix}-tab-${c}`}
+        aria-controls={`${idPrefix}-panel-${c}`}
+        aria-selected={i === 0 ? 'true' : 'false'}
+        tabindex={i === 0 ? 0 : -1}
+        class="gallery__tab"
+      >{t.gallery.categories[c]}</button>
+    ))}
+  </div>
+  {cats.map((c, i) => (
+    <div
+      class:list={['gallery__panel', { 'is-active': i === 0 }]}
+      role="tabpanel"
+      id={`${idPrefix}-panel-${c}`}
+      aria-labelledby={`${idPrefix}-tab-${c}`}
+      tabindex="0"
+    >
+      <ul class="gallery__grid" role="list">
+        {gallery[c].map((id) => (
+          <li class="gallery__item">
+            <Photo id={id} lang={lang} sizes="(min-width: 1024px) 25vw, 50vw" tag={false} />
+          </li>
+        ))}
+      </ul>
+    </div>
+  ))}
+  {provisional && <p class="gallery__note small muted">{t.gallery.placeholderNote}</p>}
+</div>
+
+<style>
+  .gallery__tabs { display: flex; gap: 4px; overflow-x: auto; border-bottom: 1px solid var(--border); margin-bottom: var(--space-lg); scrollbar-width: thin; }
+  .gallery__tab {
+    flex: none; min-height: 48px; padding: 8px 16px;
+    background: transparent; border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px;
+    color: var(--text-2); font-size: var(--fs-sm); font-weight: 600; white-space: nowrap;
+    transition: color 200ms ease, background-color 200ms ease, border-color 200ms ease;
+  }
+  .gallery__tab:focus-visible { outline-offset: -3px; }
+  .gallery__tab:hover { background: var(--surface); color: var(--text); }
+  .gallery__tab[aria-selected='true'] { color: var(--accent); border-bottom-color: var(--accent); }
+  :global(html.js) .gallery__panel:not(.is-active) { display: none; }
+  :global(html:not(.js)) .gallery__panel + .gallery__panel { margin-top: var(--space-lg); }
+  .gallery__panel:focus-visible { outline-offset: 4px; }
+  .gallery__grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-md); list-style: none; padding: 0; }
+  @media (min-width: 640px) { .gallery__grid { gap: var(--space-lg); } }
+  @media (min-width: 1024px) { .gallery__grid { grid-template-columns: repeat(4, 1fr); } }
+  .gallery__item { position: relative; aspect-ratio: 4 / 3; border-radius: var(--radius-md); overflow: hidden; background: var(--surface-2); }
+  .gallery__item :global(img) { width: 100%; height: 100%; object-fit: cover; transition: transform 400ms var(--ease); }
+  @media (prefers-reduced-motion: no-preference) { .gallery__item:hover :global(img) { transform: scale(1.04); } }
+  .gallery__note { margin-top: var(--space-md); }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-tabs]').forEach((root) => {
+    const tabs = [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    const select = (tab: HTMLButtonElement, focus = true) => {
+      tabs.forEach((t) => {
+        const on = t === tab;
+        t.setAttribute('aria-selected', String(on));
+        t.tabIndex = on ? 0 : -1;
+        document.getElementById(t.getAttribute('aria-controls') || '')?.classList.toggle('is-active', on);
+      });
+      if (focus) tab.focus();
+    };
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', () => select(tab, false));
+      tab.addEventListener('keydown', (e) => {
+        const map: Record<string, number> = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: tabs.length - 1 };
+        if (!(e.key in map)) return;
+        e.preventDefault();
+        select(tabs[(map[e.key] + tabs.length) % tabs.length]);
+      });
+    });
+  });
+</script>

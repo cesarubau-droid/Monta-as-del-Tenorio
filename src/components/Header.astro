@@ -1,0 +1,190 @@
+---
+import Icon from './Icon.astro';
+import Logo from './Logo.astro';
+import { useT } from '../i18n/ui';
+import { url, switchLangPath, type Lang, type RouteKey } from '../i18n/routes';
+
+interface Props { lang: Lang; current?: RouteKey }
+const { lang, current } = Astro.props;
+const t = useT(lang);
+const other: Lang = lang === 'en' ? 'es' : 'en';
+const links: { key: RouteKey; label: string }[] = [
+  { key: 'home', label: t.nav.home },
+  { key: 'cabins', label: t.nav.cabins },
+  { key: 'tours', label: t.nav.tours },
+  { key: 'gallery', label: t.nav.gallery },
+  { key: 'contact', label: t.nav.contact },
+];
+const switchHref = switchLangPath(Astro.url.pathname, other);
+---
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a href={url(lang, 'home')} class="brand">
+      <Logo />
+    </a>
+
+    <nav id="site-nav" class="site-nav" aria-label={t.nav.label} data-open="false">
+      <ul role="list" class="site-nav__list">
+        {links.map((l) => (
+          <li>
+            <a href={url(lang, l.key)} class="site-nav__link" aria-current={current === l.key ? 'page' : undefined}>
+              {l.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+      <a href={url(lang, 'reserve')} class="btn site-nav__cta" data-track="reservation_start" data-track-location="header">
+        {t.nav.reserve}
+      </a>
+    </nav>
+
+    <div class="site-header__tools">
+      <a
+        href={switchHref}
+        class="tool-btn lang-switch"
+        hreflang={other}
+        lang={other}
+        aria-label={t.nav.switchTo}
+        data-track="language_switch"
+        data-track-to={other}
+      >
+        <Icon name="globe" size={20} />
+        <span>{other.toUpperCase()}</span>
+      </a>
+      <button type="button" class="tool-btn theme-toggle" aria-pressed="false" data-theme-toggle>
+        <span class="sr-only">{t.nav.themeToggle}</span>
+        <Icon name="moon" size={20} class="icon theme-toggle__moon" />
+        <Icon name="sun" size={20} class="icon theme-toggle__sun" />
+      </button>
+      <a href={url(lang, 'reserve')} class="btn header-cta" data-track="reservation_start" data-track-location="header">
+        {t.nav.reserve}
+      </a>
+      <button
+        type="button"
+        class="tool-btn menu-toggle"
+        aria-expanded="false"
+        aria-controls="site-nav"
+        data-label-open={t.nav.openMenu}
+        data-label-close={t.nav.closeMenu}
+        aria-label={t.nav.openMenu}
+      >
+        <Icon name="menu" size={24} class="icon menu-toggle__open" />
+        <Icon name="close" size={24} class="icon menu-toggle__close" />
+      </button>
+    </div>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky; top: 0; z-index: 100;
+    background: color-mix(in srgb, var(--bg) 94%, transparent);
+    backdrop-filter: saturate(1.4) blur(8px);
+    border-bottom: 1px solid var(--border);
+  }
+  .site-header__inner { display: flex; align-items: center; gap: 8px; min-height: var(--header-h); }
+  .brand { display: inline-flex; align-items: center; min-height: 44px; color: var(--text); text-decoration: none; margin-right: auto; }
+  .brand:hover { text-decoration: none; }
+  .site-header__tools { display: flex; align-items: center; gap: 4px; }
+  .tool-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+    min-width: 44px; min-height: 44px; padding: 0 8px;
+    background: transparent; border: 1px solid transparent; border-radius: var(--radius-md);
+    color: var(--text); font-size: var(--fs-sm); font-weight: 600; text-decoration: none;
+  }
+  .tool-btn:hover { background: var(--surface); text-decoration: none; }
+  :global(.theme-toggle__sun) { display: none; }
+  :global(:root[data-theme='dark']) :global(.theme-toggle__sun) { display: block; }
+  :global(:root[data-theme='dark']) :global(.theme-toggle__moon) { display: none; }
+  :global(.menu-toggle__close) { display: none; }
+  .menu-toggle[aria-expanded='true'] :global(.menu-toggle__open) { display: none; }
+  .menu-toggle[aria-expanded='true'] :global(.menu-toggle__close) { display: block; }
+  .header-cta { display: none; }
+  .brand { min-width: 0; }
+  @media (max-width: 639px) {
+    .lang-switch :global(.icon) { display: none; }
+    .site-header__tools { gap: 0; }
+    .site-header__inner { gap: 4px; }
+  }
+
+  /* Mobile: collapsible panel */
+  .site-nav {
+    position: absolute; top: 100%; left: 0; right: 0;
+    background: var(--bg); border-bottom: 1px solid var(--border); box-shadow: var(--shadow-md);
+    padding: 8px var(--gutter) 24px;
+    display: none;
+  }
+  .site-nav[data-open='true'] { display: block; }
+  :global(html:not(.js)) .site-nav { position: static; display: block; box-shadow: none; border: 0; padding: 0; }
+  :global(html:not(.js)) .menu-toggle { display: none; }
+  .site-nav__list { list-style: none; padding: 0; }
+  .site-nav__link {
+    display: flex; align-items: center; min-height: 48px; padding: 8px 16px;
+    font-size: 1rem; font-weight: 600; color: var(--text-2); border-radius: var(--radius-md);
+    transition: color 200ms ease, background-color 200ms ease;
+  }
+  .site-nav__link:hover, .site-nav__link[aria-current='page'] { color: var(--accent); text-decoration: none; background: var(--surface); }
+  .site-nav__cta { width: 100%; margin-top: 12px; }
+
+  @media (min-width: 640px) {
+    .menu-toggle { display: none; }
+    .site-nav { position: static; display: block; background: none; border: 0; box-shadow: none; padding: 0; }
+    .site-nav__list { display: flex; gap: 0; }
+    .site-nav__link { font-size: var(--fs-sm); padding: 8px 10px; min-height: 44px; background: none !important; position: relative; }
+    .site-nav__link[aria-current='page']::after {
+      content: ''; position: absolute; left: 10px; right: 10px; bottom: 4px; height: 2px; background: var(--accent); border-radius: 2px;
+    }
+    .site-nav__cta { display: none; }
+  }
+  @media (min-width: 1024px) {
+    .site-header__inner { gap: 16px; }
+    .site-nav__link { padding: 8px 16px; }
+    .site-nav__link[aria-current='page']::after { left: 16px; right: 16px; }
+    .header-cta { display: inline-flex; min-height: 44px; padding: 10px 20px; margin-left: 8px; }
+  }
+</style>
+
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>('.menu-toggle');
+  const nav = document.getElementById('site-nav');
+  if (toggle && nav) {
+    const setOpen = (open: boolean) => {
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.setAttribute('aria-label', (open ? toggle.dataset.labelClose : toggle.dataset.labelOpen) || '');
+      nav.dataset.open = String(open);
+      if (open) nav.querySelector<HTMLElement>('a')?.focus();
+    };
+    toggle.addEventListener('click', () => setOpen(toggle.getAttribute('aria-expanded') !== 'true'));
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+    nav.addEventListener('click', (e) => {
+      if ((e.target as HTMLElement).closest('a')) setOpen(false);
+    });
+    document.addEventListener('click', (e) => {
+      const target = e.target as Node;
+      if (toggle.getAttribute('aria-expanded') === 'true' && !nav.contains(target) && !toggle.contains(target)) setOpen(false);
+    });
+    matchMedia('(min-width: 640px)').addEventListener('change', (e) => e.matches && setOpen(false));
+  }
+
+  // Theme toggle (initial theme is set inline in <head> to avoid a flash)
+  const themeBtn = document.querySelector<HTMLButtonElement>('[data-theme-toggle]');
+  const root = document.documentElement;
+  const sync = () => themeBtn?.setAttribute('aria-pressed', String(root.dataset.theme === 'dark'));
+  sync();
+  themeBtn?.addEventListener('click', () => {
+    const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+    root.dataset.theme = next;
+    try { localStorage.setItem('theme', next); } catch { /* storage unavailable */ }
+    sync();
+  });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    let stored: string | null = null;
+    try { stored = localStorage.getItem('theme'); } catch { /* ignore */ }
+    if (!stored) { root.dataset.theme = e.matches ? 'dark' : 'light'; sync(); }
+  });
+</script>

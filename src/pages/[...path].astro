@@ -1,0 +1,66 @@
+---
+/**
+ * Single router for every static page in both languages.
+ * EN lives at the root (/cabins), ES under /es (/es/cabins).
+ */
+import Base from '../layouts/Base.astro';
+import Home from '../views/Home.astro';
+import Cabins from '../views/Cabins.astro';
+import Tours from '../views/Tours.astro';
+import TourView from '../views/Tour.astro';
+import Pages from '../views/Pages.astro';
+import { tours } from '../data/offer';
+import { languages, routes, defaultLang, type Lang, type RouteKey } from '../i18n/routes';
+import { useT } from '../i18n/ui';
+
+export function getStaticPaths() {
+  const out: { params: { path: string | undefined }; props: { lang: Lang; key: RouteKey; tour?: string } }[] = [];
+  for (const lang of languages) {
+    const prefix = lang === defaultLang ? '' : lang;
+    for (const key of Object.keys(routes) as RouteKey[]) {
+      const path = [prefix, routes[key]].filter(Boolean).join('/') || undefined;
+      out.push({ params: { path }, props: { lang, key } });
+    }
+    for (const tour of tours) {
+      out.push({ params: { path: [prefix, 'tours', tour.slug].filter(Boolean).join('/') }, props: { lang, key: 'tours', tour: tour.slug } });
+    }
+  }
+  return out;
+}
+
+const { lang, key, tour: tourSlug } = Astro.props;
+const t = useT(lang);
+const tour = tourSlug ? tours.find((x) => x.slug === tourSlug) : undefined;
+
+const simple = ['gallery', 'contact', 'reserve', 'faq', 'story', 'sustainability', 'deposit', 'privacy', 'terms', 'policy'] as const;
+type Simple = (typeof simple)[number];
+const isSimple = (simple as readonly string[]).includes(key);
+
+const siteUrl = Astro.site ?? new URL(Astro.url.origin);
+const tourJsonLd = tour
+  ? [{
+      '@context': 'https://schema.org',
+      '@type': 'TouristTrip',
+      name: tour.name[lang],
+      description: tour.summary[lang],
+      touristType: lang === 'es' ? 'Naturaleza y aventura' : 'Nature and adventure',
+      provider: { '@type': 'LodgingBusiness', name: 'Montañas del Tenorio', url: new URL('/', siteUrl).href },
+    }]
+  : [];
+const current: RouteKey | undefined = ['home', 'cabins', 'tours', 'gallery', 'contact'].includes(key) ? key : undefined;
+---
+<Base
+  lang={lang}
+  page={key}
+  current={current}
+  title={tour ? `${tour.name[lang]} | Montañas del Tenorio` : undefined}
+  description={tour ? tour.summary[lang] : undefined}
+  noindex={key === 'deposit'}
+  jsonLd={tourJsonLd}
+>
+  {key === 'home' && <Home lang={lang} />}
+  {key === 'cabins' && <Cabins lang={lang} />}
+  {key === 'tours' && !tour && <Tours lang={lang} />}
+  {tour && <TourView lang={lang} tour={tour} />}
+  {isSimple && <Pages lang={lang} kind={key as Simple} />}
+</Base>

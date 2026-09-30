@@ -1,0 +1,43 @@
+---
+import Icon from './Icon.astro';
+import { site } from '../data/site';
+import { useT } from '../i18n/ui';
+import type { Lang } from '../i18n/routes';
+
+interface Props { lang: Lang; class?: string }
+const { lang, class: cls } = Astro.props;
+const t = useT(lang);
+const items = [
+  { id: 'instagram', label: 'Instagram', href: site.social.instagram },
+  { id: 'facebook', label: 'Facebook', href: site.social.facebook },
+  { id: 'tiktok', label: 'TikTok', href: site.social.tiktok },
+].filter((i) => i.href) as { id: 'instagram' | 'facebook' | 'tiktok'; label: string; href: string }[];
+---
+{
+  items.length > 0 && (
+    <ul class:list={['social', cls]} role="list">
+      {items.map((i) => (
+        <li>
+          <a
+            href={i.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`${i.label} ${t.newTab}`}
+            data-track="social_click"
+            data-track-network={i.id}
+          >
+            <Icon name={i.id} />
+          </a>
+        </li>
+      ))}
+    </ul>
+  )
+}
+<style>
+  .social { display: flex; gap: 8px; list-style: none; padding: 0; }
+  .social a {
+    display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 50%;
+    color: inherit; border: 1px solid currentColor; transition: background-color 200ms ease;
+  }
+  .social a:hover { background: color-mix(in srgb, currentColor 12%, transparent); }
+</style>

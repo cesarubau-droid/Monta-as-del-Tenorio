@@ -1,0 +1,32 @@
+---
+/**
+ * PROVISIONAL wordmark (no official logo was provided).
+ * To use the official logo: save it as public/brand/logo.svg and replace the
+ * markup below with <img src="/brand/logo.svg" alt="" width="…" height="36" />.
+ */
+interface Props { inverse?: boolean }
+const { inverse = false } = Astro.props;
+---
+<span class:list={['logo', { 'logo--inverse': inverse }]}>
+  <svg class="logo__mark" width="36" height="36" viewBox="0 0 36 36" aria-hidden="true" focusable="false">
+    <circle cx="18" cy="18" r="18" fill="#0A7266" />
+    <path d="M5 26 L14 13 L19 20 L23 15 L31 26 Z" fill="#fff" />
+    <path d="M9 29 C14 26 22 26 27 29" stroke="#6FD3D6" stroke-width="2.5" fill="none" stroke-linecap="round" />
+  </svg>
+  <span class="logo__text">
+    <span class="logo__name">Montañas del Tenorio</span>
+    <span class="logo__sub">Río Celeste · Costa Rica</span>
+  </span>
+</span>
+<style>
+  .logo { display: inline-flex; align-items: center; gap: 10px; }
+  .logo__mark { flex: none; }
+  .logo__text { display: flex; flex-direction: column; line-height: 1.1; min-width: 0; }
+  .logo__name { font-family: var(--font-serif); font-weight: 700; font-size: 1.0625rem; color: var(--text); white-space: nowrap; }
+  .logo__sub { font-size: 0.75rem; color: var(--text-2); letter-spacing: 0.04em; white-space: nowrap; }
+  .logo--inverse .logo__name, .logo--inverse .logo__sub { color: #fff; }
+  @media (min-width: 640px) and (max-width: 899px) {
+    .logo__text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  }
+  @media (max-width: 379px) { .logo__name { font-size: 0.9375rem; } .logo__sub { display: none; } }
+</style>

@@ -1,0 +1,45 @@
+---
+import Icon from './Icon.astro';
+import { site } from '../data/site';
+import { useT, fmt } from '../i18n/ui';
+import type { Lang } from '../i18n/routes';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+// Map link: configured Google Maps URL, or a search for Río Celeste as fallback.
+const mapHref = site.mapsUrl ?? 'https://www.google.com/maps/search/?api=1&query=R%C3%ADo+Celeste%2C+Volc%C3%A1n+Tenorio%2C+Costa+Rica';
+---
+<div class="loc" id="location">
+  <h3 class="loc__title">{t.contact.locationTitle}</h3>
+  <p class="loc__lead"><Icon name="pin" />{t.contact.location}</p>
+  <ul class="loc__list" role="list">
+    <li><Icon name="plane" />{fmt(t.contact.fromLIR, { n: site.travel.lirHours })}</li>
+    <li><Icon name="plane" />{fmt(t.contact.fromSJO, { n: site.travel.sjoHours })}</li>
+    <li><Icon name="car" />{t.contact.access}</li>
+  </ul>
+  <a class="btn btn--outline" href={mapHref} target="_blank" rel="noopener noreferrer" data-track="map_click">
+    <Icon name="pin" />{t.contact.openMap}<span class="sr-only"> {t.newTab}</span>
+  </a>
+  {site.mapsEmbedUrl && (
+    <iframe
+      class="loc__map"
+      src={site.mapsEmbedUrl}
+      title={t.contact.locationTitle + ' — Google Maps'}
+      loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade"
+      width="600"
+      height="300"
+    ></iframe>
+  )}
+</div>
+<style>
+  .loc { margin-top: var(--space-xl); display: grid; gap: var(--space-sm); padding: var(--space-lg); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); }
+  @media (min-width: 900px) { .loc { grid-template-columns: 1fr 1.4fr auto; align-items: center; column-gap: var(--space-xl); } .loc__title { grid-column: 1 / -1; } }
+  .loc__title { font-size: var(--fs-h4); }
+  .loc__lead, .loc__list li { display: flex; gap: 10px; align-items: flex-start; }
+  .loc :global(.icon) { color: var(--accent); margin-top: 3px; }
+  .loc .btn :global(.icon) { color: inherit; margin: 0; }
+  .loc__map { grid-column: 1 / -1; width: 100%; height: 300px; border: 0; border-radius: var(--radius-md); margin-top: var(--space-sm); }
+  .loc__list { display: grid; gap: 6px; list-style: none; padding: 0; font-size: var(--fs-sm); }
+</style>

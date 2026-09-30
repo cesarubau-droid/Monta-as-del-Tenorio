@@ -1,0 +1,68 @@
+---
+import Logo from './Logo.astro';
+import SocialLinks from './SocialLinks.astro';
+import { useT } from '../i18n/ui';
+import { url, type Lang } from '../i18n/routes';
+import { site } from '../data/site';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+const year = new Date().getFullYear();
+---
+<footer class="site-footer on-dark">
+  <div class="container site-footer__grid">
+    <div class="site-footer__brand">
+      <Logo inverse />
+      <p>{t.footer.tagline}</p>
+      <p class="site-footer__region">{site.region[lang]}</p>
+      <SocialLinks lang={lang} />
+    </div>
+    <nav aria-label={t.footer.explore}>
+      <h2 class="site-footer__title">{t.footer.explore}</h2>
+      <ul role="list">
+        <li><a href={url(lang, 'home')}>{t.nav.home}</a></li>
+        <li><a href={url(lang, 'cabins')}>{t.nav.cabins}</a></li>
+        <li><a href={url(lang, 'tours')}>{t.nav.tours}</a></li>
+        <li><a href={url(lang, 'gallery')}>{t.nav.gallery}</a></li>
+        <li><a href={url(lang, 'contact')}>{t.nav.contact}</a></li>
+        <li><a href={url(lang, 'reserve')}>{t.nav.reserve}</a></li>
+      </ul>
+    </nav>
+    <nav aria-label={t.footer.info}>
+      <h2 class="site-footer__title">{t.footer.info}</h2>
+      <ul role="list">
+        <li><a href={url(lang, 'story')}>{t.footer.story}</a></li>
+        <li><a href={url(lang, 'sustainability')}>{t.footer.sustainability}</a></li>
+        <li><a href={url(lang, 'faq')}>{t.footer.faq}</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="container site-footer__bottom">
+    <p>© {year} Montañas del Tenorio. {t.footer.rights}</p>
+    <ul role="list" class="site-footer__legal">
+      <li><a href={url(lang, 'privacy')}>{t.footer.privacy}</a></li>
+      <li><a href={url(lang, 'terms')}>{t.footer.terms}</a></li>
+      <li><a href={url(lang, 'policy')}>{t.footer.policy}</a></li>
+    </ul>
+  </div>
+</footer>
+<style>
+  .site-footer { background: #13302b; color: #d9e6e3; padding-block: var(--space-2xl) var(--space-xl); }
+  .site-footer a { color: #ffffff; }
+  .site-footer__grid { display: grid; gap: var(--space-xl); }
+  @media (min-width: 640px) { .site-footer__grid { grid-template-columns: 2fr 1fr 1fr; } }
+  .site-footer__brand p { margin-top: var(--space-sm); max-width: 36ch; }
+  .site-footer__region { font-size: var(--fs-sm); }
+  .site-footer__brand :global(.social) { margin-top: var(--space-md); }
+  .site-footer__title { font-family: var(--font-sans); font-size: var(--fs-label); letter-spacing: 0.12em; text-transform: uppercase; color: #9fd8cf; margin-bottom: 8px; }
+  .site-footer ul { list-style: none; padding: 0; }
+  .site-footer nav a { display: inline-flex; align-items: center; min-height: 44px; }
+  .site-footer__bottom {
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-sm);
+    margin-top: var(--space-xl); padding-top: var(--space-lg); border-top: 1px solid rgba(255, 255, 255, 0.18);
+    font-size: var(--fs-sm);
+  }
+  .site-footer__legal { display: flex; flex-wrap: wrap; gap: 0 var(--space-md); }
+  .site-footer__legal a { display: inline-flex; min-height: 44px; align-items: center; }
+</style>

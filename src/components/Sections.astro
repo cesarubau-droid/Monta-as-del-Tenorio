@@ -1,0 +1,14 @@
+---
+/**
+ * Small shared section header.
+ * <Sections kicker="…" title="…" lead="…" center id="…" />
+ */
+interface Props { kicker?: string; title: string; lead?: string; center?: boolean; id?: string; level?: 'h1' | 'h2' }
+const { kicker, title, lead, center = false, id, level: H = 'h2' } = Astro.props;
+---
+<div class:list={['section-head', { 'section-head--center': center }]}>
+  {kicker && <p class="kicker">{kicker}</p>}
+  <H id={id}>{title}</H>
+  {lead && <p class="lead">{lead}</p>}
+  <slot />
+</div>
