@@ -1,0 +1,61 @@
+---
+/**
+ * Botón "Volver arriba".
+ * Aparece cuando el usuario ya bajó por la página (más de 600 px) y lo lleva
+ * de vuelta al inicio. Se ubica encima del botón flotante de WhatsApp.
+ */
+import Icon from './Icon.astro';
+import { useT } from '../i18n/ui';
+import type { Lang } from '../i18n/routes';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+---
+<button type="button" class="to-top" data-to-top aria-label={t.backToTop} title={t.backToTop}>
+  <Icon name="up" size={22} />
+</button>
+
+<style>
+  .to-top {
+    position: fixed; right: 20px; bottom: 84px; z-index: 89;
+    display: grid; place-items: center; width: 48px; height: 48px; padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.18); border-radius: 50%;
+    background: var(--petrol); color: var(--celeste-soft); cursor: pointer;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+    /* Oculto por defecto: no se ve ni recibe foco hasta que aparece */
+    opacity: 0; visibility: hidden; transform: translateY(12px);
+    transition: opacity 200ms ease, transform 200ms var(--ease), visibility 0s linear 200ms, background-color 200ms ease;
+  }
+  .to-top.is-visible {
+    opacity: 1; visibility: visible; transform: none;
+    transition: opacity 200ms ease, transform 200ms var(--ease), visibility 0s, background-color 200ms ease;
+  }
+  .to-top:hover { background: var(--petrol-mid); color: #fff; }
+  .to-top:focus-visible { outline: 3px solid var(--celeste); outline-offset: 3px; }
+  @media (min-width: 1024px) { .to-top { right: 28px; bottom: 92px; } }
+  :global(:root[data-theme='dark']) .to-top { background: var(--petrol-mid); color: #fff; }
+</style>
+
+<script>
+  const btn = document.querySelector<HTMLButtonElement>('[data-to-top]');
+  if (btn) {
+    const THRESHOLD = 600;
+    let ticking = false;
+    const update = () => {
+      btn.classList.toggle('is-visible', window.scrollY > THRESHOLD);
+      ticking = false;
+    };
+    window.addEventListener('scroll', () => {
+      if (!ticking) { ticking = true; requestAnimationFrame(update); }
+    }, { passive: true });
+    update();
+
+    btn.addEventListener('click', () => {
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+      // Accesibilidad: el foco vuelve al inicio del contenido, no se queda en un botón que desaparece
+      document.getElementById('main')?.focus({ preventScroll: true });
+    });
+  }
+</script>

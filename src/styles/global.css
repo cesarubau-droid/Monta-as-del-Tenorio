@@ -130,6 +130,10 @@
 *, *::before, *::after { box-sizing: border-box; }
 * { margin: 0; }
 html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-padding-top: calc(var(--header-h) + 16px); }
+/* Sin barra de desplazamiento de la página (se sigue pudiendo desplazar con rueda, teclado y táctil).
+   La navegación hacia arriba la da el botón "Volver arriba" (BackToTop.astro). */
+html { scrollbar-width: none; }
+html::-webkit-scrollbar { display: none; }
 @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
 body {
   font-family: var(--font-sans);
