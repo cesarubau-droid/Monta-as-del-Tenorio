@@ -23,6 +23,8 @@ const palettes = {
   mist: { sky: ['#DDE8E4', '#F4F7F5'], m: ['#A9C9BE', '#6FA896', '#3F8A72', '#24644E'] },
   dusk: { sky: ['#F3D3C2', '#FBEDE4'], m: ['#C79A86', '#8E7A6B', '#4E6B5A', '#2F4D3F'] },
   night: { sky: ['#0E1B2B', '#1C3346'], m: ['#23415A', '#1B3447', '#132736', '#0B1822'] },
+  // Río y volcán: atardecer azul petróleo sobre el río celeste
+  petrol: { sky: ['#0F3D45', '#3F7F86'], m: ['#2A6B74', '#1D555D', '#0F3D45', '#0A2A30'] },
   cacao: { sky: ['#F1E2D3', '#FAF3EC'], m: ['#C9A184', '#9C7153', '#6E4B35', '#4A3122'] },
 };
 
@@ -94,7 +96,7 @@ const S43 = [1200, 900];
 
 // Hero slides carry no in-image label: the hero shows an HTML "Provisional image" note instead.
 const jobs = [
-  ['hero/hero-forest-river', S169, { palette: 'mist', river: true, label: false }],
+  ['hero/hero-forest-river', S169, { palette: 'petrol', river: true, label: false }],
   ['hero/hero-cabin-couple', S169, { palette: 'dusk', icon: ['cabin'], label: false }],
   ['hero/hero-family-tubing', S169, { palette: 'day', river: true, icon: ['tube'], label: false }],
   ['hero/hero-wildlife', S169, { palette: 'day', icon: ['bird', 'frog'], label: false }],

@@ -26,12 +26,12 @@ const formHref = `${url(lang, 'contact')}#contact-form`;
             </a>
           ) : null
         }
-        <a class="btn btn--lg btn--purple" href={formHref} data-track="contact_click" data-track-location="contact_section">
+        <a class="btn btn--lg btn--outline" href={formHref} data-track="contact_click" data-track-location="contact_section">
           <Icon name="form" />{t.contact.form}
         </a>
         {
           site.email && (
-            <a class="btn btn--lg btn--blue" href={`mailto:${site.email}`} data-track="email_click" data-track-location="contact_section">
+            <a class="btn btn--lg btn--outline" href={`mailto:${site.email}`} data-track="email_click" data-track-location="contact_section">
               <Icon name="mail" />{t.contact.email}
             </a>
           )
@@ -45,13 +45,9 @@ const formHref = `${url(lang, 'contact')}#contact-form`;
   </div>
 </section>
 <style>
-  .cta__box {
-    text-align: center; padding: var(--space-2xl) var(--space-lg); border-radius: var(--radius-md);
-    background: color-mix(in srgb, var(--coral) 9%, var(--bg)); border: 1px solid color-mix(in srgb, var(--coral) 35%, var(--border));
-  }
-  .cta__box .kicker { color: var(--coral-ink); }
-  :global(:root[data-theme='dark']) .cta__box .kicker { color: #f0a283; }
-  .cta__quote { margin: var(--space-sm) auto 0; max-width: 52ch; }
+  .cta__box { text-align: center; }
+  .cta__box h2 { font-size: var(--fs-display); line-height: 1; }
+  .cta__quote { margin: var(--space-md) auto 0; max-width: 52ch; }
   .cta__buttons { display: grid; gap: var(--space-lg); margin-top: var(--space-xl); }
   @media (min-width: 640px) { .cta__buttons { display: flex; justify-content: center; flex-wrap: wrap; } }
   @media (min-width: 1024px) { .cta__buttons { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 240px); justify-content: center; } }
