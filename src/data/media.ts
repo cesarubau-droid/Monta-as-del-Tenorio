@@ -61,9 +61,9 @@ export const media: Record<string, MediaItem> = Object.fromEntries([
   ph('about', 'founders', '4:3', 'Portrait of the founding family at the property', 'the family behind Montañas del Tenorio', 'la familia detrás de Montañas del Tenorio'),
   ph('about', 'lookout', '4:3', 'View from the lookout on the property', 'the lookout on the property', 'el mirador de la propiedad'),
   // CABINS (3:2)
-  ph('cabins', 'cabin-rustic', '3:2', 'Cabin 1 — 100% rustic wooden cabin with forest view (sleeps 7)', 'the rustic wooden cabin', 'la cabaña rústica de madera'),
-  ph('cabins', 'cabin-semirustic', '3:2', 'Cabin 2 — wooden exterior and terrace with forest view (sleeps 4)', 'the semi-rustic cabin and its terrace', 'la cabaña semirrústica y su terraza'),
-  ph('cabins', 'cabin-accessible', '3:2', 'Cabin 3 — accessible cabin (Ley 7600), terrace for birdwatching', 'the accessible cabin terrace', 'la terraza de la cabaña accesible'),
+  ph('cabins', 'cabin-rustic', '3:2', 'Tenorio Cabin — 2 bedrooms and rustic rancho with wood-fired grill (sleeps 7)', 'the Tenorio Cabin', 'la Cabaña Tenorio'),
+  ph('cabins', 'cabin-semirustic', '3:2', 'Colibrí Cabin — terrace with chairs and forest view (sleeps 4)', 'the Colibrí Cabin and its terrace', 'la Cabaña Colibrí y su terraza'),
+  ph('cabins', 'cabin-accessible', '3:2', 'Tapir Cabin — accessible (Ley 7600), forest view for birdwatching', 'the Tapir Cabin and its forest view', 'la Cabaña Tapir y su vista al bosque'),
   // TOURS (3:2)
   ph('tours', 'tour-tubing', '3:2', 'Guests tubing on Río Celeste with a guide', 'tubing on the river', 'tubing en el río'),
   ph('tours', 'tour-chocolate', '3:2', 'Hands with cacao pods / chocolate making', 'cacao and chocolate', 'cacao y chocolate'),

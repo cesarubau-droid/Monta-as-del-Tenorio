@@ -45,6 +45,7 @@ const tourJsonLd = tour
       description: tour.summary[lang],
       touristType: lang === 'es' ? 'Naturaleza y aventura' : 'Nature and adventure',
       provider: { '@type': 'LodgingBusiness', name: 'Montañas del Tenorio', url: new URL('/', siteUrl).href },
+      ...(tour.price ? { offers: { '@type': 'Offer', price: tour.price.amount, priceCurrency: tour.price.currency } } : {}),
     }]
   : [];
 const current: RouteKey | undefined = ['home', 'cabins', 'tours', 'gallery', 'contact'].includes(key) ? key : undefined;

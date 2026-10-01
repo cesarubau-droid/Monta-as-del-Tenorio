@@ -4,7 +4,8 @@ import Photo from '../components/Photo.astro';
 import Icon from '../components/Icon.astro';
 import TourCard from '../components/TourCard.astro';
 import ContactCta from '../components/ContactCta.astro';
-import { tours, formatHours, formatUSD, type Tour } from '../data/offer';
+import { tours, formatHours, type Tour } from '../data/offer';
+import PriceTag from '../components/PriceTag.astro';
 import { whatsappUrl } from '../data/site';
 import { useT, fmt } from '../i18n/ui';
 import { url, type Lang } from '../i18n/routes';
@@ -29,7 +30,7 @@ const wa = whatsappUrl(lang === 'es' ? `¡Hola! Me interesa el tour: ${name}.` :
       <dl class="facts">
         <div><dt><Icon name="clock" size={20} />{t.tours.duration}</dt><dd>{fmt(t.tours.hours, { n: formatHours(tour.hours, lang) })}</dd></div>
         <div><dt><Icon name="compass" size={20} />{t.tours.guide}</dt><dd>{t.tours.included}</dd></div>
-        <div><dt><Icon name="calendar" size={20} />{t.tours.priceLabel}</dt><dd>{tour.priceUSD !== null ? `${formatUSD(tour.priceUSD, lang)} ${t.tours.perPerson}` : t.tours.priceOnRequest}</dd></div>
+        <div><dt><Icon name="calendar" size={20} />{t.tours.priceLabel}</dt><dd><PriceTag price={tour.price} lang={lang} kind="tour" variant="inline" /></dd></div>
       </dl>
       <p class="muted">{t.tours.askUs}</p>
       <div class="btn-row">

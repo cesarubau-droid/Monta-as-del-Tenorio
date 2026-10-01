@@ -59,6 +59,7 @@ const highlightIcons = ['eye', 'lookout', 'leaf', 'compass'] as const;
     <div class="grid grid--3">
       {cabins.map((c) => <CabinCard cabin={c} lang={lang} />)}
     </div>
+    <p class="small muted cabins-note">{t.cabins.seasonNote}</p>
   </div>
 </section>
 
@@ -97,6 +98,7 @@ const highlightIcons = ['eye', 'lookout', 'leaf', 'compass'] as const;
 <ContactCta lang={lang} />
 
 <style>
+  .cabins-note { margin-top: var(--space-lg); }
   .about__media { position: relative; aspect-ratio: 4 / 3; border-radius: var(--radius-md); overflow: hidden; background: var(--surface-2); }
   .about__media :global(img) { width: 100%; height: 100%; object-fit: cover; }
   .about__body { margin-top: var(--space-md); }

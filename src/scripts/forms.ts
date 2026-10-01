@@ -69,7 +69,7 @@ export function initInquiryForms(): void {
     const success = document.getElementById(form.dataset.success || '');
     const kind = form.querySelector<HTMLInputElement>('[name="type"]')?.value === 'contact' ? 'contact' : 'reservation';
 
-    // Prefill from query string (?cabin=rustic&tour=tubing)
+    // Prefill from query string (?cabin=tenorio&tour=tubing)
     const params = new URLSearchParams(location.search);
     const cabin = params.get('cabin');
     const cabinSel = form.querySelector<HTMLSelectElement>('[name="cabin"]');
