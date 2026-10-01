@@ -42,8 +42,8 @@ export const faqs: Faq[] = [
     home: true,
     q: { en: 'Can we come with children?', es: '¿Podemos ir con niños?' },
     a: {
-      en: 'Yes, families are very welcome — our rustic cabin sleeps up to 7 guests. Include the number of children in your request so we can recommend the best cabin and tours for your family.',
-      es: 'Sí, las familias son muy bienvenidas: nuestra cabaña rústica recibe hasta 7 personas. Indica el número de niños en tu solicitud para recomendarte la mejor cabaña y los tours más adecuados.',
+      en: 'Yes, families are very welcome — the Tenorio Cabin sleeps up to 7 guests. Include the number of children in your request so we can recommend the best cabin and tours for your family.',
+      es: 'Sí, las familias son muy bienvenidas: la Cabaña Tenorio recibe hasta 7 personas. Indica el número de niños en tu solicitud para recomendarte la mejor cabaña y los tours más adecuados.',
     },
   },
   {
@@ -84,8 +84,8 @@ export const faqs: Faq[] = [
     id: 'accessible',
     q: { en: 'Do you have an accessible cabin?', es: '¿Tienen una cabaña accesible?' },
     a: {
-      en: 'Yes. One of our cabins is designed to be accessible for guests with disabilities under Costa Rica’s Law 7600. It sleeps 2, plus a sofa bed for a possible third guest.',
-      es: 'Sí. Una de nuestras cabañas está diseñada para ser accesible para personas con discapacidad según la Ley 7600. Es para 2 personas, más un sofá cama para una posible tercera.',
+      en: 'Yes. The Tapir Cabin is designed to be accessible for guests with disabilities under Costa Rica’s Law 7600. It sleeps 2, plus a sofa bed for a possible third guest. The Tenorio Cabin also offers easy access for guests with disabilities.',
+      es: 'Sí. La Cabaña Tapir está diseñada para ser accesible para personas con discapacidad según la Ley 7600. Es para 2 personas, más un sofá cama para una posible tercera. La Cabaña Tenorio también tiene fácil acceso para personas con discapacidad.',
     },
   },
   {

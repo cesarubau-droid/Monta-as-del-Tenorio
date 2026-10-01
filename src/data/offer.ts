@@ -1,13 +1,29 @@
 /**
- * Cabins and tours — facts come ONLY from the official documentation.
+ * Cabins and tours.
  *
- * Prices: the documentation says prices are visible on the site but does not
- * define amounts. Set `priceUSD` (number) when the owners confirm them; while
- * it is null the site shows "Rate on request".
+ * Names, rooms, amenities and prices confirmed by the owners (30 Sep 2026).
+ * Cabin prices are in colones and vary by season, so they are shown as
+ * "From …". Tour prices are in US dollars. Set `price: null` to show
+ * "Rate on request" instead.
  */
 import type { Lang } from '../i18n/routes';
 
 type L = Record<Lang, string>;
+
+export type Currency = 'CRC' | 'USD';
+
+export interface Price {
+  amount: number;
+  currency: Currency;
+  /** Seasonal / starting price → shown as "From …" */
+  from?: boolean;
+  /** Unit shown after the amount */
+  unit: 'night' | 'person' | 'adult';
+  /** Extra context next to the unit (e.g. "per couple") */
+  basis?: L;
+  /** Additional lines (extra guests, children, minimums…) */
+  notes?: Record<Lang, string[]>;
+}
 
 export interface Cabin {
   slug: string;
@@ -15,7 +31,7 @@ export interface Cabin {
   name: L;
   capacity: number;
   capacityNote?: L;
-  priceUSD: number | null;
+  price: Price | null;
   summary: L;
   description: L;
   features: Record<Lang, string[]>;
@@ -23,61 +39,83 @@ export interface Cabin {
 
 export const cabins: Cabin[] = [
   {
-    slug: 'rustic',
+    slug: 'tenorio',
     image: 'cabin-rustic',
-    name: { en: 'Rustic Cabin', es: 'Cabaña Rústica' },
+    name: { en: 'Tenorio Cabin', es: 'Cabaña Tenorio' },
     capacity: 7,
-    priceUSD: null,
+    price: {
+      amount: 60000,
+      currency: 'CRC',
+      from: true,
+      unit: 'night',
+      basis: { en: 'up to 5 guests', es: 'hasta 5 personas' },
+      notes: {
+        en: [`${formatMoney(10000, 'CRC', 'en')} per additional guest (up to 7)`],
+        es: [`${formatMoney(10000, 'CRC', 'es')} por persona adicional (hasta 7)`],
+      },
+    },
     summary: {
-      en: 'Built entirely of wood and wrapped in forest views — room for the whole family.',
-      es: 'Construida totalmente en madera y rodeada de vistas al bosque: espacio para toda la familia.',
+      en: 'Two bedrooms, two bathrooms and a rustic rancho with a wood-fired grill — room for the whole family.',
+      es: 'Dos habitaciones, dos baños y un rancho rústico con parrilla de leña: espacio para toda la familia.',
     },
     description: {
-      en: 'Our 100% rustic wooden cabin is made for gathering. With space for up to seven guests and everything you need to cook, it is the place to share long breakfasts, slow afternoons and nights listening to the forest.',
-      es: 'Nuestra cabaña 100% rústica de madera está hecha para reunirse. Con espacio para hasta siete personas y todo lo necesario para cocinar, es el lugar para compartir desayunos largos, tardes tranquilas y noches escuchando el bosque.',
+      en: 'Our largest cabin is made for gathering. It has two bedrooms, each with a double bed and a bunk bed, two bathrooms (one inside and one by the rancho) and a TV. Its rustic rancho with a wood-fired grill is ready for a family barbecue. It also offers easy access for guests with disabilities.',
+      es: 'Nuestra cabaña más grande está hecha para reunirse. Tiene dos habitaciones, cada una con cama matrimonial y camarote, dos baños (uno adentro y otro junto al rancho) y TV. Su rancho rústico con parrilla de leña está listo para una carne asada en familia. Además, tiene fácil acceso para personas con discapacidad.',
     },
     features: {
-      en: ['100% rustic wood', 'Forest view', 'Equipped for cooking', 'Up to 7 guests'],
-      es: ['100% rústica de madera', 'Vista al bosque', 'Equipada para cocinar', 'Hasta 7 personas'],
+      en: ['2 bedrooms: double bed + bunk bed in each', '2 bathrooms', 'Rustic rancho with wood-fired grill', 'TV', 'Easy access for guests with disabilities', 'Equipped for cooking', 'Up to 7 guests'],
+      es: ['2 habitaciones: cama matrimonial + camarote en cada una', '2 baños', 'Rancho rústico con parrilla de leña', 'TV', 'Fácil acceso para personas con discapacidad', 'Equipada para cocinar', 'Hasta 7 personas'],
     },
   },
   {
-    slug: 'semi-rustic',
+    slug: 'colibri',
     image: 'cabin-semirustic',
-    name: { en: 'Semi-Rustic Cabin', es: 'Cabaña Semirrústica' },
+    name: { en: 'Colibrí Cabin', es: 'Cabaña Colibrí' },
     capacity: 4,
-    priceUSD: null,
+    price: {
+      amount: 25000,
+      currency: 'CRC',
+      from: true,
+      unit: 'night',
+      basis: { en: 'per couple', es: 'por pareja' },
+    },
     summary: {
-      en: 'Wooden exterior and a terrace facing the forest — ideal for couples and small families.',
-      es: 'Exterior de madera y una terraza frente al bosque: ideal para parejas y familias pequeñas.',
+      en: 'Two bedrooms and a terrace with chairs facing the forest — ideal for couples and small families.',
+      es: 'Dos habitaciones y una terraza con sillas frente al bosque: ideal para parejas y familias pequeñas.',
     },
     description: {
-      en: 'With its wooden exterior and a terrace that looks straight into the forest, this cabin for up to four guests invites you to slow down. Cook your own meals, read on the terrace and let the sounds of Río Celeste set the pace.',
-      es: 'Con su exterior de madera y una terraza que mira directo al bosque, esta cabaña para hasta cuatro personas te invita a bajar el ritmo. Cocina tus comidas, lee en la terraza y deja que los sonidos de Río Celeste marquen el paso.',
+      en: 'This cabin has two bedrooms with a double bed each, a TV, a fridge and hot water. Its terrace, with chairs looking straight into the forest, invites you to slow down and let the sounds of Río Celeste set the pace.',
+      es: 'Esta cabaña tiene dos habitaciones con cama matrimonial cada una, TV, refrigeradora y agua caliente. Su terraza, con sillas que miran directo al bosque, te invita a bajar el ritmo y dejar que los sonidos de Río Celeste marquen el paso.',
     },
     features: {
-      en: ['Wooden exterior', 'Terrace with forest view', 'Equipped for cooking', 'Up to 4 guests'],
-      es: ['Exterior de madera', 'Terraza con vista al bosque', 'Equipada para cocinar', 'Hasta 4 personas'],
+      en: ['2 bedrooms with a double bed', 'Terrace with chairs and forest view', 'TV and fridge', 'Hot water', 'Equipped for cooking', 'Up to 4 guests'],
+      es: ['2 habitaciones con cama matrimonial', 'Terraza con sillas y vista al bosque', 'TV y refrigeradora', 'Agua caliente', 'Equipada para cocinar', 'Hasta 4 personas'],
     },
   },
   {
-    slug: 'accessible',
+    slug: 'tapir',
     image: 'cabin-accessible',
-    name: { en: 'Accessible Cabin', es: 'Cabaña Accesible' },
+    name: { en: 'Tapir Cabin', es: 'Cabaña Tapir' },
     capacity: 2,
     capacityNote: { en: '+ sofa bed (possible 3rd guest)', es: '+ sofá cama (posible 3.ª persona)' },
-    priceUSD: null,
+    price: {
+      amount: 25000,
+      currency: 'CRC',
+      from: true,
+      unit: 'night',
+      basis: { en: 'per couple', es: 'por pareja' },
+    },
     summary: {
-      en: 'Accessible design (Costa Rica Law 7600) and a terrace made for birdwatching.',
-      es: 'Diseño accesible (Ley 7600) y una terraza ideal para el avistamiento de aves.',
+      en: 'Accessible design (Costa Rica Law 7600) and a forest view made for birdwatching.',
+      es: 'Diseño accesible (Ley 7600) y vista al bosque, perfecta para observar aves.',
     },
     description: {
-      en: 'Designed to be accessible for guests with disabilities under Costa Rica’s Law 7600, this cabin sleeps two, with a sofa bed for a possible third guest. Its forest-view terrace is ideal for birdwatching from morning coffee to sunset.',
-      es: 'Diseñada para ser accesible para personas con discapacidad según la Ley 7600, esta cabaña es para dos personas, con sofá cama para una posible tercera. Su terraza con vista al bosque es ideal para observar aves desde el café de la mañana hasta el atardecer.',
+      en: 'Designed to be accessible for guests with disabilities under Costa Rica’s Law 7600, this cabin has a double bed and a sofa bed for a possible third guest, plus hot water. Its forest view is perfect for anyone who loves birdwatching, from morning coffee to sunset.',
+      es: 'Diseñada para ser accesible para personas con discapacidad según la Ley 7600, esta cabaña tiene una cama matrimonial y un sofá cama para una posible tercera persona, además de agua caliente. Su vista al bosque es perfecta para quienes disfrutan observar aves, desde el café de la mañana hasta el atardecer.',
     },
     features: {
-      en: ['Accessible (Law 7600)', 'Terrace for birdwatching', 'Forest view', 'Equipped for cooking'],
-      es: ['Accesible (Ley 7600)', 'Terraza para avistamiento de aves', 'Vista al bosque', 'Equipada para cocinar'],
+      en: ['Double bed + sofa bed', 'Accessible (Law 7600)', 'Forest view, ideal for birdwatching', 'Hot water', 'Equipped for cooking'],
+      es: ['Cama matrimonial + sofá cama', 'Accesible (Ley 7600)', 'Vista al bosque, ideal para observar aves', 'Agua caliente', 'Equipada para cocinar'],
     },
   },
 ];
@@ -87,7 +125,7 @@ export interface Tour {
   image: string;
   name: L;
   hours: number;
-  priceUSD: number | null;
+  price: Price | null;
   summary: L;
   description: Record<Lang, string[]>;
 }
@@ -98,7 +136,7 @@ export const tours: Tour[] = [
     image: 'tour-tubing',
     name: { en: 'Tubing on Río Celeste', es: 'Tubing en Río Celeste' },
     hours: 1.5,
-    priceUSD: null,
+    price: { amount: 50, currency: 'USD', unit: 'person' },
     summary: {
       en: 'Float the river with a specialized guide — adventure with the forest all around.',
       es: 'Recorre el río con un guía especializado: aventura con el bosque alrededor.',
@@ -119,7 +157,15 @@ export const tours: Tour[] = [
     image: 'tour-chocolate',
     name: { en: 'Chocolate Tour', es: 'Tour de Chocolate' },
     hours: 2,
-    priceUSD: null,
+    price: {
+      amount: 35,
+      currency: 'USD',
+      unit: 'adult',
+      notes: {
+        en: [`Children under 10: ${formatMoney(15, 'USD', 'en')}`, `Solo travelers: minimum rate ${formatMoney(70, 'USD', 'en')}`],
+        es: [`Menores de 10 años: ${formatMoney(15, 'USD', 'es')}`, `Una sola persona: tarifa mínima de ${formatMoney(70, 'USD', 'es')}`],
+      },
+    },
     summary: {
       en: 'Discover the journey from cacao to chocolate with a specialized guide.',
       es: 'Descubre el camino del cacao al chocolate con un guía especializado.',
@@ -140,7 +186,7 @@ export const tours: Tour[] = [
     image: 'tour-night-walk',
     name: { en: 'Night Walk', es: 'Caminata Nocturna' },
     hours: 1.5,
-    priceUSD: null,
+    price: { amount: 40, currency: 'USD', unit: 'person' },
     summary: {
       en: 'See the forest wake up after dark on a guided night walk.',
       es: 'Mira cómo despierta el bosque de noche en una caminata guiada.',
@@ -162,10 +208,11 @@ export function formatHours(h: number, lang: Lang): string {
   return new Intl.NumberFormat(lang === 'es' ? 'es-CR' : 'en-US', { maximumFractionDigits: 1 }).format(h);
 }
 
-export function formatUSD(n: number, lang: Lang): string {
+export function formatMoney(n: number, currency: Currency, lang: Lang): string {
   return new Intl.NumberFormat(lang === 'es' ? 'es-CR' : 'en-US', {
     style: 'currency',
-    currency: 'USD',
+    currency,
+    currencyDisplay: 'narrowSymbol',
     maximumFractionDigits: 0,
   }).format(n);
 }

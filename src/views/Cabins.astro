@@ -3,7 +3,8 @@ import PageHero from '../components/PageHero.astro';
 import Photo from '../components/Photo.astro';
 import Icon from '../components/Icon.astro';
 import ContactCta from '../components/ContactCta.astro';
-import { cabins, formatUSD } from '../data/offer';
+import { cabins } from '../data/offer';
+import PriceTag from '../components/PriceTag.astro';
 import { useT, fmt } from '../i18n/ui';
 import { url, type Lang } from '../i18n/routes';
 
@@ -28,10 +29,8 @@ const t = useT(lang);
           <ul class="chip-list" role="list">
             {c.features[lang].map((f) => <li class="chip">{f}</li>)}
           </ul>
-          <p class="card__price detail__price">
-            <span class="sr-only">{t.cabins.priceLabel}: </span>
-            {c.priceUSD !== null ? <>{formatUSD(c.priceUSD, lang)} <small>{t.cabins.perNight}</small></> : t.cabins.priceOnRequest}
-          </p>
+          <PriceTag price={c.price} lang={lang} kind="cabin" class="detail__price" />
+          <p class="small muted">{t.cabins.seasonNote}</p>
           <div class="btn-row">
             <a class="btn btn--lg" href={`${url(lang, 'reserve')}?cabin=${c.slug}`} data-track="reservation_start" data-track-cabin={c.slug}>
               {t.cabins.book}<span class="sr-only">: {c.name[lang]}</span>

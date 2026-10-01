@@ -1,7 +1,8 @@
 ---
 import Photo from './Photo.astro';
 import Icon from './Icon.astro';
-import { formatHours, formatUSD, type Tour } from '../data/offer';
+import PriceTag from './PriceTag.astro';
+import { formatHours, type Tour } from '../data/offer';
 import { useT, fmt } from '../i18n/ui';
 import { url, type Lang } from '../i18n/routes';
 
@@ -21,13 +22,7 @@ const name = tour.name[lang];
       <li><Icon name="compass" size={18} />{t.tours.guide}</li>
     </ul>
     <p class="card__text">{tour.summary[lang]}</p>
-    <p class="card__price">
-      {tour.priceUSD !== null ? (
-        <>{formatUSD(tour.priceUSD, lang)} <small>{t.tours.perPerson}</small></>
-      ) : (
-        <>{t.tours.priceOnRequest}</>
-      )}
-    </p>
+    <PriceTag price={tour.price} lang={lang} kind="tour" />
     <div class="card__actions">
       <a
         class="btn btn--outline"

@@ -1,0 +1,70 @@
+---
+/**
+ * Muestra un precio de cabaña o tour: "Desde ₡60 000 / noche · hasta 5 personas"
+ * y, debajo, las notas (persona adicional, niños, mínimos…).
+ * Sin precio → "Tarifa a consultar".
+ *
+ * variant="card": párrafo con la línea superior de las tarjetas.
+ * variant="inline": texto simple (por ejemplo dentro de un <dd>).
+ */
+import { formatMoney, type Price } from '../data/offer';
+import { useT } from '../i18n/ui';
+import type { Lang } from '../i18n/routes';
+
+interface Props {
+  price: Price | null;
+  lang: Lang;
+  kind: 'cabin' | 'tour';
+  variant?: 'card' | 'inline';
+  class?: string;
+}
+const { price, lang, kind, variant = 'card', class: extra } = Astro.props;
+const t = useT(lang);
+
+const unit = price
+  ? { night: t.cabins.perNight, person: t.tours.perPerson, adult: t.tours.perAdult }[price.unit]
+  : '';
+const tail = price ? [unit, price.basis?.[lang]].filter(Boolean).join(' · ') : '';
+const onRequest = kind === 'cabin' ? t.cabins.priceOnRequest : t.tours.priceOnRequest;
+const label = kind === 'cabin' ? t.cabins.priceLabel : t.tours.priceLabel;
+const notes = price?.notes?.[lang] ?? [];
+---
+{variant === 'card' ? (
+  <div class:list={['price', extra]}>
+    <p class="card__price">
+      <span class="sr-only">{label}: </span>
+      {price ? (
+        <>
+          {price.from && <span class="price__from">{t.cabins.from} </span>}
+          {formatMoney(price.amount, price.currency, lang)} <small>{tail}</small>
+        </>
+      ) : onRequest}
+    </p>
+    {notes.length > 0 && (
+      <ul class="price__notes" role="list">{notes.map((n) => <li>{n}</li>)}</ul>
+    )}
+  </div>
+) : (
+  <>
+    {price ? (
+      <>
+        {price.from && `${t.cabins.from} `}{formatMoney(price.amount, price.currency, lang)} {tail}
+        {notes.length > 0 && <span class="price__inline-notes">{notes.map((n) => <span>{n}</span>)}</span>}
+      </>
+    ) : onRequest}
+  </>
+)}
+
+<style>
+  .price { margin-top: auto; }
+  .price .card__price { margin-top: 0; }
+  .price__from {
+    display: block; margin-bottom: 2px;
+    font-family: var(--font-sans); font-size: var(--fs-label); font-weight: 700;
+    letter-spacing: 0.16em; text-transform: uppercase; color: var(--kicker);
+  }
+  .price__notes { list-style: none; padding: 0; margin-top: 6px; font-size: var(--fs-sm); color: var(--text-2); }
+  .price__notes li + li { margin-top: 2px; }
+  .price__inline-notes { display: block; margin-top: 4px; font-size: var(--fs-sm); color: var(--text-2); }
+  .price__inline-notes span { display: block; }
+</style>

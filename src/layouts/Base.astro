@@ -12,6 +12,7 @@ import WhatsAppFloat from '../components/WhatsAppFloat.astro';
 import BackToTop from '../components/BackToTop.astro';
 import { useT } from '../i18n/ui';
 import { switchLangPath, type Lang, type RouteKey } from '../i18n/routes';
+import { cabins, formatMoney } from '../data/offer';
 import { site } from '../data/site';
 
 interface Props {
@@ -49,6 +50,12 @@ const business = {
   ...(site.email ? { email: site.email } : {}),
   ...(sameAs.length ? { sameAs } : {}),
   numberOfRooms: 3,
+  ...(() => {
+    const amounts = cabins.flatMap((c) => (c.price ? [c.price.amount] : []));
+    return amounts.length
+      ? { priceRange: `${formatMoney(Math.min(...amounts), 'CRC', lang)} – ${formatMoney(Math.max(...amounts), 'CRC', lang)}`, currenciesAccepted: 'CRC, USD' }
+      : {};
+  })(),
   availableLanguage: ['en', 'es'],
 };
 const structured = page === 'home' ? [business, ...jsonLd] : jsonLd;
