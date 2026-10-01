@@ -34,7 +34,7 @@ const mapHref = site.mapsUrl ?? 'https://www.google.com/maps/search/?api=1&query
   )}
 </div>
 <style>
-  .loc { margin-top: var(--space-xl); display: grid; gap: var(--space-sm); padding: var(--space-lg); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); }
+  .loc { margin-top: var(--space-xl); display: grid; gap: var(--space-sm); padding: var(--space-lg); background: var(--card-bg); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-md); }
   @media (min-width: 900px) { .loc { grid-template-columns: 1fr 1.4fr auto; align-items: center; column-gap: var(--space-xl); } .loc__title { grid-column: 1 / -1; } }
   .loc__title { font-size: var(--fs-h4); }
   .loc__lead, .loc__list li { display: flex; gap: 10px; align-items: flex-start; }
