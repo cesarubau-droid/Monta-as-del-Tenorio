@@ -1,11 +1,13 @@
 ---
 /**
- * Trust section. Only verified items are shown (see src/data/content.ts).
- * Ratings, ICT and Tripadvisor appear automatically once enabled there.
+ * "Reserva con confianza": anuncios en plataformas (con calificación verificada),
+ * datos de confianza y, debajo, las mejores reseñas reales de huéspedes.
+ * Todo sale de src/data/content.ts; el bloque de reseñas se oculta si no hay reseñas.
  */
 import Icon from './Icon.astro';
 import SectionHead from './Sections.astro';
-import { trustBadges, trustFacts } from '../data/content';
+import { trustBadges, trustFacts, reviews, type ReviewSource } from '../data/content';
+import { site } from '../data/site';
 import { useT, fmt } from '../i18n/ui';
 import type { Lang } from '../i18n/routes';
 
@@ -13,6 +15,26 @@ interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = useT(lang);
 const badges = trustBadges.filter((b) => b.enabled);
+
+const sourceLabel: Record<ReviewSource, string> = {
+  airbnb: 'Airbnb',
+  tripadvisor: 'Tripadvisor',
+  booking: 'Booking.com',
+  google: 'Google',
+};
+const sourceUrl: Partial<Record<ReviewSource, string | null>> = {
+  airbnb: site.listings.airbnb,
+  tripadvisor: site.listings.tripadvisor,
+  booking: site.listings.booking,
+};
+const best = [...reviews].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0)).slice(0, 3);
+const readAll = (['airbnb', 'tripadvisor', 'booking'] as ReviewSource[])
+  .filter((s) => sourceUrl[s])
+  .map((s) => ({ label: sourceLabel[s], url: sourceUrl[s] as string }));
+
+const num = (n: number) => new Intl.NumberFormat(lang === 'es' ? 'es-CR' : 'en-US', { maximumFractionDigits: 2 }).format(n);
+const monthYear = (d?: string) =>
+  d ? new Intl.DateTimeFormat(lang === 'es' ? 'es-CR' : 'en-US', { month: 'long', year: 'numeric' }).format(new Date(`${d}-15`)) : '';
 ---
 <section class="section" aria-labelledby="trust-title">
   <div class="container">
@@ -24,8 +46,10 @@ const badges = trustBadges.filter((b) => b.enabled);
             {b.kind === 'listing' ? t.trust.listedOn : ''}
             <span class="trust__logo">{b.label}</span>
             {b.rating !== null && (
-              <span class="trust__stars" role="img" aria-label={fmt(t.testimonials.rating, { n: b.rating })}>
-                {Array.from({ length: 5 }, () => <Icon name="star" size={16} />)}
+              <span class="trust__rating">
+                <Icon name="star" size={16} />
+                <span><strong>{num(b.rating)}</strong><span class="sr-only"> {fmt(t.testimonials.rating, { n: num(b.rating) })}</span></span>
+                {b.reviewCount && <span class="trust__count">· {fmt(t.trust.reviewCount, { n: b.reviewCount })}</span>}
               </span>
             )}
           </span>
@@ -43,6 +67,39 @@ const badges = trustBadges.filter((b) => b.enabled);
         </li>
       ))}
     </ul>
+
+    {best.length > 0 && (
+      <div class="reviews">
+        <h3 class="reviews__title">{t.trust.reviewsTitle}</h3>
+        <ul class="reviews__list" role="list">
+          {best.map((r) => (
+            <li>
+              <figure class="review">
+                {r.rating && (
+                  <span class="review__stars" role="img" aria-label={fmt(t.testimonials.rating, { n: r.rating })}>
+                    {Array.from({ length: Math.round(r.rating) }, () => <Icon name="star" size={16} />)}
+                  </span>
+                )}
+                <blockquote lang={r.lang}><p>“{r.text}”</p></blockquote>
+                <figcaption>
+                  <span><strong>{r.name}</strong>{r.from && ` · ${r.from}`}</span>
+                  <span class="review__meta">{fmt(t.trust.reviewOn, { site: sourceLabel[r.source] })}{r.date && ` · ${monthYear(r.date)}`}</span>
+                </figcaption>
+              </figure>
+            </li>
+          ))}
+        </ul>
+        {readAll.length > 0 && (
+          <p class="reviews__all">
+            {readAll.map((s) => (
+              <a href={s.url} target="_blank" rel="noopener noreferrer">
+                {fmt(t.trust.readAll, { site: s.label })}<span class="sr-only"> {t.newTab}</span>
+              </a>
+            ))}
+          </p>
+        )}
+      </div>
+    )}
   </div>
 </section>
 <style>
@@ -55,6 +112,20 @@ const badges = trustBadges.filter((b) => b.enabled);
   }
   .trust__logo { font-weight: 700; font-size: 1.05rem; color: var(--text); font-family: var(--font-serif); min-height: 48px; display: grid; place-items: center; }
   .trust__text { font-size: var(--fs-sm); font-weight: 600; color: var(--text); display: flex; flex-direction: column; align-items: center; gap: 4px; }
-  .trust__stars { display: inline-flex; color: #b8860b; }
+  .trust__rating { display: inline-flex; align-items: center; gap: 4px; flex-wrap: wrap; justify-content: center; }
+  .trust__rating :global(.icon) { color: var(--clay); }
+  .trust__count { font-weight: 400; color: var(--text-2); }
   .trust__link { font-size: var(--fs-sm); text-decoration: underline; min-height: 44px; display: inline-flex; align-items: center; }
+
+  .reviews { margin-top: var(--space-3xl); }
+  .reviews__title { text-align: center; font-size: clamp(1.6rem, 3vw, 2.2rem); margin-bottom: var(--space-xl); }
+  .reviews__list { display: grid; gap: var(--space-lg); list-style: none; padding: 0; }
+  @media (min-width: 900px) { .reviews__list { grid-template-columns: repeat(3, 1fr); } }
+  .review { height: 100%; display: flex; flex-direction: column; gap: var(--space-md); padding: var(--space-xl) var(--space-lg); background: var(--card-bg); border: 1px solid var(--border); border-top: 3px solid var(--celeste); }
+  .review__stars { display: inline-flex; color: var(--clay); }
+  .review blockquote { font-family: var(--font-serif); font-size: 1.15rem; line-height: 1.5; color: var(--text); flex: 1; }
+  .review figcaption { font-size: var(--fs-sm); color: var(--text); display: grid; gap: 2px; }
+  .review__meta { color: var(--text-2); }
+  .reviews__all { margin-top: var(--space-lg); display: flex; flex-wrap: wrap; gap: var(--space-sm) var(--space-xl); justify-content: center; font-size: var(--fs-sm); }
+  .reviews__all a { text-decoration: underline; min-height: 44px; display: inline-flex; align-items: center; }
 </style>

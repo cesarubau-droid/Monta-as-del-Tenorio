@@ -64,6 +64,17 @@ export const media: Record<string, MediaItem> = Object.fromEntries([
   ph('cabins', 'cabin-rustic', '3:2', 'Tenorio Cabin — 2 bedrooms and rustic rancho with wood-fired grill (sleeps 7)', 'the Tenorio Cabin', 'la Cabaña Tenorio'),
   ph('cabins', 'cabin-semirustic', '3:2', 'Colibrí Cabin — terrace with chairs and forest view (sleeps 4)', 'the Colibrí Cabin and its terrace', 'la Cabaña Colibrí y su terraza'),
   ph('cabins', 'cabin-accessible', '3:2', 'Tapir Cabin — accessible (Ley 7600), forest view for birdwatching', 'the Tapir Cabin and its forest view', 'la Cabaña Tapir y su vista al bosque'),
+  // CABIN GALLERIES (3:2) — first image of each gallery is the cabin photo above
+  ph('cabins', 'tenorio-bedroom', '3:2', 'Tenorio — bedroom with double bed and bunk bed', 'a bedroom in the Tenorio Cabin', 'una habitación de la Cabaña Tenorio'),
+  ph('cabins', 'tenorio-bathroom', '3:2', 'Tenorio — bathroom', 'a bathroom in the Tenorio Cabin', 'un baño de la Cabaña Tenorio'),
+  ph('cabins', 'tenorio-rancho', '3:2', 'Tenorio — rustic rancho with wood-fired grill', 'the rancho with wood-fired grill', 'el rancho con parrilla de leña'),
+  ph('cabins', 'tenorio-living', '3:2', 'Tenorio — living area with TV', 'the living area of the Tenorio Cabin', 'la sala de la Cabaña Tenorio'),
+  ph('cabins', 'colibri-bedroom', '3:2', 'Colibrí — bedroom with double bed', 'a bedroom in the Colibrí Cabin', 'una habitación de la Cabaña Colibrí'),
+  ph('cabins', 'colibri-terrace', '3:2', 'Colibrí — terrace with chairs facing the forest', 'the terrace of the Colibrí Cabin', 'la terraza de la Cabaña Colibrí'),
+  ph('cabins', 'colibri-kitchen', '3:2', 'Colibrí — kitchen area with fridge', 'the kitchen of the Colibrí Cabin', 'la cocina de la Cabaña Colibrí'),
+  ph('cabins', 'tapir-bedroom', '3:2', 'Tapir — double bed and sofa bed', 'the bedroom of the Tapir Cabin', 'la habitación de la Cabaña Tapir'),
+  ph('cabins', 'tapir-bathroom', '3:2', 'Tapir — bathroom', 'the bathroom of the Tapir Cabin', 'el baño de la Cabaña Tapir'),
+  ph('cabins', 'tapir-birdwatching', '3:2', 'Tapir — forest view for birdwatching', 'the forest view from the Tapir Cabin', 'la vista al bosque desde la Cabaña Tapir'),
   // TOURS (3:2)
   ph('tours', 'tour-tubing', '3:2', 'Guests tubing on Río Celeste with a guide', 'tubing on the river', 'tubing en el río'),
   ph('tours', 'tour-chocolate', '3:2', 'Hands with cacao pods / chocolate making', 'cacao and chocolate', 'cacao y chocolate'),
@@ -82,6 +93,30 @@ export const gallery = {
   guides: ['guides-1', 'guides-2', 'guides-3', 'guides-4'],
 } as const;
 export type GalleryCategory = keyof typeof gallery;
+
+type L = Record<Lang, string>;
+/** Photos shown in each cabin's carousel ("Ver más"), in order, with a short caption. */
+export const cabinGalleries: Record<string, { id: string; caption: L }[]> = {
+  tenorio: [
+    { id: 'cabin-rustic', caption: { en: 'Exterior', es: 'Exterior' } },
+    { id: 'tenorio-bedroom', caption: { en: 'Bedroom: double bed and bunk bed', es: 'Habitación: cama matrimonial y camarote' } },
+    { id: 'tenorio-living', caption: { en: 'Living area with TV', es: 'Sala con TV' } },
+    { id: 'tenorio-bathroom', caption: { en: 'Bathroom', es: 'Baño' } },
+    { id: 'tenorio-rancho', caption: { en: 'Rustic rancho with wood-fired grill', es: 'Rancho rústico con parrilla de leña' } },
+  ],
+  colibri: [
+    { id: 'cabin-semirustic', caption: { en: 'Exterior', es: 'Exterior' } },
+    { id: 'colibri-bedroom', caption: { en: 'Bedroom with double bed', es: 'Habitación con cama matrimonial' } },
+    { id: 'colibri-terrace', caption: { en: 'Terrace facing the forest', es: 'Terraza frente al bosque' } },
+    { id: 'colibri-kitchen', caption: { en: 'Kitchen', es: 'Cocina' } },
+  ],
+  tapir: [
+    { id: 'cabin-accessible', caption: { en: 'Exterior', es: 'Exterior' } },
+    { id: 'tapir-bedroom', caption: { en: 'Double bed and sofa bed', es: 'Cama matrimonial y sofá cama' } },
+    { id: 'tapir-bathroom', caption: { en: 'Bathroom', es: 'Baño' } },
+    { id: 'tapir-birdwatching', caption: { en: 'Forest view for birdwatching', es: 'Vista al bosque para observar aves' } },
+  ],
+};
 
 export const heroSlides = ['hero-forest-river', 'hero-cabin-couple', 'hero-family-tubing', 'hero-wildlife'];
 

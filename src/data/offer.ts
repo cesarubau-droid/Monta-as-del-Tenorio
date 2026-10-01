@@ -2,8 +2,8 @@
  * Cabins and tours.
  *
  * Names, rooms, amenities and prices confirmed by the owners (30 Sep 2026).
- * Cabin prices are in colones and vary by season, so they are shown as
- * "From …". Tour prices are in US dollars. Set `price: null` to show
+ * All prices are in US dollars with VAT (IVA 13%) included. Cabin prices vary
+ * by season, so they are shown as "From …". Set `price: null` to show
  * "Rate on request" instead.
  */
 import type { Lang } from '../i18n/routes';
@@ -44,14 +44,14 @@ export const cabins: Cabin[] = [
     name: { en: 'Tenorio Cabin', es: 'Cabaña Tenorio' },
     capacity: 7,
     price: {
-      amount: 60000,
-      currency: 'CRC',
+      amount: 120,
+      currency: 'USD',
       from: true,
       unit: 'night',
       basis: { en: 'up to 5 guests', es: 'hasta 5 personas' },
       notes: {
-        en: [`${formatMoney(10000, 'CRC', 'en')} per additional guest (up to 7)`],
-        es: [`${formatMoney(10000, 'CRC', 'es')} por persona adicional (hasta 7)`],
+        en: [`${formatMoney(20, 'USD', 'en')} per additional guest (up to 7)`],
+        es: [`${formatMoney(20, 'USD', 'es')} por persona adicional (hasta 7)`],
       },
     },
     summary: {
@@ -73,11 +73,15 @@ export const cabins: Cabin[] = [
     name: { en: 'Colibrí Cabin', es: 'Cabaña Colibrí' },
     capacity: 4,
     price: {
-      amount: 25000,
-      currency: 'CRC',
+      amount: 50,
+      currency: 'USD',
       from: true,
       unit: 'night',
       basis: { en: 'per couple', es: 'por pareja' },
+      notes: {
+        en: [`${formatMoney(20, 'USD', 'en')} per additional guest (up to 4)`],
+        es: [`${formatMoney(20, 'USD', 'es')} por persona adicional (hasta 4)`],
+      },
     },
     summary: {
       en: 'Two bedrooms and a terrace with chairs facing the forest — ideal for couples and small families.',
@@ -99,8 +103,8 @@ export const cabins: Cabin[] = [
     capacity: 2,
     capacityNote: { en: '+ sofa bed (possible 3rd guest)', es: '+ sofá cama (posible 3.ª persona)' },
     price: {
-      amount: 25000,
-      currency: 'CRC',
+      amount: 50,
+      currency: 'USD',
       from: true,
       unit: 'night',
       basis: { en: 'per couple', es: 'por pareja' },
@@ -135,7 +139,7 @@ export const tours: Tour[] = [
     slug: 'tubing',
     image: 'tour-tubing',
     name: { en: 'Tubing on Río Celeste', es: 'Tubing en Río Celeste' },
-    hours: 1.5,
+    hours: 2,
     price: { amount: 50, currency: 'USD', unit: 'person' },
     summary: {
       en: 'Float the river with a specialized guide — adventure with the forest all around.',
@@ -143,11 +147,11 @@ export const tours: Tour[] = [
     },
     description: {
       en: [
-        'Tubing is the most playful way to experience the river. For an hour and a half you float with the current, surrounded by forest, with a specialized guide leading the way.',
+        'Tubing is the most playful way to experience the river. For two hours you float with the current, surrounded by forest, with a specialized guide leading the way.',
         'It is one of those experiences you will keep telling stories about — easy to share with family and friends.',
       ],
       es: [
-        'El tubing es la forma más divertida de vivir el río. Durante hora y media te dejas llevar por la corriente, rodeado de bosque, con un guía especializado al frente.',
+        'El tubing es la forma más divertida de vivir el río. Durante dos horas te dejas llevar por la corriente, rodeado de bosque, con un guía especializado al frente.',
         'Es una de esas experiencias de las que seguirás contando historias, fácil de compartir en familia o con amigos.',
       ],
     },
@@ -156,7 +160,7 @@ export const tours: Tour[] = [
     slug: 'chocolate',
     image: 'tour-chocolate',
     name: { en: 'Chocolate Tour', es: 'Tour de Chocolate' },
-    hours: 2,
+    hours: 1.5,
     price: {
       amount: 35,
       currency: 'USD',
@@ -172,11 +176,11 @@ export const tours: Tour[] = [
     },
     description: {
       en: [
-        'A two-hour experience to discover how cacao becomes chocolate, guided by a specialist who shares the stories behind every step.',
+        'An hour-and-a-half experience to discover how cacao becomes chocolate, guided by a specialist who shares the stories behind every step.',
         'A calm, delicious plan — perfect for a relaxed afternoon.',
       ],
       es: [
-        'Una experiencia de dos horas para descubrir cómo el cacao se convierte en chocolate, de la mano de un guía especializado que comparte las historias detrás de cada paso.',
+        'Una experiencia de hora y media para descubrir cómo el cacao se convierte en chocolate, de la mano de un guía especializado que comparte las historias detrás de cada paso.',
         'Un plan tranquilo y delicioso, perfecto para una tarde relajada.',
       ],
     },

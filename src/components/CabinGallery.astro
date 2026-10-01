@@ -1,0 +1,243 @@
+---
+/**
+ * Carrusel de fotos de una cabaña + visor ampliado (lightbox).
+ * - Se desliza con el dedo, con las flechas o con las miniaturas.
+ * - Al tocar una foto se abre en grande dentro de un <dialog> (Esc o "Cerrar" para salir).
+ * - Las fotos salen de cabinGalleries en src/data/media.ts.
+ */
+import Photo from './Photo.astro';
+import Icon from './Icon.astro';
+import { cabinGalleries, getMedia } from '../data/media';
+import { useT, fmt } from '../i18n/ui';
+import type { Lang } from '../i18n/routes';
+
+interface Props { slug: string; name: string; lang: Lang; eager?: boolean }
+const { slug, name, lang, eager = false } = Astro.props;
+const t = useT(lang);
+const items = (cabinGalleries[slug] ?? []).map((g) => {
+  const m = getMedia(g.id);
+  const large = m.optimized ? m.src.replace(/\.[a-z]+$/i, '-1600.webp') : m.src;
+  return { ...g, m, large, caption: g.caption[lang] };
+});
+const total = items.length;
+const label = fmt(t.carousel.label, { name });
+---
+{total > 0 && (
+  <div class="cg" data-cg aria-roledescription="carousel" aria-label={label} role="region">
+    <div class="cg__viewport">
+      <ul class="cg__track" data-cg-track role="list">
+        {items.map((it, i) => (
+          <li
+            class="cg__slide"
+            aria-roledescription="slide"
+            aria-label={fmt(t.carousel.counter, { n: i + 1, total })}
+            data-src={it.large}
+            data-w={it.m.width}
+            data-h={it.m.height}
+            data-alt={it.m.alt[lang]}
+            data-caption={it.caption}
+          >
+            <button type="button" class="cg__open" data-cg-open={i} aria-label={fmt(t.carousel.open, { caption: it.caption })}>
+              <Photo id={it.id} lang={lang} sizes="(min-width: 900px) 50vw, 100vw" eager={eager && i === 0} />
+            </button>
+          </li>
+        ))}
+      </ul>
+      {total > 1 && (
+        <>
+          <button type="button" class="cg__nav cg__nav--prev" data-cg-prev aria-label={t.carousel.prev}><Icon name="left" size={20} /></button>
+          <button type="button" class="cg__nav cg__nav--next" data-cg-next aria-label={t.carousel.next}><Icon name="right" size={20} /></button>
+        </>
+      )}
+      <span class="cg__count" aria-hidden="true"><span data-cg-n>1</span> / {total}</span>
+    </div>
+    <p class="cg__caption" data-cg-caption aria-live="polite">{items[0].caption}</p>
+    {total > 1 && (
+      <div class="cg__thumbs" role="group" aria-label={label}>
+        {items.map((it, i) => (
+          <button type="button" class="cg__thumb" data-cg-thumb={i} aria-label={`${fmt(t.carousel.goTo, { n: i + 1 })}: ${it.caption}`} aria-current={i === 0 ? 'true' : undefined}>
+            <Photo id={it.id} lang={lang} sizes="120px" alt="" />
+          </button>
+        ))}
+      </div>
+    )}
+
+    <dialog class="lb" data-cg-dialog aria-label={label}>
+      <div class="lb__inner">
+        <button type="button" class="lb__close" data-lb-close aria-label={t.carousel.close}><Icon name="close" size={24} /></button>
+        <figure class="lb__figure">
+          <img class="lb__img" data-lb-img src={items[0].large} width={items[0].m.width} height={items[0].m.height} alt={items[0].m.alt[lang]} />
+          <figcaption class="lb__caption"><span data-lb-caption>{items[0].caption}</span> <span class="lb__count"><span data-lb-n>1</span> / {total}</span></figcaption>
+        </figure>
+        {total > 1 && (
+          <>
+            <button type="button" class="lb__nav lb__nav--prev" data-lb-prev aria-label={t.carousel.prev}><Icon name="left" size={24} /></button>
+            <button type="button" class="lb__nav lb__nav--next" data-lb-next aria-label={t.carousel.next}><Icon name="right" size={24} /></button>
+          </>
+        )}
+      </div>
+    </dialog>
+  </div>
+)}
+
+<style>
+  .cg { display: grid; gap: var(--space-sm); min-width: 0; }
+  .cg__viewport { position: relative; }
+  .cg__track {
+    display: flex; overflow-x: auto; scroll-snap-type: x mandatory; list-style: none; padding: 0; margin: 0;
+    scrollbar-width: none; background: var(--surface-2);
+  }
+  .cg__track::-webkit-scrollbar { display: none; }
+  @media (prefers-reduced-motion: no-preference) { .cg__track { scroll-behavior: smooth; } }
+  .cg__slide { flex: 0 0 100%; scroll-snap-align: start; aspect-ratio: 3 / 2; }
+  .cg__open { display: block; width: 100%; height: 100%; padding: 0; border: 0; background: none; cursor: zoom-in; }
+  .cg__open :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .cg__open:focus-visible { outline-offset: -4px; }
+
+  .cg__nav {
+    position: absolute; top: 50%; translate: 0 -50%;
+    display: grid; place-items: center; width: 44px; height: 44px; padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 50%;
+    background: rgba(10, 42, 48, 0.72); color: #fff; cursor: pointer;
+    transition: background-color 200ms ease;
+  }
+  .cg__nav:hover { background: var(--petrol); }
+  .cg__nav:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+  .cg__nav--prev { left: 12px; }
+  .cg__nav--next { right: 12px; }
+  .cg__count {
+    position: absolute; right: 12px; bottom: 12px; padding: 4px 10px;
+    background: rgba(10, 42, 48, 0.72); color: #fff; font-size: var(--fs-label); font-weight: 700; letter-spacing: 0.1em;
+  }
+  .cg__caption { font-size: var(--fs-sm); color: var(--text-2); min-height: 1.6em; }
+
+  .cg__thumbs { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+  .cg__thumbs::-webkit-scrollbar { display: none; }
+  .cg__thumb {
+    flex: 0 0 auto; width: 76px; aspect-ratio: 3 / 2; padding: 0; border: 2px solid transparent;
+    background: var(--surface-2); cursor: pointer; opacity: 0.65; transition: opacity 200ms ease, border-color 200ms ease;
+  }
+  .cg__thumb :global(img) { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .cg__thumb:hover { opacity: 1; }
+  .cg__thumb[aria-current='true'] { opacity: 1; border-color: var(--accent); }
+  @media (min-width: 640px) { .cg__thumb { width: 96px; } }
+
+  /* Lightbox */
+  .lb {
+    width: 100vw; max-width: 100vw; height: 100dvh; max-height: 100dvh; margin: 0; padding: 0; border: 0;
+    background: rgba(6, 22, 26, 0.96); color: #fff;
+  }
+  .lb::backdrop { background: rgba(6, 22, 26, 0.9); }
+  .lb__inner { position: relative; height: 100%; display: grid; place-items: center; padding: 64px 16px 24px; }
+  @media (min-width: 900px) { .lb__inner { padding: 64px 88px 32px; } }
+  .lb__figure { display: grid; gap: 12px; justify-items: center; max-width: 100%; max-height: 100%; }
+  .lb__img { max-width: 100%; max-height: calc(100dvh - 160px); width: auto; height: auto; object-fit: contain; }
+  .lb__caption { font-size: var(--fs-sm); color: #e3ecec; text-align: center; }
+  .lb__count { margin-left: 8px; color: var(--celeste-soft); font-weight: 700; letter-spacing: 0.1em; }
+  .lb__close, .lb__nav {
+    position: absolute; display: grid; place-items: center; width: 48px; height: 48px; padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.35); border-radius: 50%; background: rgba(255, 255, 255, 0.08); color: #fff; cursor: pointer;
+  }
+  .lb__close:hover, .lb__nav:hover { background: rgba(255, 255, 255, 0.18); }
+  .lb__close:focus-visible, .lb__nav:focus-visible { outline: 3px solid var(--celeste); outline-offset: 2px; }
+  .lb__close { top: 12px; right: 12px; }
+  .lb__nav { top: 50%; translate: 0 -50%; }
+  .lb__nav--prev { left: 12px; }
+  .lb__nav--next { right: 12px; }
+  @media (max-width: 639px) { .lb__nav { top: auto; bottom: 16px; translate: none; } }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-cg]').forEach((root) => {
+    const track = root.querySelector<HTMLElement>('[data-cg-track]')!;
+    const slides = [...track.querySelectorAll<HTMLElement>('li')];
+    const total = slides.length;
+    const nEl = root.querySelector('[data-cg-n]');
+    const capEl = root.querySelector('[data-cg-caption]');
+    const thumbs = [...root.querySelectorAll<HTMLButtonElement>('[data-cg-thumb]')];
+    const dialog = root.querySelector<HTMLDialogElement>('[data-cg-dialog]')!;
+    const lbImg = dialog.querySelector<HTMLImageElement>('[data-lb-img]')!;
+    const lbCap = dialog.querySelector('[data-lb-caption]');
+    const lbN = dialog.querySelector('[data-lb-n]');
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let index = 0;
+    let lbIndex = 0;
+
+    const mod = (i: number) => (i + total) % total;
+
+    // ----- Carousel -----
+    const setActive = (i: number) => {
+      index = i;
+      if (nEl) nEl.textContent = String(i + 1);
+      if (capEl) capEl.textContent = slides[i].dataset.caption ?? '';
+      thumbs.forEach((b, k) => (k === i ? b.setAttribute('aria-current', 'true') : b.removeAttribute('aria-current')));
+      thumbs[i]?.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: reduce ? 'auto' : 'smooth' });
+    };
+    const goTo = (i: number) => {
+      const target = mod(i);
+      track.scrollTo({ left: target * track.clientWidth, behavior: reduce ? 'auto' : 'smooth' });
+      setActive(target);
+    };
+    let raf = 0;
+    track.addEventListener('scroll', () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const i = Math.round(track.scrollLeft / track.clientWidth);
+        if (i !== index && i >= 0 && i < total) setActive(i);
+      });
+    }, { passive: true });
+    root.querySelector('[data-cg-prev]')?.addEventListener('click', () => goTo(index - 1));
+    root.querySelector('[data-cg-next]')?.addEventListener('click', () => goTo(index + 1));
+    thumbs.forEach((b, k) => b.addEventListener('click', () => goTo(k)));
+    track.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') { e.preventDefault(); goTo(index + 1); }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); goTo(index - 1); }
+    });
+
+    // ----- Lightbox -----
+    const show = (i: number) => {
+      lbIndex = mod(i);
+      const s = slides[lbIndex].dataset;
+      lbImg.src = s.src ?? '';
+      lbImg.alt = s.alt ?? '';
+      if (s.w) lbImg.width = Number(s.w);
+      if (s.h) lbImg.height = Number(s.h);
+      if (lbCap) lbCap.textContent = s.caption ?? '';
+      if (lbN) lbN.textContent = String(lbIndex + 1);
+    };
+    root.querySelectorAll<HTMLButtonElement>('[data-cg-open]').forEach((b) =>
+      b.addEventListener('click', () => {
+        show(Number(b.dataset.cgOpen));
+        dialog.showModal();
+        document.documentElement.style.overflow = 'hidden';
+      }),
+    );
+    dialog.querySelector('[data-lb-close]')?.addEventListener('click', () => dialog.close());
+    dialog.querySelector('[data-lb-prev]')?.addEventListener('click', () => show(lbIndex - 1));
+    dialog.querySelector('[data-lb-next]')?.addEventListener('click', () => show(lbIndex + 1));
+    dialog.addEventListener('keydown', (e) => {
+      if (total < 2) return;
+      if (e.key === 'ArrowRight') { e.preventDefault(); show(lbIndex + 1); }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); show(lbIndex - 1); }
+    });
+    // Click on the dark area (not the photo or a button) closes it
+    dialog.addEventListener('click', (e) => {
+      const el = e.target as HTMLElement;
+      if (el === dialog || el.classList.contains('lb__inner')) dialog.close();
+    });
+    // Swipe left/right on touch screens
+    let x0: number | null = null;
+    dialog.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse') x0 = e.clientX; });
+    dialog.addEventListener('pointerup', (e) => {
+      if (x0 === null || total < 2) return;
+      const dx = e.clientX - x0;
+      x0 = null;
+      if (Math.abs(dx) > 50) show(lbIndex + (dx < 0 ? 1 : -1));
+    });
+    dialog.addEventListener('close', () => {
+      document.documentElement.style.overflow = '';
+      if (lbIndex !== index) goTo(lbIndex);
+      slides[lbIndex].querySelector('button')?.focus({ preventScroll: true });
+    });
+  });
+</script>

@@ -71,6 +71,31 @@ const icons = {
   lookout: (W, H, c) => `<g transform="translate(${W * 0.22} ${H * 0.5})" stroke="${c}" stroke-width="8" fill="none"><path d="M0 0 H160 M10 0 V90 M150 0 V90 M0 -30 H160 M0 -30 V0 M160 -30 V0"/></g>`,
 };
 
+// Interior scenes for the cabin galleries (bedroom, bathroom, rancho…).
+const rooms = {
+  bed: (W, H) => `<g transform="translate(${W * 0.25} ${H * 0.5})"><rect width="${W * 0.5}" height="${H * 0.08}" y="${H * 0.12}" fill="#7A5236"/><rect width="${W * 0.5}" height="${H * 0.12}" fill="#F4EDE2"/><rect x="${W * 0.03}" y="-${H * 0.06}" width="${W * 0.13}" height="${H * 0.07}" rx="12" fill="#FFFFFF"/><rect x="${W * 0.34}" y="-${H * 0.06}" width="${W * 0.13}" height="${H * 0.07}" rx="12" fill="#FFFFFF"/><rect x="${W * 0.18}" y="${H * 0.02}" width="${W * 0.32}" height="${H * 0.1}" fill="#2A6B74"/><rect y="-${H * 0.2}" width="${W * 0.5}" height="${H * 0.2}" fill="#5C3D28" opacity=".9"/></g>`,
+  bunk: (W, H) => `<g transform="translate(${W * 0.62} ${H * 0.22})" fill="#5C3D28"><rect width="10" height="${H * 0.5}"/><rect x="${W * 0.22}" width="10" height="${H * 0.5}"/><rect y="${H * 0.12}" width="${W * 0.23}" height="${H * 0.05}" fill="#F4EDE2"/><rect y="${H * 0.38}" width="${W * 0.23}" height="${H * 0.05}" fill="#F4EDE2"/></g>`,
+  bath: (W, H) => `<g transform="translate(${W * 0.3} ${H * 0.35})"><rect width="${W * 0.16}" height="${H * 0.28}" rx="10" fill="#FFFFFF" stroke="#C9C2B6" stroke-width="4"/><rect x="${W * 0.25}" y="-${H * 0.15}" width="${W * 0.18}" height="${H * 0.43}" fill="#DCEFF0" stroke="#9CC9CC" stroke-width="4"/><circle cx="${W * 0.34}" cy="-${H * 0.08}" r="${H * 0.025}" fill="#9CC9CC"/><rect x="${W * 0.02}" y="-${H * 0.17}" width="${W * 0.12}" height="${H * 0.1}" fill="#BFD8DA"/></g>`,
+  grill: (W, H) => `<g transform="translate(${W * 0.18} ${H * 0.18})"><path d="M0 ${H * 0.12} L${W * 0.32} 0 L${W * 0.64} ${H * 0.12} Z" fill="#5C3D28"/><rect x="${W * 0.04}" y="${H * 0.12}" width="12" height="${H * 0.5}" fill="#5C3D28"/><rect x="${W * 0.58}" y="${H * 0.12}" width="12" height="${H * 0.5}" fill="#5C3D28"/><rect x="${W * 0.22}" y="${H * 0.4}" width="${W * 0.2}" height="${H * 0.14}" fill="#7B7B7B"/><path d="M${W * 0.26} ${H * 0.4} q10 -40 24 -6 q12 -50 26 0 q14 -36 26 4" fill="#E0763C"/><rect x="${W * 0.21}" y="${H * 0.38}" width="${W * 0.22}" height="8" fill="#2B2B2B"/></g>`,
+  sofa: (W, H) => `<g transform="translate(${W * 0.22} ${H * 0.5})"><rect width="${W * 0.36}" height="${H * 0.16}" rx="14" fill="#2A6B74"/><rect y="-${H * 0.1}" width="${W * 0.36}" height="${H * 0.12}" rx="14" fill="#1D555D"/><rect x="${W * 0.46}" y="-${H * 0.24}" width="${W * 0.2}" height="${H * 0.13}" fill="#1C1C1C"/><rect x="${W * 0.55}" y="-${H * 0.11}" width="8" height="${H * 0.1}" fill="#5C3D28"/></g>`,
+  kitchen: (W, H) => `<g transform="translate(${W * 0.15} ${H * 0.45})"><rect width="${W * 0.7}" height="${H * 0.25}" fill="#7A5236"/><rect y="-8" width="${W * 0.7}" height="10" fill="#E9E1D3"/><rect x="${W * 0.05}" y="-${H * 0.3}" width="${W * 0.25}" height="${H * 0.14}" fill="#7A5236"/><rect x="${W * 0.5}" y="-${H * 0.12}" width="${W * 0.1}" height="${H * 0.1}" rx="6" fill="#C9C2B6"/><rect x="${W * 0.36}" y="-${H * 0.06}" width="${W * 0.1}" height="${H * 0.05}" fill="#2B2B2B"/></g>`,
+  terrace: (W, H) => `<g transform="translate(${W * 0.25} ${H * 0.62})" fill="#5C3D28"><rect x="-${W * 0.25}" y="${H * 0.12}" width="${W}" height="${H * 0.3}" fill="#8A6040"/><rect width="${W * 0.1}" height="${H * 0.1}"/><rect y="-${H * 0.14}" width="12" height="${H * 0.24}"/><rect x="${W * 0.36}" width="${W * 0.1}" height="${H * 0.1}"/><rect x="${W * 0.36}" y="-${H * 0.14}" width="12" height="${H * 0.24}"/><rect x="-${W * 0.25}" y="-${H * 0.04}" width="${W}" height="8" fill="#6B4630"/></g>`,
+};
+function room({ id, W, H, kind, extra = [], window = true, label: showLabel = true }) {
+  const fs = Math.round(H * 0.035), pw = fs * 20, ph = fs * 2;
+  const win = window ? `<rect x="${W * 0.08}" y="${H * 0.12}" width="${W * 0.22}" height="${H * 0.3}" fill="#9FD3C7" stroke="#6B4630" stroke-width="10"/><path d="M${W * 0.08} ${H * 0.34} q${W * 0.06} -40 ${W * 0.11} -10 q${W * 0.05} -30 ${W * 0.11} 0 V${H * 0.42} H${W * 0.08} Z" fill="#3F8A72"/>` : '';
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" preserveAspectRatio="xMidYMid slice">
+<!-- PROVISIONAL IMAGE (${id}) — replace with final photo. See src/data/media.ts -->
+<defs><linearGradient id="w" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E9D9C1"/><stop offset="1" stop-color="#D9C3A3"/></linearGradient></defs>
+<rect width="${W}" height="${H}" fill="url(#w)"/>
+${Array.from({ length: 14 }, (_, i) => `<rect x="${(W / 14) * i}" width="2" height="${H * 0.72}" fill="#C8AE89" opacity=".6"/>`).join('')}
+<rect y="${H * 0.72}" width="${W}" height="${H * 0.28}" fill="#9A6C48"/>
+${win}
+${[kind, ...extra].map((k) => rooms[k](W, H)).join('')}
+${showLabel ? `<g transform="translate(${Math.round(H * 0.04)} ${H - ph - Math.round(H * 0.04)})"><rect width="${pw}" height="${ph}" rx="${ph / 2}" fill="#000000" opacity=".55"/><text x="${pw / 2}" y="${ph * 0.66}" text-anchor="middle" font-family="Segoe UI, Roboto, Arial, sans-serif" font-size="${fs}" font-weight="600" fill="#fff">Imagen provisional · Provisional image</text></g>` : ''}
+</svg>`;
+}
+
 function svg({ id, W, H, palette = 'day', river = false, icon, iconColor = '#1E3A34', label: showLabel = true }) {
   const r = rng(id);
   const pal = palettes[palette];
@@ -117,9 +142,30 @@ for (const cat of Object.keys(galleryPal)) {
   }
 }
 
-for (const [rel, [W, H], opts] of jobs) {
+// Cabin galleries (ids match cabinGalleries in src/data/media.ts)
+const roomJobs = [
+  ['cabins/tenorio-bedroom', { kind: 'bed', extra: ['bunk'] }],
+  ['cabins/tenorio-bathroom', { kind: 'bath' }],
+  ['cabins/tenorio-rancho', { kind: 'grill', window: false }],
+  ['cabins/tenorio-living', { kind: 'sofa' }],
+  ['cabins/colibri-bedroom', { kind: 'bed' }],
+  ['cabins/colibri-terrace', { kind: 'terrace', window: false }],
+  ['cabins/colibri-kitchen', { kind: 'kitchen' }],
+  ['cabins/tapir-bedroom', { kind: 'bed', extra: ['sofa'] }],
+  ['cabins/tapir-bathroom', { kind: 'bath' }],
+];
+const outdoorJobs = [
+  ['cabins/tapir-birdwatching', S32, { palette: 'mist', icon: ['bird', 'lookout'] }],
+];
+
+for (const [rel, [W, H], opts] of [...jobs, ...outdoorJobs]) {
   const file = path.join(root, 'images', `${rel}.svg`);
   await mkdir(path.dirname(file), { recursive: true });
   await writeFile(file, svg({ id: rel, W, H, ...opts }));
 }
-console.log(`✔ ${jobs.length} provisional images written to public/images`);
+for (const [rel, opts] of roomJobs) {
+  const file = path.join(root, 'images', `${rel}.svg`);
+  await mkdir(path.dirname(file), { recursive: true });
+  await writeFile(file, room({ id: rel, W: S32[0], H: S32[1], ...opts }));
+}
+console.log(`✔ ${jobs.length + outdoorJobs.length + roomJobs.length} provisional images written to public/images`);
