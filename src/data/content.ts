@@ -24,8 +24,8 @@ export const faqs: Faq[] = [
     home: true,
     q: { en: 'What is included in the tours?', es: '¿Qué incluyen los tours?' },
     a: {
-      en: 'Every tour — tubing (1.5 h), chocolate (2 h) and night walk (1.5 h) — is led by a specialized guide. Tours are booked separately from the cabins; tell us which ones you like and we will confirm details and availability by WhatsApp.',
-      es: 'Todos los tours —tubing (1,5 h), chocolate (2 h) y caminata nocturna (1,5 h)— se realizan con un guía especializado. Se reservan aparte de las cabañas; cuéntanos cuáles te interesan y te confirmamos detalles y disponibilidad por WhatsApp.',
+      en: 'Every tour — tubing (2 h), chocolate (1.5 h) and night walk (1.5 h) — is led by a specialized guide. Tours are booked separately from the cabins; tell us which ones you like and we will confirm details and availability by WhatsApp.',
+      es: 'Todos los tours —tubing (2 h), chocolate (1,5 h) y caminata nocturna (1,5 h)— se realizan con un guía especializado. Se reservan aparte de las cabañas; cuéntanos cuáles te interesan y te confirmamos detalles y disponibilidad por WhatsApp.',
     },
   },
   {
@@ -99,10 +99,10 @@ export const faqs: Faq[] = [
 ];
 
 /**
- * Trust badges. The wireframe lists Booking ★★★★★, Airbnb ★★★★★, ICT Certified
- * and Tripadvisor Travelers' Choice. The documentation only confirms that the
- * business is active on Booking and Airbnb, so ratings, ICT and Tripadvisor
- * stay disabled until the owners confirm them (set enabled: true + add url/rating).
+ * Trust badges. Only verified data: Booking, Airbnb and Tripadvisor listings
+ * (links come from env vars) and the Airbnb rating read from the public
+ * listing on 30 Sep 2026 — update rating/reviewCount when they change.
+ * ICT stays disabled until the owners confirm it.
  */
 export interface TrustBadge {
   id: string;
@@ -110,15 +110,17 @@ export interface TrustBadge {
   kind: 'listing' | 'certification' | 'award';
   enabled: boolean;
   url: string | null;
-  /** Verified rating (e.g. 4.9). null = don't show stars. */
+  /** Verified average rating (e.g. 4.88). null = don't show. */
   rating: number | null;
+  /** Number of reviews behind the rating. */
+  reviewCount?: number;
 }
 
 export const trustBadges: TrustBadge[] = [
+  { id: 'airbnb', label: 'Airbnb', kind: 'listing', enabled: true, url: site.listings.airbnb, rating: 4.88, reviewCount: 57 },
+  { id: 'tripadvisor', label: 'Tripadvisor', kind: 'listing', enabled: true, url: site.listings.tripadvisor, rating: null },
   { id: 'booking', label: 'Booking.com', kind: 'listing', enabled: true, url: site.listings.booking, rating: null },
-  { id: 'airbnb', label: 'Airbnb', kind: 'listing', enabled: true, url: site.listings.airbnb, rating: null },
   { id: 'ict', label: 'ICT', kind: 'certification', enabled: false, url: null, rating: null },
-  { id: 'tripadvisor', label: 'Tripadvisor', kind: 'award', enabled: false, url: null, rating: null },
 ];
 
 /** Facts that build trust, all from the documentation. */
@@ -126,7 +128,6 @@ export const trustFacts: { icon: string; text: L }[] = [
   { icon: 'home', text: { en: 'Family-run', es: 'Negocio familiar' } },
   { icon: 'compass', text: { en: 'Specialized guides on every tour', es: 'Guías especializados en cada tour' } },
   { icon: 'access', text: { en: 'Accessible cabin (Law 7600)', es: 'Cabaña accesible (Ley 7600)' } },
-  { icon: 'shield', text: { en: `Secure ${p}% deposit via PayPal`, es: `Adelanto seguro del ${p}% vía PayPal` } },
 ];
 
 export const sustainability: { id: string; icon: string; title: L; text: L }[] = [
@@ -160,15 +161,21 @@ export const sustainability: { id: string; icon: string; title: L; text: L }[] =
 ];
 
 /**
- * Testimonials — ONLY real reviews, copied with permission (e.g. from Booking
- * or Airbnb). The section stays hidden while this list is empty.
- * Example shape: { quote: { en: '…', es: '…' }, name: 'Ana', country: 'Canada', rating: 5, source: 'Booking.com' }
+ * Guest reviews — ONLY real reviews copied from the public listings
+ * (Airbnb, Tripadvisor, Booking.com, Google). Keep the text exactly as the
+ * guest wrote it, in its original language (`lang`). The reviews block in the
+ * "Book with confidence" section stays hidden while this list is empty.
+ * Shape: { text: '…', lang: 'es', name: 'Ana', from: 'Canadá', date: '2026-08', rating: 5, source: 'airbnb' }
  */
-export interface Testimonial {
-  quote: L;
+export type ReviewSource = 'airbnb' | 'tripadvisor' | 'booking' | 'google';
+export interface Review {
+  text: string;
+  lang: Lang;
   name: string;
-  country: string;
-  rating: number;
-  source?: string;
+  from?: string;
+  /** YYYY-MM */
+  date?: string;
+  rating?: number;
+  source: ReviewSource;
 }
-export const testimonials: Testimonial[] = [];
+export const reviews: Review[] = [];

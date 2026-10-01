@@ -32,6 +32,9 @@ export const site = {
   listings: {
     booking: clean(env.PUBLIC_BOOKING_URL),
     airbnb: clean(env.PUBLIC_AIRBNB_URL),
+    tripadvisor:
+      clean(env.PUBLIC_TRIPADVISOR_URL) ??
+      'https://www.tripadvisor.com/Hotel_Review-g309224-d34104570-Reviews-Montanas_del_Tenorio-Alajuela_Province_of_Alajuela.html',
   },
   paypalMeUrl: clean(env.PUBLIC_PAYPAL_ME_URL),
   depositPercent: 30,

@@ -27,7 +27,7 @@ const unit = price
 const tail = price ? [unit, price.basis?.[lang]].filter(Boolean).join(' · ') : '';
 const onRequest = kind === 'cabin' ? t.cabins.priceOnRequest : t.tours.priceOnRequest;
 const label = kind === 'cabin' ? t.cabins.priceLabel : t.tours.priceLabel;
-const notes = price?.notes?.[lang] ?? [];
+const notes = price ? [...(price.notes?.[lang] ?? []), t.cabins.taxIncluded] : [];
 ---
 {variant === 'card' ? (
   <div class:list={['price', extra]}>

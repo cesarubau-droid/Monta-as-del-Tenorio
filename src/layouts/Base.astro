@@ -51,9 +51,11 @@ const business = {
   ...(sameAs.length ? { sameAs } : {}),
   numberOfRooms: 3,
   ...(() => {
-    const amounts = cabins.flatMap((c) => (c.price ? [c.price.amount] : []));
+    const prices = cabins.flatMap((c) => (c.price ? [c.price] : []));
+    const amounts = prices.map((p) => p.amount);
+    const cur = prices[0]?.currency ?? 'USD';
     return amounts.length
-      ? { priceRange: `${formatMoney(Math.min(...amounts), 'CRC', lang)} – ${formatMoney(Math.max(...amounts), 'CRC', lang)}`, currenciesAccepted: 'CRC, USD' }
+      ? { priceRange: `${formatMoney(Math.min(...amounts), cur, lang)} – ${formatMoney(Math.max(...amounts), cur, lang)}`, currenciesAccepted: 'USD, CRC' }
       : {};
   })(),
   availableLanguage: ['en', 'es'],
