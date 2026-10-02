@@ -113,9 +113,9 @@ const en = {
   gallery: {
     kicker: 'Gallery',
     title: 'A glimpse of Montañas del Tenorio',
-    lead: 'Forest, river, wildlife and the people who guide you.',
+    lead: 'Forest, river, wildlife and the forest at night.',
     tabsLabel: 'Photo categories',
-    categories: { forest: 'Forest Views', river: 'River & Tubing', wildlife: 'Wildlife', guides: 'Guides' },
+    categories: { forest: 'Forest Views', river: 'River & Tubing', wildlife: 'Wildlife', night: 'At Night' },
     seeAll: 'Open gallery',
     placeholderNote: 'Our photo gallery is being updated. Images shown are provisional illustrations.',
   },
@@ -261,7 +261,7 @@ const en = {
     },
     gallery: {
       title: 'Gallery | Montañas del Tenorio, Río Celeste',
-      description: 'Forest views, river and tubing, wildlife and guides at Montañas del Tenorio, a family-run eco lodge near Tenorio Volcano.',
+      description: 'Forest views, river and tubing, wildlife and night life at Montañas del Tenorio, a family-run eco lodge near Tenorio Volcano.',
     },
     contact: {
       title: 'Contact & Location | Montañas del Tenorio',
@@ -404,9 +404,9 @@ const es: Dict = {
   gallery: {
     kicker: 'Galería',
     title: 'Un vistazo a Montañas del Tenorio',
-    lead: 'Bosque, río, vida silvestre y las personas que te guían.',
+    lead: 'Bosque, río, vida silvestre y el bosque de noche.',
     tabsLabel: 'Categorías de fotos',
-    categories: { forest: 'Vistas del bosque', river: 'Río y tubing', wildlife: 'Vida silvestre', guides: 'Guías' },
+    categories: { forest: 'Vistas del bosque', river: 'Río y tubing', wildlife: 'Vida silvestre', night: 'De noche' },
     seeAll: 'Abrir galería',
     placeholderNote: 'Estamos actualizando nuestra galería. Las imágenes que ves son ilustraciones provisionales.',
   },
@@ -552,7 +552,7 @@ const es: Dict = {
     },
     gallery: {
       title: 'Galería | Montañas del Tenorio, Río Celeste',
-      description: 'Vistas del bosque, río y tubing, vida silvestre y guías en Montañas del Tenorio, eco lodge familiar junto al Volcán Tenorio.',
+      description: 'Vistas del bosque, río y tubing, vida silvestre y fauna nocturna en Montañas del Tenorio, eco lodge familiar junto al Volcán Tenorio.',
     },
     contact: {
       title: 'Contacto y Ubicación | Montañas del Tenorio',

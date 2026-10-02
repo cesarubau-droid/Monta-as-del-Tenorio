@@ -17,3 +17,6 @@ public/apple-touch-icon.png
 public/images/**/*.svg
 # Lockfile not versioned yet (exact versions pinned in package.json)
 package-lock.json
+
+# Archivos comprimidos (fotos crudas, entregas) — no se versionan
+*.zip
