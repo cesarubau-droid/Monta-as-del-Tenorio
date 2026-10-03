@@ -51,46 +51,68 @@ function ph(folder: string, id: string, ratio: Ratio, brief: string, en: string,
   ];
 }
 
+/** Final photo (optimized by `npm run optimize-photos` from photos/<id>.jpg). */
+function photo(folder: string, id: string, ratio: Ratio, en: string, es: string): [string, MediaItem] {
+  const [width, height] = size[ratio];
+  return [id, { src: `/images/${folder}/${id}.jpg`, width, height, brief: '', placeholder: false, optimized: true, alt: { en, es } }];
+}
+
 export const media: Record<string, MediaItem> = Object.fromEntries([
   // HERO (16:9) — per wireframe: forest/river + couple at cabin + family tubing + wildlife
-  ph('hero', 'hero-forest-river', '16:9', 'Río Celeste turquoise water with surrounding forest', 'forest and the turquoise Río Celeste', 'bosque y el Río Celeste turquesa'),
-  ph('hero', 'hero-cabin-couple', '16:9', 'Couple relaxing on a cabin terrace facing the forest', 'a couple on a cabin terrace', 'una pareja en la terraza de una cabaña'),
-  ph('hero', 'hero-family-tubing', '16:9', 'Family tubing on the river with a guide', 'a family tubing on the river', 'una familia haciendo tubing en el río'),
-  ph('hero', 'hero-wildlife', '16:9', 'Wildlife close-up in the forest (bird, frog, etc.)', 'wildlife in the forest', 'vida silvestre en el bosque'),
+  photo('hero', 'hero-forest-river', '16:9', 'Río Celeste flowing between mossy rocks in the rainforest', 'El Río Celeste corriendo entre rocas con musgo en el bosque'),
+  photo('hero', 'hero-cabin-couple', '16:9', 'Wooden balcony of the Tenorio Cabin with rocking chairs and a view of the garden', 'Balcón de madera de la Cabaña Tenorio con mecedoras y vista al jardín'),
+  photo('hero', 'hero-family-tubing', '16:9', 'Guests with helmets tubing down the rapids of Río Celeste', 'Huéspedes con casco bajando los rápidos del Río Celeste en tubing'),
+  photo('hero', 'hero-wildlife', '16:9', 'Keel-billed toucan perched on a branch near the cabins', 'Tucán pico iris posado en una rama cerca de las cabañas'),
   // ABOUT
   ph('about', 'founders', '4:3', 'Portrait of the founding family at the property', 'the family behind Montañas del Tenorio', 'la familia detrás de Montañas del Tenorio'),
-  ph('about', 'lookout', '4:3', 'View from the lookout on the property', 'the lookout on the property', 'el mirador de la propiedad'),
+  photo('about', 'lookout', '4:3', 'View from the cabin porch over the pasture and forest', 'Vista desde el corredor de la cabaña hacia el potrero y el bosque'),
   // CABINS (3:2)
-  ph('cabins', 'cabin-rustic', '3:2', 'Tenorio Cabin — 2 bedrooms and rustic rancho with wood-fired grill (sleeps 7)', 'the Tenorio Cabin', 'la Cabaña Tenorio'),
-  ph('cabins', 'cabin-semirustic', '3:2', 'Colibrí Cabin — terrace with chairs and forest view (sleeps 4)', 'the Colibrí Cabin and its terrace', 'la Cabaña Colibrí y su terraza'),
+  photo('cabins', 'cabin-rustic', '3:2', 'Wooden porch of the Tenorio Cabin overlooking the garden', 'Corredor de madera de la Cabaña Tenorio con vista al jardín'),
+  photo('cabins', 'cabin-semirustic', '3:2', 'Covered terrace of the Colibrí Cabin with armchairs facing the forest', 'Terraza techada de la Cabaña Colibrí con sillones frente al bosque'),
   ph('cabins', 'cabin-accessible', '3:2', 'Tapir Cabin — accessible (Ley 7600), forest view for birdwatching', 'the Tapir Cabin and its forest view', 'la Cabaña Tapir y su vista al bosque'),
+  photo('cabins', 'tenorio-kitchen', '3:2', 'Tenorio Cabin kitchen with gas stove and wooden cupboard', 'Cocina de la Cabaña Tenorio con cocina de gas y alacena de madera'),
+  photo('cabins', 'tenorio-lounge', '3:2', 'Tenorio Cabin lounge with wicker sofas and green curtains', 'Sala de la Cabaña Tenorio con sillones de mimbre y cortinas verdes'),
+  photo('cabins', 'tenorio-terrace', '3:2', 'Covered terrace of the Tenorio Cabin with wooden tables', 'Terraza techada de la Cabaña Tenorio con mesas de madera'),
   // CABIN GALLERIES (3:2) — first image of each gallery is the cabin photo above
-  ph('cabins', 'tenorio-bedroom', '3:2', 'Tenorio — bedroom with double bed and bunk bed', 'a bedroom in the Tenorio Cabin', 'una habitación de la Cabaña Tenorio'),
-  ph('cabins', 'tenorio-bathroom', '3:2', 'Tenorio — bathroom', 'a bathroom in the Tenorio Cabin', 'un baño de la Cabaña Tenorio'),
-  ph('cabins', 'tenorio-rancho', '3:2', 'Tenorio — rustic rancho with wood-fired grill', 'the rancho with wood-fired grill', 'el rancho con parrilla de leña'),
-  ph('cabins', 'tenorio-living', '3:2', 'Tenorio — living area with TV', 'the living area of the Tenorio Cabin', 'la sala de la Cabaña Tenorio'),
-  ph('cabins', 'colibri-bedroom', '3:2', 'Colibrí — bedroom with double bed', 'a bedroom in the Colibrí Cabin', 'una habitación de la Cabaña Colibrí'),
-  ph('cabins', 'colibri-terrace', '3:2', 'Colibrí — terrace with chairs facing the forest', 'the terrace of the Colibrí Cabin', 'la terraza de la Cabaña Colibrí'),
-  ph('cabins', 'colibri-kitchen', '3:2', 'Colibrí — kitchen area with fridge', 'the kitchen of the Colibrí Cabin', 'la cocina de la Cabaña Colibrí'),
+  photo('cabins', 'tenorio-bedroom', '3:2', 'Tenorio Cabin bedroom with a double bed and a bunk bed', 'Habitación de la Cabaña Tenorio con cama matrimonial y camarote'),
+  photo('cabins', 'tenorio-bathroom', '3:2', 'Tenorio Cabin bathroom with stone walls and shower', 'Baño de la Cabaña Tenorio con paredes de piedra y ducha'),
+  photo('cabins', 'tenorio-rancho', '3:2', 'Rustic rancho with a wood-fired grill and wooden tables', 'Rancho rústico con parrilla de leña y mesas de madera'),
+  photo('cabins', 'tenorio-living', '3:2', 'Tenorio Cabin living area with wooden floors', 'Sala de la Cabaña Tenorio con piso de madera'),
+  photo('cabins', 'colibri-bedroom', '3:2', 'Colibrí Cabin bedroom with a double bed and a window to the garden', 'Habitación de la Cabaña Colibrí con cama matrimonial y ventana al jardín'),
+  photo('cabins', 'colibri-terrace', '3:2', 'Colibrí Cabin terrace with a dining table and armchairs', 'Terraza de la Cabaña Colibrí con mesa de comedor y sillones'),
+  photo('cabins', 'colibri-bathroom', '3:2', 'Colibrí Cabin bathroom', 'Baño de la Cabaña Colibrí'),
+  photo('cabins', 'colibri-kitchen', '3:2', 'Colibrí Cabin kitchen and living area with fridge', 'Cocina y sala de la Cabaña Colibrí con refrigeradora'),
   ph('cabins', 'tapir-bedroom', '3:2', 'Tapir — double bed and sofa bed', 'the bedroom of the Tapir Cabin', 'la habitación de la Cabaña Tapir'),
   ph('cabins', 'tapir-bathroom', '3:2', 'Tapir — bathroom', 'the bathroom of the Tapir Cabin', 'el baño de la Cabaña Tapir'),
   ph('cabins', 'tapir-birdwatching', '3:2', 'Tapir — forest view for birdwatching', 'the forest view from the Tapir Cabin', 'la vista al bosque desde la Cabaña Tapir'),
   // TOURS (3:2)
-  ph('tours', 'tour-tubing', '3:2', 'Guests tubing on Río Celeste with a guide', 'tubing on the river', 'tubing en el río'),
+  photo('tours', 'tour-tubing', '3:2', 'A group getting ready for tubing in the turquoise water of Río Celeste', 'Un grupo listo para el tubing en el agua turquesa del Río Celeste'),
   ph('tours', 'tour-chocolate', '3:2', 'Hands with cacao pods / chocolate making', 'cacao and chocolate', 'cacao y chocolate'),
-  ph('tours', 'tour-night-walk', '3:2', 'Guide with flashlight showing a frog at night', 'a guided walk at night', 'una caminata guiada de noche'),
+  photo('tours', 'tour-night-walk', '3:2', 'Frog on a leaf lit by a flashlight during the night walk', 'Rana sobre una hoja iluminada con linterna durante la caminata nocturna'),
   // GALLERY (4:3) — 4 per category
-  ...['1', '2', '3', '4'].map((n) => ph('gallery/forest', `forest-${n}`, '4:3', 'Forest views / lookout / cabins in the forest', `forest view ${n}`, `vista del bosque ${n}`)),
-  ...['1', '2', '3', '4'].map((n) => ph('gallery/river', `river-${n}`, '4:3', 'Río Celeste and tubing', `river and tubing ${n}`, `río y tubing ${n}`)),
-  ...['1', '2', '3', '4'].map((n) => ph('gallery/wildlife', `wildlife-${n}`, '4:3', 'Birds, frogs and other wildlife on the property', `wildlife ${n}`, `vida silvestre ${n}`)),
-  ...['1', '2', '3', '4'].map((n) => ph('gallery/guides', `guides-${n}`, '4:3', 'Specialized guides with guests', `guide with guests ${n}`, `guía con visitantes ${n}`)),
+  photo('gallery/forest', 'forest-1', '4:3', 'Garden with flowering tropical plants next to one of the cabins', 'Jardín con plantas tropicales en flor junto a una de las cabañas'),
+  photo('gallery/forest', 'forest-2', '4:3', 'A cabin among tropical plants and red flowers', 'Una cabaña entre plantas tropicales y flores rojas'),
+  photo('gallery/forest', 'forest-3', '4:3', 'Wild mushrooms growing on a mossy log beside a cabin', 'Hongos silvestres en un tronco con musgo junto a una cabaña'),
+  photo('gallery/forest', 'forest-4', '4:3', 'Green garden and forest edge on the property', 'Jardín verde y orilla del bosque en la propiedad'),
+  photo('gallery/river', 'river-1', '4:3', 'Turquoise Río Celeste flowing over river stones', 'El Río Celeste turquesa corriendo entre piedras'),
+  photo('gallery/river', 'river-2', '4:3', 'Waterfall of turquoise water in the forest', 'Catarata de agua turquesa en medio del bosque'),
+  photo('gallery/river', 'river-3', '4:3', 'A turtle resting on a log over Río Celeste', 'Una tortuga descansando sobre un tronco en el Río Celeste'),
+  photo('gallery/river', 'river-4', '4:3', 'Tubing on Río Celeste seen from above', 'Tubing en el Río Celeste visto desde arriba'),
+  photo('gallery/wildlife', 'wildlife-1', '4:3', 'Strawberry poison-dart frog (blue jeans frog) on a tree trunk', 'Rana blue jeans (rana venenosa) sobre un tronco'),
+  photo('gallery/wildlife', 'wildlife-2', '4:3', 'Yellow-throated toucan in the trees by the cabins', 'Tucán de garganta amarilla en los árboles junto a las cabañas'),
+  photo('gallery/wildlife', 'wildlife-3', '4:3', 'Golden silk orb-weaver spider on its web', 'Araña de seda dorada en su telaraña'),
+  photo('gallery/wildlife', 'wildlife-4', '4:3', 'Hawk moth caterpillar that imitates a snake', 'Oruga de esfinge que imita a una serpiente'),
+  photo('gallery/night', 'night-1', '4:3', 'Small yellow tree frog found on the night walk', 'Pequeña rana arborícola amarilla en la caminata nocturna'),
+  photo('gallery/night', 'night-2', '4:3', 'A bird sleeping on a branch at night', 'Un pájaro durmiendo en una rama de noche'),
+  photo('gallery/night', 'night-3', '4:3', 'Glass frog on a leaf at night', 'Rana de vidrio sobre una hoja de noche'),
+  photo('gallery/night', 'night-4', '4:3', 'Toad on a mossy rock at night', 'Sapo sobre una roca con musgo de noche'),
 ]);
 
 export const gallery = {
   forest: ['forest-1', 'forest-2', 'forest-3', 'forest-4'],
   river: ['river-1', 'river-2', 'river-3', 'river-4'],
   wildlife: ['wildlife-1', 'wildlife-2', 'wildlife-3', 'wildlife-4'],
-  guides: ['guides-1', 'guides-2', 'guides-3', 'guides-4'],
+  night: ['night-1', 'night-2', 'night-3', 'night-4'],
 } as const;
 export type GalleryCategory = keyof typeof gallery;
 
@@ -98,17 +120,22 @@ type L = Record<Lang, string>;
 /** Photos shown in each cabin's carousel ("Ver más"), in order, with a short caption. */
 export const cabinGalleries: Record<string, { id: string; caption: L }[]> = {
   tenorio: [
-    { id: 'cabin-rustic', caption: { en: 'Exterior', es: 'Exterior' } },
+    { id: 'cabin-rustic', caption: { en: 'Porch with a view of the garden', es: 'Corredor con vista al jardín' } },
     { id: 'tenorio-bedroom', caption: { en: 'Bedroom: double bed and bunk bed', es: 'Habitación: cama matrimonial y camarote' } },
-    { id: 'tenorio-living', caption: { en: 'Living area with TV', es: 'Sala con TV' } },
+    { id: 'tenorio-lounge', caption: { en: 'Lounge', es: 'Sala' } },
+    { id: 'tenorio-living', caption: { en: 'Hallway and dining area', es: 'Pasillo y comedor' } },
+    { id: 'tenorio-kitchen', caption: { en: 'Kitchen', es: 'Cocina' } },
     { id: 'tenorio-bathroom', caption: { en: 'Bathroom', es: 'Baño' } },
+    { id: 'tenorio-terrace', caption: { en: 'Covered terrace', es: 'Terraza techada' } },
+    { id: 'hero-cabin-couple', caption: { en: 'Balcony with rocking chairs', es: 'Balcón con mecedoras' } },
     { id: 'tenorio-rancho', caption: { en: 'Rustic rancho with wood-fired grill', es: 'Rancho rústico con parrilla de leña' } },
   ],
   colibri: [
-    { id: 'cabin-semirustic', caption: { en: 'Exterior', es: 'Exterior' } },
+    { id: 'cabin-semirustic', caption: { en: 'Covered terrace with armchairs', es: 'Terraza techada con sillones' } },
     { id: 'colibri-bedroom', caption: { en: 'Bedroom with double bed', es: 'Habitación con cama matrimonial' } },
+    { id: 'colibri-kitchen', caption: { en: 'Kitchen and living area', es: 'Cocina y sala' } },
+    { id: 'colibri-bathroom', caption: { en: 'Bathroom', es: 'Baño' } },
     { id: 'colibri-terrace', caption: { en: 'Terrace facing the forest', es: 'Terraza frente al bosque' } },
-    { id: 'colibri-kitchen', caption: { en: 'Kitchen', es: 'Cocina' } },
   ],
   tapir: [
     { id: 'cabin-accessible', caption: { en: 'Exterior', es: 'Exterior' } },
