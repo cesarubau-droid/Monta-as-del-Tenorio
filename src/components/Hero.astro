@@ -1,5 +1,9 @@
 ---
-import Icon from './Icon.astro';
+/**
+ * Portada: una foto fija del Río Celeste que ocupa toda la pantalla.
+ * Se mete por debajo del header (que aquí es transparente) gracias al margen negativo.
+ */
+import Photo from './Photo.astro';
 import { useT } from '../i18n/ui';
 import { url, type Lang } from '../i18n/routes';
 
@@ -8,25 +12,8 @@ const { lang } = Astro.props;
 const t = useT(lang);
 ---
 <section class="hero" aria-labelledby="hero-title">
-  <!-- Video de portada: decorativo, sin sonido, en bucle. Se pausa con el botón y no arranca solo
-       si la persona pidió "reducir movimiento" o tiene activado el ahorro de datos. -->
-  <div class="hero__media" data-hero-video>
-    <video
-      class="hero__video"
-      muted
-      loop
-      playsinline
-      preload="none"
-      poster="/images/hero/hero-tubing-poster.jpg"
-      data-src-sm="/videos/hero-tubing-480.mp4"
-      data-src-lg="/videos/hero-tubing.mp4"
-      aria-hidden="true"
-      tabindex="-1"
-    ></video>
-    <button type="button" class="hero__btn hero__toggle" data-toggle data-paused="true" aria-label={t.hero.play} data-label-pause={t.hero.pause} data-label-play={t.hero.play}>
-      <Icon name="pause" size={18} class="icon hero__pause" />
-      <Icon name="play" size={18} class="icon hero__play" />
-    </button>
+  <div class="hero__media">
+    <Photo id="hero-forest-river" lang={lang} eager sizes="100vw" class="hero__img" alt="" />
   </div>
 
   <div class="hero__content">
@@ -46,22 +33,25 @@ const t = useT(lang);
 </section>
 
 <style>
-  .hero { position: relative; isolation: isolate; min-height: 520px; display: flex; align-items: flex-end; color: #fff; overflow: hidden; background: var(--petrol); }
-  @media (min-width: 1024px) { .hero { min-height: min(82vh, 720px); } }
-  .hero__media { position: absolute; inset: 0; z-index: -1; background: var(--petrol) url('/images/hero/hero-tubing-poster.jpg') center / cover no-repeat; }
-  .hero__video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-  /* Overlay so white text keeps AA contrast over any frame */
+  .hero {
+    position: relative; isolation: isolate; display: flex; align-items: flex-end; color: #fff; overflow: hidden; background: var(--petrol);
+    /* Toda la pantalla, contando el espacio del header que queda encima */
+    margin-top: calc(-1 * var(--header-h) - 1px); /* + borde del header */
+    min-height: 100vh;
+    min-height: 100svh;
+  }
+  .hero__media { position: absolute; inset: 0; z-index: -1; }
+  .hero__media :global(picture), .hero__media :global(img) { display: block; width: 100%; height: 100%; }
+  .hero__media :global(img) { object-fit: cover; object-position: 50% 60%; }
+  /* Overlay: arriba oscurece para el header, abajo para que el texto blanco cumpla AA */
   .hero__media::after {
     content: ''; position: absolute; inset: 0; pointer-events: none;
     background:
-      linear-gradient(180deg, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.35) 45%, rgba(0, 0, 0, 0.75) 100%),
+      linear-gradient(180deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.25) 12%, rgba(0, 0, 0, 0) 26%),
+      linear-gradient(180deg, rgba(0, 0, 0, 0) 30%, rgba(0, 0, 0, 0.35) 55%, rgba(0, 0, 0, 0.78) 100%),
       linear-gradient(90deg, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0) 65%);
   }
-  /* Content sits above the video; let clicks reach the pause button */
-  .hero__content { pointer-events: none; }
-  .hero__content :is(a, h1, p) { pointer-events: auto; }
-  .hero__content { width: 100%; padding-block: var(--space-2xl) calc(var(--space-2xl) + 56px); }
-  @media (min-width: 640px) { .hero__content { padding-bottom: calc(var(--space-2xl) + 24px); } }
+  .hero__content { width: 100%; padding-block: calc(var(--header-h) + var(--space-2xl)) var(--space-3xl); }
   .hero h1 { color: #fff; max-width: 14ch; font-size: var(--fs-display); line-height: 1; text-shadow: 0 2px 16px rgba(0, 0, 0, 0.35); }
   .hero__eyebrow {
     display: block; margin-bottom: var(--space-md); max-width: 40ch;
@@ -73,69 +63,4 @@ const t = useT(lang);
   .hero__ctas { margin-top: var(--space-lg); flex-direction: column; }
   .hero__ctas .btn { width: 100%; }
   @media (min-width: 640px) { .hero__ctas { flex-direction: row; } .hero__ctas .btn { width: auto; } }
-  .hero__placeholder-note {
-    display: inline-block; margin-bottom: var(--space-md); font-size: var(--fs-label); font-weight: 600;
-    padding: 2px 10px; border-radius: 999px; background: rgba(0, 0, 0, 0.55);
-  }
-
-  .hero__toggle { position: absolute; right: var(--gutter); bottom: 16px; z-index: 2; }
-  @media (min-width: 640px) { .hero__toggle { right: calc(var(--gutter) + 8px); bottom: 24px; } }
-  .hero__btn {
-    display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; padding: 0; cursor: pointer;
-    background: rgba(0, 0, 0, 0.4); color: #fff; border: 1px solid rgba(255, 255, 255, 0.5);
-    transition: background-color 200ms ease;
-  }
-  .hero__btn:hover { background: rgba(0, 0, 0, 0.6); }
-  .hero__btn :global(.hero__play) { display: none; }
-  .hero__btn[data-paused='true'] :global(.hero__play) { display: block; }
-  .hero__btn[data-paused='true'] :global(.hero__pause) { display: none; }
 </style>
-
-<script>
-  document.querySelectorAll<HTMLElement>('[data-hero-video]').forEach((root) => {
-    const video = root.querySelector<HTMLVideoElement>('video');
-    const toggle = root.querySelector<HTMLButtonElement>('[data-toggle]');
-    if (!video || !toggle) return;
-
-    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true;
-    let loaded = false;
-
-    const setPaused = (p: boolean) => {
-      toggle.dataset.paused = String(p);
-      toggle.setAttribute('aria-label', (p ? toggle.dataset.labelPlay : toggle.dataset.labelPause) || '');
-    };
-    const load = () => {
-      if (loaded) return;
-      video.src = (matchMedia('(min-width: 768px)').matches ? video.dataset.srcLg : video.dataset.srcSm) || '';
-      loaded = true;
-    };
-    const play = () => {
-      load();
-      video.play().then(() => setPaused(false)).catch(() => setPaused(true));
-    };
-    const pause = () => { video.pause(); setPaused(true); };
-
-    // The person decides: once they pause, it stays paused
-    let userPaused = reduced || saveData;
-    toggle.addEventListener('click', () => {
-      userPaused = !video.paused;
-      if (userPaused) pause(); else play();
-    });
-    // Save battery: pause when the tab is hidden or the hero is off screen
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) video.pause();
-      else if (!userPaused && loaded) video.play().catch(() => {});
-    });
-    if ('IntersectionObserver' in window) {
-      new IntersectionObserver(([e]) => {
-        if (!loaded || userPaused) return;
-        if (e.isIntersecting) video.play().catch(() => {});
-        else video.pause();
-      }).observe(root);
-    }
-
-    if (userPaused) setPaused(true);
-    else play();
-  });
-</script>

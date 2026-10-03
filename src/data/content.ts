@@ -183,19 +183,56 @@ export interface Review {
 /**
  * Real reviews from the Airbnb listing (export of 2 Oct 2026, public comments only).
  * Airbnb exports them already translated to Spanish; the text is kept exactly as exported.
- * The first three are shown, in this order.
+ * Shown in the reviews carousel, in this order. Picked: 5 stars, no mention of
+ * breakfast being included (breakfast is a separate service), no complaints.
  */
 export const reviews: Review[] = [
   {
-    text: 'Excelente estancia para nuestra familia de 5 en este alojamiento de troncos de madera. Muy rústico. A pocos minutos del parque Tenorio y de la cascada Río Celeste. Muy buena comunicación con nuestro anfitrión, que incluso nos llevó a ver la salida de la luna y las luciérnagas, ¡y nos bañamos en el río de su propiedad! ¡Gracias por todo! También nos encantaron los colibríes y los perros muy amigables. ¡En resumen, fue genial!',
+    text: "Excelente estancia para nuestra familia de 5 en este alojamiento de troncos de madera. Muy rústico. A pocos minutos del parque Tenorio y de la cascada Río Celeste. Muy buena comunicación con nuestro anfitrión, que incluso nos llevó a ver la salida de la luna y las luciérnagas, ¡y nos bañamos en el río de su propiedad! ¡Gracias por todo! También nos encantaron los colibríes y los perros muy amigables. ¡En resumen, fue genial!",
     lang: 'es', name: 'Chrystèle', date: '2025-08', rating: 5, source: 'airbnb', translatedFrom: 'fr',
   },
   {
-    text: 'Hermosa casa y patio con mucho carácter. Lo mejor de todo fue la caminata de 5 minutos hasta el Río Celeste a través de la propiedad de los dueños. Había muchas aves. ¡Excelente estadía!',
+    text: "¡Nos encantó nuestra estancia! ¡El lugar es exactamente como se muestra en la foto y está en una ubicación excelente! Solo estuvimos allí una noche, pero nos hubiera gustado quedarnos más tiempo. ¡Qué propiedad tan hermosa!",
+    lang: 'es', name: 'Chelsea', date: '2026-07', rating: 5, source: 'airbnb', translatedFrom: 'en',
+  },
+  {
+    text: "Hermosa casa y patio con mucho carácter. Lo mejor de todo fue la caminata de 5 minutos hasta el Río Celeste a través de la propiedad de los dueños. Había muchas aves. ¡Excelente estadía!",
     lang: 'es', name: 'Betsy', date: '2026-04', rating: 5, source: 'airbnb', translatedFrom: 'en',
   },
   {
-    text: '¡Nos encantó nuestra estancia! ¡El lugar es exactamente como se muestra en la foto y está en una ubicación excelente! Solo estuvimos allí una noche, pero nos hubiera gustado quedarnos más tiempo. ¡Qué propiedad tan hermosa!',
-    lang: 'es', name: 'Chelsea', date: '2026-07', rating: 5, source: 'airbnb', translatedFrom: 'en',
+    text: "Preciosa casa de campo con un jardín fantástico y un lugar para nadar en el Río Celeste.",
+    lang: 'es', name: 'Laurens', date: '2026-03', rating: 5, source: 'airbnb', translatedFrom: 'en',
+  },
+  {
+    text: "Un lugar muy bello y tranquilo. A escasos 300 mts del Río Celeste y con una entrada privada al río.",
+    lang: 'es', name: 'David', date: '2025-06', rating: 5, source: 'airbnb',
+  },
+  {
+    text: "Lo pasamos de maravilla. La cabaña era exactamente lo que estábamos buscando. La anfitriona hizo todo lo posible para que nos sintiéramos como en casa y nos mostró la hermosa propiedad. El río está a solo unos minutos a pie a través de un hermoso sendero en su propiedad. Nuestra estancia fue todo lo que podíamos haber pedido. Sin dudas volveremos!",
+    lang: 'es', name: 'Michelle', date: '2024-06', rating: 5, source: 'airbnb', translatedFrom: 'en',
+  },
+  {
+    text: "Nos encantó nuestra estancia aquí. Iliana fue una anfitriona amable y muy atenta, y nos hizo sentir como en casa. Está ubicado en unas tierras de cultivo impresionantes, y durante nuestra estancia allí vimos ranas venenosas, perezosos y aves increíbles. Se encuentra a unos 10 minutos del parque nacional y de algunos restaurantes excelentes, pero la cocina también es fácil de usar. Excelente lugar para hospedarnos en familia y sin duda nos hospedaremos allí de nuevo cuando volvamos a la zona.",
+    lang: 'es', name: 'Devon', date: '2023-04', rating: 5, source: 'airbnb', translatedFrom: 'en',
+  },
+  {
+    text: "Decidimos pasar nuestros últimos dos días en el volcán Tenorio, sin saber nada sobre él. Tuvimos la suerte de encontrar este tesoro. La cabaña de Xinia está en una hermosa propiedad y granja. Ha plantado las flores y los arbustos con un ojo artístico y como un regalo para los huéspedes. Hay colibríes a pocos metros de ti en el porche, deleitándose con las flores. Ella y su familia son el epítome de la hospitalidad y la amabilidad. Nos enamoramos de la zona y de la comunidad, y esperamos volver pronto.",
+    lang: 'es', name: 'Jenna', date: '2022-07', rating: 5, source: 'airbnb', translatedFrom: 'en',
+  },
+  {
+    text: "Excepcional. Un pequeño paraíso. Nos hubiera gustado quedarnos más tiempo.",
+    lang: 'es', name: 'Sebastien', date: '2022-07', rating: 5, source: 'airbnb', translatedFrom: 'fr',
+  },
+  {
+    text: "¡Fue una estadía absolutamente increíble! ¡Desde el paisaje hasta el perezoso que vive en el patio trasero! ¡Todo sobre esta estancia fue perfecto! La hospitalidad del anfitrión fue perfecta y fue muy amable y acogedor. ¡Recomendaría este lugar a cualquiera que quiera pasar tiempo en Costa Rica! ¡Sinceramente, no tengo nada negativo que decir!",
+    lang: 'es', name: 'Jamison', date: '2022-05', rating: 5, source: 'airbnb', translatedFrom: 'en',
+  },
+  {
+    text: "¡Ojalá hubiéramos planeado pasar más tiempo en la zona, porque esta cabaña es simplemente preciosa! Un lugar fabuloso para relajarse después de hacer senderismo, y también se puede observar a un perezoso que vive allí. En general, la comunicación fue excelente y, gracias a las indicaciones que nos proporcionaron, no tuvimos problemas para encontrar el lugar. ¡Me hospedaría aquí de nuevo!",
+    lang: 'es', name: 'Robin', date: '2022-04', rating: 5, source: 'airbnb', translatedFrom: 'en',
+  },
+  {
+    text: "Nada que objetar, salvo que no hay que dudar en alojarse allí. El lugar es mágico y tranquilo. No duden en pedirle a Xinia el queso fresco que elabora... Está delicioso. Volveremos tan pronto como sea posible.",
+    lang: 'es', name: 'Karl', date: '2022-01', rating: 5, source: 'airbnb', translatedFrom: 'fr',
   },
 ];

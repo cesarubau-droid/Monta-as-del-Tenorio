@@ -1,133 +1,240 @@
 ---
 /**
- * "Reserva con confianza": anuncios en plataformas (con calificación verificada),
- * datos de confianza y, debajo, las mejores reseñas reales de huéspedes.
- * Todo sale de src/data/content.ts; el bloque de reseñas se oculta si no hay reseñas.
+ * "Reserva con confianza", versión compacta:
+ * - Una fila de datos: calificación promedio de huéspedes + datos del negocio.
+ * - Carrusel de reseñas reales que avanza solo (se puede pausar y mover a mano).
+ * - Enlaces discretos a otras plataformas (sin Airbnb: la idea es reservar directo).
+ * Todo sale de src/data/content.ts; el carrusel se oculta si no hay reseñas.
  */
 import Icon from './Icon.astro';
 import SectionHead from './Sections.astro';
-import { trustBadges, trustFacts, reviews, type ReviewSource } from '../data/content';
-import { site } from '../data/site';
+import { trustBadges, trustFacts, reviews } from '../data/content';
 import { useT, fmt } from '../i18n/ui';
 import type { Lang } from '../i18n/routes';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = useT(lang);
-const badges = trustBadges.filter((b) => b.enabled);
 
-const sourceLabel: Record<ReviewSource, string> = {
-  airbnb: 'Airbnb',
-  tripadvisor: 'Tripadvisor',
-  booking: 'Booking.com',
-  google: 'Google',
-};
-const sourceUrl: Partial<Record<ReviewSource, string | null>> = {
-  airbnb: site.listings.airbnb,
-  tripadvisor: site.listings.tripadvisor,
-  booking: site.listings.booking,
-};
-const best = reviews.slice(0, 3);
-// Only platforms that already have reviews (Tripadvisor has none yet)
-const readAll = (['airbnb', 'booking'] as ReviewSource[])
-  .filter((s) => sourceUrl[s])
-  .map((s) => ({ label: sourceLabel[s], url: sourceUrl[s] as string }));
+// Calificación promedio (viene del anuncio con más reseñas; no se muestra el nombre de la plataforma)
+const rated = trustBadges.find((b) => b.enabled && b.rating !== null && b.reviewCount);
+// Otras plataformas donde también estamos (Airbnb queda fuera a propósito)
+const others = trustBadges.filter((b) => b.enabled && b.kind === 'listing' && b.id !== 'airbnb' && b.url);
 
 const num = (n: number) => new Intl.NumberFormat(lang === 'es' ? 'es-CR' : 'en-US', { maximumFractionDigits: 2 }).format(n);
 const monthYear = (d?: string) =>
   d ? new Intl.DateTimeFormat(lang === 'es' ? 'es-CR' : 'en-US', { month: 'long', year: 'numeric' }).format(new Date(`${d}-15`)) : '';
 ---
-<section class="section" aria-labelledby="trust-title">
+<section class="section trust-sec" aria-labelledby="trust-title">
   <div class="container">
     <SectionHead kicker={t.trust.kicker} title={t.trust.title} center id="trust-title" />
-    <ul class="trust" role="list">
-      {badges.map((b) => (
-        <li class="trust__badge">
-          <span class="trust__text">
-            {b.kind === 'listing' ? t.trust.listedOn : ''}
-            <span class="trust__logo">{b.label}</span>
-            {b.rating !== null && (
-              <span class="trust__rating">
-                <Icon name="star" size={16} />
-                <span><strong>{num(b.rating)}</strong><span class="sr-only"> {fmt(t.testimonials.rating, { n: num(b.rating) })}</span></span>
-                {b.reviewCount && <span class="trust__count">· {fmt(t.trust.reviewCount, { n: b.reviewCount })}</span>}
-              </span>
-            )}
-          </span>
-          {b.url && (
-            <a href={b.url} target="_blank" rel="noopener noreferrer" class="trust__link">
-              {t.trust.viewListing}<span class="sr-only"> ({b.label}) {t.newTab}</span>
-            </a>
-          )}
+
+    <ul class="facts" role="list">
+      {rated && (
+        <li class="fact fact--rating">
+          <Icon name="star" size={18} />
+          <span><strong>{fmt(t.trust.ratingSummary, { n: num(rated.rating as number) })}</strong> · {fmt(t.trust.reviewCount, { n: rated.reviewCount as number })}</span>
         </li>
-      ))}
+      )}
       {trustFacts.map((f) => (
-        <li class="trust__badge">
-          <span class="icon-circle"><Icon name={f.icon as 'home'} /></span>
-          <span class="trust__text">{f.text[lang]}</span>
+        <li class="fact">
+          <Icon name={f.icon as 'home'} size={18} />
+          <span>{f.text[lang]}</span>
         </li>
       ))}
     </ul>
 
-    {best.length > 0 && (
-      <div class="reviews">
-        <h3 class="reviews__title">{t.trust.reviewsTitle}</h3>
-        <ul class="reviews__list" role="list">
-          {best.map((r) => (
-            <li>
+    {reviews.length > 0 && (
+      <div class="rv" data-reviews role="region" aria-roledescription="carousel" aria-label={t.trust.carouselLabel}>
+        <div class="rv__head">
+          <h3 class="rv__title">{t.trust.reviewsTitle}</h3>
+          <div class="rv__controls">
+            <button type="button" class="rv__btn" data-rv-prev aria-label={t.trust.prev}><Icon name="left" size={20} /></button>
+            <button type="button" class="rv__btn" data-rv-toggle data-paused="false" aria-label={t.trust.pause} data-label-pause={t.trust.pause} data-label-play={t.trust.play}>
+              <Icon name="pause" size={16} class="icon rv__pause" />
+              <Icon name="play" size={16} class="icon rv__play" />
+            </button>
+            <button type="button" class="rv__btn" data-rv-next aria-label={t.trust.next}><Icon name="right" size={20} /></button>
+          </div>
+        </div>
+
+        <ul class="rv__track" role="list" data-rv-track aria-live="off" tabindex="0" aria-label={t.trust.carouselLabel}>
+          {reviews.map((r, i) => (
+            <li class="rv__slide" aria-roledescription="slide" aria-label={`${i + 1} / ${reviews.length}`}>
               <figure class="review">
                 {r.rating && (
                   <span class="review__stars" role="img" aria-label={fmt(t.testimonials.rating, { n: r.rating })}>
-                    {Array.from({ length: Math.round(r.rating) }, () => <Icon name="star" size={16} />)}
+                    {Array.from({ length: Math.round(r.rating) }, () => <Icon name="star" size={14} />)}
                   </span>
                 )}
-                <blockquote lang={r.lang}><p>“{r.text}”</p></blockquote>
+                <blockquote lang={r.lang} id={`rv-text-${i}`}><p>“{r.text}”</p></blockquote>
+                <button type="button" class="review__more" data-rv-more aria-expanded="false" aria-controls={`rv-text-${i}`} data-label-more={t.trust.readMore} data-label-less={t.trust.readLess} hidden>{t.trust.readMore}</button>
                 <figcaption>
-                  <span><strong>{r.name}</strong>{r.from && ` · ${r.from}`}</span>
-                  <span class="review__meta">{fmt(t.trust.reviewOn, { site: sourceLabel[r.source] })}{r.date && ` · ${monthYear(r.date)}`}</span>
-                  {r.translatedFrom && <span class="review__meta">{fmt(t.trust.translatedBy, { site: sourceLabel[r.source] })}</span>}
+                  <strong>{r.name}</strong>
+                  <span class="review__meta">
+                    {monthYear(r.date)}
+                    {r.translatedFrom && ` · ${fmt(t.trust.translatedFrom, { lang: t.trust.langs[r.translatedFrom] })}`}
+                  </span>
                 </figcaption>
               </figure>
             </li>
           ))}
         </ul>
-        {readAll.length > 0 && (
-          <p class="reviews__all">
-            {readAll.map((s) => (
-              <a href={s.url} target="_blank" rel="noopener noreferrer">
-                {fmt(t.trust.readAll, { site: s.label })}<span class="sr-only"> {t.newTab}</span>
-              </a>
-            ))}
-          </p>
-        )}
       </div>
+    )}
+
+    {others.length > 0 && (
+      <p class="also">
+        {t.trust.alsoOn}{' '}
+        {others.map((b, i) => (
+          <>
+            {i > 0 && ' · '}
+            <a href={b.url as string} target="_blank" rel="noopener noreferrer">{b.label}<span class="sr-only"> {t.newTab}</span></a>
+          </>
+        ))}
+      </p>
     )}
   </div>
 </section>
-<style>
-  .trust { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-md); list-style: none; padding: 0; }
-  @media (min-width: 640px) { .trust { grid-template-columns: repeat(3, 1fr); gap: var(--space-lg); } }
-  @media (min-width: 1024px) { .trust { grid-template-columns: repeat(6, 1fr); } }
-  .trust__badge {
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center;
-    padding: var(--space-md); min-height: 140px; background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-md);
-  }
-  .trust__logo { font-weight: 700; font-size: 1.05rem; color: var(--text); font-family: var(--font-serif); min-height: 48px; display: grid; place-items: center; }
-  .trust__text { font-size: var(--fs-sm); font-weight: 600; color: var(--text); display: flex; flex-direction: column; align-items: center; gap: 4px; }
-  .trust__rating { display: inline-flex; align-items: center; gap: 4px; flex-wrap: wrap; justify-content: center; }
-  .trust__rating :global(.icon) { color: var(--clay); }
-  .trust__count { font-weight: 400; color: var(--text-2); }
-  .trust__link { font-size: var(--fs-sm); text-decoration: underline; min-height: 44px; display: inline-flex; align-items: center; }
 
-  .reviews { margin-top: var(--space-3xl); }
-  .reviews__title { text-align: center; font-size: clamp(1.6rem, 3vw, 2.2rem); margin-bottom: var(--space-xl); }
-  .reviews__list { display: grid; gap: var(--space-lg); list-style: none; padding: 0; }
-  @media (min-width: 900px) { .reviews__list { grid-template-columns: repeat(3, 1fr); } }
-  .review { height: 100%; display: flex; flex-direction: column; gap: var(--space-md); padding: var(--space-xl) var(--space-lg); background: var(--card-bg); border: 1px solid var(--border); border-top: 3px solid var(--celeste); }
-  .review__stars { display: inline-flex; color: var(--clay); }
-  .review blockquote { font-family: var(--font-serif); font-size: 1.15rem; line-height: 1.5; color: var(--text); flex: 1; }
+<style>
+  .trust-sec { padding-block: clamp(48px, 7vw, 80px); }
+  .trust-sec :global(.section-head) { margin-bottom: var(--space-lg); }
+  .trust-sec :global(.section-head h2) { font-size: clamp(1.9rem, 4vw, 2.6rem); }
+
+  /* Fila compacta de datos */
+  .facts { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 12px; list-style: none; padding: 0; }
+  .fact {
+    display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px;
+    font-size: var(--fs-sm); font-weight: 600; color: var(--text);
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 999px;
+  }
+  .fact :global(.icon) { color: var(--kicker); flex: none; }
+  .fact--rating :global(.icon) { color: var(--clay); }
+  @media (max-width: 639px) { .facts { gap: 6px; } .fact { padding: 6px 12px; font-size: 0.8125rem; } }
+  .fact--rating span { font-weight: 400; }
+  .fact--rating strong { font-weight: 700; }
+
+  /* Carrusel */
+  .rv { margin-top: var(--space-2xl); }
+  .rv__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-md); margin-bottom: var(--space-md); }
+  .rv__title { font-size: clamp(1.25rem, 2.2vw, 1.6rem); }
+  .rv__controls { display: flex; gap: 6px; flex: none; }
+  .rv__btn {
+    display: grid; place-items: center; width: 44px; height: 44px; padding: 0; cursor: pointer;
+    background: var(--card-bg); color: var(--text); border: 1px solid var(--border); border-radius: 50%;
+    transition: background-color 200ms ease, color 200ms ease;
+  }
+  .rv__btn:hover { background: var(--petrol); color: #fff; border-color: var(--petrol); }
+  .rv__btn:focus-visible { outline: 3px solid var(--celeste); outline-offset: 2px; }
+  .rv__btn :global(.rv__play) { display: none; }
+  .rv__btn[data-paused='true'] :global(.rv__play) { display: block; }
+  .rv__btn[data-paused='true'] :global(.rv__pause) { display: none; }
+
+  .rv__track {
+    display: grid; grid-auto-flow: column; grid-auto-columns: 88%; gap: var(--space-md);
+    list-style: none; padding: 2px 2px 8px; margin: 0;
+    overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+  .rv__track::-webkit-scrollbar { display: none; }
+  @media (min-width: 640px) { .rv__track { grid-auto-columns: calc((100% - var(--space-md)) / 2); } }
+  @media (min-width: 1024px) { .rv__track { grid-auto-columns: calc((100% - 2 * var(--space-md)) / 3); } }
+  .rv__track { align-items: start; }
+  .rv__slide { scroll-snap-align: start; display: flex; }
+
+  .review {
+    width: 100%; display: flex; flex-direction: column; gap: 12px; padding: var(--space-lg);
+    background: var(--card-bg); border: 1px solid var(--border); border-top: 3px solid var(--celeste);
+  }
+  .review__stars { display: inline-flex; gap: 2px; color: var(--clay); }
+  /* Textos largos: 6 líneas y "Leer más"; así todas las tarjetas miden lo mismo */
+  .review blockquote { font-family: var(--font-serif); font-size: 1rem; line-height: 1.55; color: var(--text); flex: 1; min-height: calc(6 * 1.55em); }
+  .review blockquote p { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 6; line-clamp: 6; overflow: hidden; }
+  .review.is-open blockquote p { display: block; -webkit-line-clamp: unset; line-clamp: none; }
+  .review__more {
+    align-self: flex-start; min-height: 44px; margin-top: -8px; padding: 0; background: none; border: 0; cursor: pointer;
+    font: inherit; font-size: var(--fs-sm); font-weight: 600; color: var(--text); text-decoration: underline;
+  }
   .review figcaption { font-size: var(--fs-sm); color: var(--text); display: grid; gap: 2px; }
   .review__meta { color: var(--text-2); }
-  .reviews__all { margin-top: var(--space-lg); display: flex; flex-wrap: wrap; gap: var(--space-sm) var(--space-xl); justify-content: center; font-size: var(--fs-sm); }
-  .reviews__all a { text-decoration: underline; min-height: 44px; display: inline-flex; align-items: center; }
+
+  .also { margin-top: var(--space-lg); text-align: center; font-size: var(--fs-sm); color: var(--text-2); }
+  .also a { display: inline-flex; align-items: center; min-height: 44px; text-decoration: underline; color: var(--text); }
 </style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-reviews]').forEach((root) => {
+    const track = root.querySelector<HTMLElement>('[data-rv-track]');
+    const toggle = root.querySelector<HTMLButtonElement>('[data-rv-toggle]');
+    if (!track || !toggle) return;
+
+    const DELAY = 6000;
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let userPaused = reduced; // con "reducir movimiento" no avanza solo
+    let hover = false;
+    let visible = false;
+    let timer: number | undefined;
+
+    const step = () => {
+      const slide = track.querySelector<HTMLElement>('.rv__slide');
+      if (!slide) return 0;
+      return slide.offsetWidth + parseFloat(getComputedStyle(track).columnGap || '0');
+    };
+    const move = (dir: 1 | -1) => {
+      const max = track.scrollWidth - track.clientWidth - 4;
+      const behavior: ScrollBehavior = reduced ? 'auto' : 'smooth';
+      if (dir === 1 && track.scrollLeft >= max) track.scrollTo({ left: 0, behavior });
+      else if (dir === -1 && track.scrollLeft <= 4) track.scrollTo({ left: track.scrollWidth, behavior });
+      else track.scrollBy({ left: dir * step(), behavior });
+    };
+
+    const setPaused = (p: boolean) => {
+      toggle.dataset.paused = String(p);
+      toggle.setAttribute('aria-label', (p ? toggle.dataset.labelPlay : toggle.dataset.labelPause) || '');
+    };
+    const sync = () => {
+      window.clearInterval(timer);
+      timer = undefined;
+      // Mientras avanza solo, el lector de pantalla no anuncia cada cambio
+      track.setAttribute('aria-live', userPaused ? 'polite' : 'off');
+      if (!userPaused && !hover && visible && !document.hidden) timer = window.setInterval(() => move(1), DELAY);
+    };
+
+    toggle.addEventListener('click', () => { userPaused = !userPaused; setPaused(userPaused); sync(); });
+    root.querySelector('[data-rv-prev]')?.addEventListener('click', () => { move(-1); sync(); });
+    root.querySelector('[data-rv-next]')?.addEventListener('click', () => { move(1); sync(); });
+
+    // Se detiene mientras la persona lo mira de cerca o lo usa con teclado
+    root.addEventListener('mouseenter', () => { hover = true; sync(); });
+    root.addEventListener('mouseleave', () => { hover = false; sync(); });
+    root.addEventListener('focusin', () => { hover = true; sync(); });
+    root.addEventListener('focusout', (e) => { if (!root.contains(e.relatedTarget as Node)) { hover = false; sync(); } });
+    track.addEventListener('pointerdown', () => { hover = true; sync(); });
+    document.addEventListener('visibilitychange', sync);
+
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(([e]) => { visible = e.isIntersecting; sync(); }, { threshold: 0.3 }).observe(root);
+    } else {
+      visible = true;
+    }
+
+    // "Leer más" solo en las reseñas que no caben en 6 líneas
+    root.querySelectorAll<HTMLButtonElement>('[data-rv-more]').forEach((btn) => {
+      const card = btn.closest<HTMLElement>('.review');
+      const p = card?.querySelector<HTMLElement>('blockquote p');
+      if (!card || !p) return;
+      if (p.scrollHeight > p.clientHeight + 2) btn.hidden = false;
+      btn.addEventListener('click', () => {
+        const open = btn.getAttribute('aria-expanded') !== 'true';
+        card.classList.toggle('is-open', open);
+        btn.setAttribute('aria-expanded', String(open));
+        btn.textContent = (open ? btn.dataset.labelLess : btn.dataset.labelMore) || '';
+        if (open) { userPaused = true; setPaused(true); sync(); } // leyendo: no se mueve
+      });
+    });
+
+    setPaused(userPaused);
+    sync();
+  });
+</script>
