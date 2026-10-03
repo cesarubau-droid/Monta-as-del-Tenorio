@@ -27,8 +27,9 @@ const sourceUrl: Partial<Record<ReviewSource, string | null>> = {
   tripadvisor: site.listings.tripadvisor,
   booking: site.listings.booking,
 };
-const best = [...reviews].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0)).slice(0, 3);
-const readAll = (['airbnb', 'tripadvisor', 'booking'] as ReviewSource[])
+const best = reviews.slice(0, 3);
+// Only platforms that already have reviews (Tripadvisor has none yet)
+const readAll = (['airbnb', 'booking'] as ReviewSource[])
   .filter((s) => sourceUrl[s])
   .map((s) => ({ label: sourceLabel[s], url: sourceUrl[s] as string }));
 
@@ -84,6 +85,7 @@ const monthYear = (d?: string) =>
                 <figcaption>
                   <span><strong>{r.name}</strong>{r.from && ` · ${r.from}`}</span>
                   <span class="review__meta">{fmt(t.trust.reviewOn, { site: sourceLabel[r.source] })}{r.date && ` · ${monthYear(r.date)}`}</span>
+                  {r.translatedFrom && <span class="review__meta">{fmt(t.trust.translatedBy, { site: sourceLabel[r.source] })}</span>}
                 </figcaption>
               </figure>
             </li>

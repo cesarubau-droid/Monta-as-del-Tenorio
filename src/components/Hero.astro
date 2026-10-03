@@ -1,59 +1,36 @@
 ---
-import Photo from './Photo.astro';
 import Icon from './Icon.astro';
-import { heroSlides, getMedia } from '../data/media';
 import { useT } from '../i18n/ui';
 import { url, type Lang } from '../i18n/routes';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = useT(lang);
-const total = heroSlides.length;
-const provisional = heroSlides.some((id) => getMedia(id).placeholder);
 ---
 <section class="hero" aria-labelledby="hero-title">
-  <div
-    class="hero__carousel"
-    role="region"
-    aria-roledescription="carousel"
-    aria-label={t.hero.carouselLabel}
-    data-carousel
-    data-interval="5000"
-  >
-    <div class="hero__slides" aria-live="off">
-      {heroSlides.map((id, i) => (
-        <div
-          class="hero__slide"
-          role="group"
-          aria-roledescription="slide"
-          aria-label={`${i + 1} ${t.hero.slideOf} ${total}`}
-          aria-hidden={i === 0 ? 'false' : 'true'}
-          data-active={i === 0 ? 'true' : 'false'}
-        >
-          <Photo id={id} lang={lang} sizes="100vw" eager={i === 0} tag={false} class="hero__img" />
-        </div>
-      ))}
-    </div>
-    <div class="hero__controls" hidden data-controls>
-      <button type="button" class="hero__btn hero__arrow" data-prev aria-label={t.hero.prev}><Icon name="left" size={20} /></button>
-      <button type="button" class="hero__btn" data-toggle aria-label={t.hero.pause} data-label-pause={t.hero.pause} data-label-play={t.hero.play}>
-        <Icon name="pause" size={18} class="icon hero__pause" />
-        <Icon name="play" size={18} class="icon hero__play" />
-      </button>
-      <button type="button" class="hero__btn hero__arrow" data-next aria-label={t.hero.next}><Icon name="right" size={20} /></button>
-      <div class="hero__dots" role="group" aria-label={t.hero.carouselLabel}>
-        {heroSlides.map((_, i) => (
-          <button type="button" class="hero__dot" data-dot={i} aria-label={`${t.hero.goTo} ${i + 1}`} aria-current={i === 0 ? 'true' : undefined}>
-            <span />
-          </button>
-        ))}
-      </div>
-    </div>
+  <!-- Video de portada: decorativo, sin sonido, en bucle. Se pausa con el botón y no arranca solo
+       si la persona pidió "reducir movimiento" o tiene activado el ahorro de datos. -->
+  <div class="hero__media" data-hero-video>
+    <video
+      class="hero__video"
+      muted
+      loop
+      playsinline
+      preload="none"
+      poster="/images/hero/hero-tubing-poster.jpg"
+      data-src-sm="/videos/hero-tubing-480.mp4"
+      data-src-lg="/videos/hero-tubing.mp4"
+      aria-hidden="true"
+      tabindex="-1"
+    ></video>
+    <button type="button" class="hero__btn hero__toggle" data-toggle data-paused="true" aria-label={t.hero.play} data-label-pause={t.hero.pause} data-label-play={t.hero.play}>
+      <Icon name="pause" size={18} class="icon hero__pause" />
+      <Icon name="play" size={18} class="icon hero__play" />
+    </button>
   </div>
 
   <div class="hero__content">
     <div class="container">
-      {provisional && <span class="hero__placeholder-note">{t.placeholderBadge}</span>}
       <h1 id="hero-title">
         <span class="hero__eyebrow">{t.hero.eyebrow}</span>
         {t.hero.title}
@@ -71,19 +48,16 @@ const provisional = heroSlides.some((id) => getMedia(id).placeholder);
 <style>
   .hero { position: relative; isolation: isolate; min-height: 520px; display: flex; align-items: flex-end; color: #fff; overflow: hidden; background: var(--petrol); }
   @media (min-width: 1024px) { .hero { min-height: min(82vh, 720px); } }
-  .hero__carousel { position: absolute; inset: 0; z-index: -1; }
-  .hero__slides, .hero__slide { position: absolute; inset: 0; }
-  .hero__slide { opacity: 0; transition: opacity 800ms cubic-bezier(0.4, 0, 0.2, 1); }
-  .hero__slide[data-active='true'] { opacity: 1; }
-  .hero__slide :global(.hero__img) { width: 100%; height: 100%; object-fit: cover; }
-  /* Overlay: spec gradient (0 → 0.4) reinforced so white text keeps AA contrast on any photo */
-  .hero__carousel::after {
+  .hero__media { position: absolute; inset: 0; z-index: -1; background: var(--petrol) url('/images/hero/hero-tubing-poster.jpg') center / cover no-repeat; }
+  .hero__video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  /* Overlay so white text keeps AA contrast over any frame */
+  .hero__media::after {
     content: ''; position: absolute; inset: 0; pointer-events: none;
     background:
-      linear-gradient(180deg, rgba(0, 0, 0, 0) 20%, rgba(0, 0, 0, 0.4) 55%, rgba(0, 0, 0, 0.72) 100%),
-      linear-gradient(90deg, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0) 60%);
+      linear-gradient(180deg, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.35) 45%, rgba(0, 0, 0, 0.75) 100%),
+      linear-gradient(90deg, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0) 65%);
   }
-  /* Content sits above the carousel; let clicks reach the carousel controls */
+  /* Content sits above the video; let clicks reach the pause button */
   .hero__content { pointer-events: none; }
   .hero__content :is(a, h1, p) { pointer-events: auto; }
   .hero__content { width: 100%; padding-block: var(--space-2xl) calc(var(--space-2xl) + 56px); }
@@ -104,10 +78,10 @@ const provisional = heroSlides.some((id) => getMedia(id).placeholder);
     padding: 2px 10px; border-radius: 999px; background: rgba(0, 0, 0, 0.55);
   }
 
-  .hero__controls { position: absolute; right: var(--gutter); bottom: 16px; display: flex; align-items: center; gap: 4px; z-index: 2; }
-  .hero__controls:not([hidden]) { display: flex; }
+  .hero__toggle { position: absolute; right: var(--gutter); bottom: 16px; z-index: 2; }
+  @media (min-width: 640px) { .hero__toggle { right: calc(var(--gutter) + 8px); bottom: 24px; } }
   .hero__btn {
-    display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%;
+    display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; padding: 0; cursor: pointer;
     background: rgba(0, 0, 0, 0.4); color: #fff; border: 1px solid rgba(255, 255, 255, 0.5);
     transition: background-color 200ms ease;
   }
@@ -115,76 +89,53 @@ const provisional = heroSlides.some((id) => getMedia(id).placeholder);
   .hero__btn :global(.hero__play) { display: none; }
   .hero__btn[data-paused='true'] :global(.hero__play) { display: block; }
   .hero__btn[data-paused='true'] :global(.hero__pause) { display: none; }
-  .hero__arrow { display: none; }
-  @media (min-width: 640px) { .hero__arrow { display: grid; } .hero__controls { right: calc(var(--gutter) + 8px); bottom: 24px; } }
-  .hero__dots { display: flex; }
-  .hero__dot { width: 44px; height: 44px; display: grid; place-items: center; background: none; border: 0; padding: 0; }
-  .hero__dot span { width: 10px; height: 10px; border-radius: 50%; background: rgba(255, 255, 255, 0.55); border: 1px solid rgba(0, 0, 0, 0.3); transition: transform 200ms ease, background-color 200ms ease; }
-  .hero__dot[aria-current='true'] span { background: #fff; transform: scale(1.3); }
 </style>
 
 <script>
-  document.querySelectorAll<HTMLElement>('[data-carousel]').forEach((root) => {
-    const slides = [...root.querySelectorAll<HTMLElement>('.hero__slide')];
-    const dots = [...root.querySelectorAll<HTMLButtonElement>('[data-dot]')];
-    const controls = root.querySelector<HTMLElement>('[data-controls]');
+  document.querySelectorAll<HTMLElement>('[data-hero-video]').forEach((root) => {
+    const video = root.querySelector<HTMLVideoElement>('video');
     const toggle = root.querySelector<HTMLButtonElement>('[data-toggle]');
-    const live = root.querySelector<HTMLElement>('.hero__slides');
-    if (slides.length < 2 || !controls || !toggle || !live) return;
-    controls.hidden = false;
+    if (!video || !toggle) return;
 
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const interval = Number(root.dataset.interval) || 5000;
-    let index = 0;
-    let timer: number | undefined;
-    let paused = reduced; // no autoplay with reduced motion
-    let hover = false;
+    const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true;
+    let loaded = false;
 
-    const show = (i: number) => {
-      index = (i + slides.length) % slides.length;
-      slides.forEach((s, n) => {
-        const on = n === index;
-        s.dataset.active = String(on);
-        s.setAttribute('aria-hidden', String(!on));
-      });
-      dots.forEach((d, n) => (n === index ? d.setAttribute('aria-current', 'true') : d.removeAttribute('aria-current')));
-    };
-    const stop = () => { if (timer) clearInterval(timer); timer = undefined; };
-    const start = () => {
-      stop();
-      if (!paused && !hover && !document.hidden) timer = window.setInterval(() => show(index + 1), interval);
-    };
     const setPaused = (p: boolean) => {
-      paused = p;
       toggle.dataset.paused = String(p);
       toggle.setAttribute('aria-label', (p ? toggle.dataset.labelPlay : toggle.dataset.labelPause) || '');
-      live.setAttribute('aria-live', p ? 'polite' : 'off');
-      start();
     };
-    const manual = (i: number) => { show(i); live.setAttribute('aria-live', 'polite'); start(); };
+    const load = () => {
+      if (loaded) return;
+      video.src = (matchMedia('(min-width: 768px)').matches ? video.dataset.srcLg : video.dataset.srcSm) || '';
+      loaded = true;
+    };
+    const play = () => {
+      load();
+      video.play().then(() => setPaused(false)).catch(() => setPaused(true));
+    };
+    const pause = () => { video.pause(); setPaused(true); };
 
-    root.querySelector('[data-prev]')?.addEventListener('click', () => manual(index - 1));
-    root.querySelector('[data-next]')?.addEventListener('click', () => manual(index + 1));
-    dots.forEach((d) => d.addEventListener('click', () => manual(Number(d.dataset.dot))));
-    toggle.addEventListener('click', () => setPaused(!paused));
-
-    const hero = root.closest('.hero') ?? root;
-    hero.addEventListener('mouseenter', () => { hover = true; stop(); });
-    hero.addEventListener('mouseleave', () => { hover = false; start(); });
-    hero.addEventListener('focusin', () => { hover = true; stop(); });
-    hero.addEventListener('focusout', () => { hover = false; start(); });
-    document.addEventListener('visibilitychange', start);
-
-    // Swipe on touch screens
-    let x0: number | null = null;
-    hero.addEventListener('touchstart', (e) => { x0 = (e as TouchEvent).touches[0].clientX; }, { passive: true });
-    hero.addEventListener('touchend', (e) => {
-      if (x0 === null) return;
-      const dx = (e as TouchEvent).changedTouches[0].clientX - x0;
-      if (Math.abs(dx) > 50) manual(index + (dx < 0 ? 1 : -1));
-      x0 = null;
+    // The person decides: once they pause, it stays paused
+    let userPaused = reduced || saveData;
+    toggle.addEventListener('click', () => {
+      userPaused = !video.paused;
+      if (userPaused) pause(); else play();
     });
+    // Save battery: pause when the tab is hidden or the hero is off screen
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) video.pause();
+      else if (!userPaused && loaded) video.play().catch(() => {});
+    });
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(([e]) => {
+        if (!loaded || userPaused) return;
+        if (e.isIntersecting) video.play().catch(() => {});
+        else video.pause();
+      }).observe(root);
+    }
 
-    setPaused(paused);
+    if (userPaused) setPaused(true);
+    else play();
   });
 </script>

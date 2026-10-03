@@ -108,6 +108,10 @@ export const cabins: Cabin[] = [
       from: true,
       unit: 'night',
       basis: { en: 'per couple', es: 'por pareja' },
+      notes: {
+        en: [`${formatMoney(20, 'USD', 'en')} for a third guest (sofa bed)`],
+        es: [`${formatMoney(20, 'USD', 'es')} por tercera persona (sofá cama)`],
+      },
     },
     summary: {
       en: 'Accessible design (Costa Rica Law 7600) and a forest view made for birdwatching.',

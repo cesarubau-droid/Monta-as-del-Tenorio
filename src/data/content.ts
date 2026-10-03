@@ -177,5 +177,25 @@ export interface Review {
   date?: string;
   rating?: number;
   source: ReviewSource;
+  /** Original language when the text shown is the platform's own translation. */
+  translatedFrom?: 'en' | 'fr' | 'de' | 'pt';
 }
-export const reviews: Review[] = [];
+/**
+ * Real reviews from the Airbnb listing (export of 2 Oct 2026, public comments only).
+ * Airbnb exports them already translated to Spanish; the text is kept exactly as exported.
+ * The first three are shown, in this order.
+ */
+export const reviews: Review[] = [
+  {
+    text: 'Excelente estancia para nuestra familia de 5 en este alojamiento de troncos de madera. Muy rústico. A pocos minutos del parque Tenorio y de la cascada Río Celeste. Muy buena comunicación con nuestro anfitrión, que incluso nos llevó a ver la salida de la luna y las luciérnagas, ¡y nos bañamos en el río de su propiedad! ¡Gracias por todo! También nos encantaron los colibríes y los perros muy amigables. ¡En resumen, fue genial!',
+    lang: 'es', name: 'Chrystèle', date: '2025-08', rating: 5, source: 'airbnb', translatedFrom: 'fr',
+  },
+  {
+    text: 'Hermosa casa y patio con mucho carácter. Lo mejor de todo fue la caminata de 5 minutos hasta el Río Celeste a través de la propiedad de los dueños. Había muchas aves. ¡Excelente estadía!',
+    lang: 'es', name: 'Betsy', date: '2026-04', rating: 5, source: 'airbnb', translatedFrom: 'en',
+  },
+  {
+    text: '¡Nos encantó nuestra estancia! ¡El lugar es exactamente como se muestra en la foto y está en una ubicación excelente! Solo estuvimos allí una noche, pero nos hubiera gustado quedarnos más tiempo. ¡Qué propiedad tan hermosa!',
+    lang: 'es', name: 'Chelsea', date: '2026-07', rating: 5, source: 'airbnb', translatedFrom: 'en',
+  },
+];
