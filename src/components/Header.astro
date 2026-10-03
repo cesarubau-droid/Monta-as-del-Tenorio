@@ -17,7 +17,7 @@ const links: { key: RouteKey; label: string }[] = [
 ];
 const switchHref = switchLangPath(Astro.url.pathname, other);
 ---
-<header class="site-header">
+<header class:list={['site-header', { 'site-header--overlay': current === 'home' }]} data-header>
   <div class="container site-header__inner">
     <a href={url(lang, 'home')} class="brand">
       <Logo inverse />
@@ -81,6 +81,15 @@ const switchHref = switchLangPath(Astro.url.pathname, other);
     background: var(--petrol);
     color: #fff;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    transition: background-color 250ms ease, border-color 250ms ease, box-shadow 250ms ease;
+  }
+  /* Portada: transparente sobre la foto; se vuelve sólido al bajar o al abrir el menú */
+  .site-header--overlay { background: transparent; border-bottom-color: transparent; }
+  .site-header--overlay:not(.is-solid) :is(.brand, .site-nav__link, .tool-btn) { color: #fff; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.55); }
+  .site-header--overlay.is-solid,
+  :global(html:not(.js)) .site-header--overlay,
+  .site-header--overlay:has(.menu-toggle[aria-expanded='true']) {
+    background: var(--petrol); border-bottom-color: rgba(255, 255, 255, 0.08); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
   }
   .site-header__inner { display: flex; align-items: center; gap: 8px; min-height: var(--header-h); }
   .brand { display: inline-flex; align-items: center; min-height: 44px; color: #fff; text-decoration: none; margin-right: auto; }
@@ -145,6 +154,15 @@ const switchHref = switchLangPath(Astro.url.pathname, other);
 </style>
 
 <script>
+  // Header transparente en la portada: sólido en cuanto la persona baja un poco
+  const header = document.querySelector<HTMLElement>('[data-header].site-header--overlay');
+  if (header) {
+    let ticking = false;
+    const update = () => { header.classList.toggle('is-solid', window.scrollY > 24); ticking = false; };
+    window.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+    update();
+  }
+
   const toggle = document.querySelector<HTMLButtonElement>('.menu-toggle');
   const nav = document.getElementById('site-nav');
   if (toggle && nav) {
