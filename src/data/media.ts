@@ -145,8 +145,6 @@ export const cabinGalleries: Record<string, { id: string; caption: L }[]> = {
   ],
 };
 
-export const heroSlides = ['hero-forest-river', 'hero-cabin-couple', 'hero-family-tubing', 'hero-wildlife'];
-
 export function getMedia(id: string): MediaItem {
   const m = media[id];
   if (!m) throw new Error(`Unknown media id: ${id}`);
