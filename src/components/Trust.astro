@@ -182,11 +182,25 @@ const monthYear = (d?: string) =>
       if (!slide) return 0;
       return slide.offsetWidth + parseFloat(getComputedStyle(track).columnGap || '0');
     };
+    // Al pasar del último al primero (o al revés): fundido en vez de recorrer todo el carril
+    let wrapping = false;
+    const wrap = (to: number) => {
+      if (reduced) { track.scrollTo({ left: to, behavior: 'auto' }); return; }
+      if (wrapping) return;
+      wrapping = true;
+      track.style.transition = 'opacity 150ms ease';
+      track.style.opacity = '0';
+      window.setTimeout(() => {
+        track.scrollTo({ left: to, behavior: 'auto' });
+        track.style.opacity = '1';
+        window.setTimeout(() => { wrapping = false; }, 150);
+      }, 150);
+    };
     const move = (dir: 1 | -1) => {
       const max = track.scrollWidth - track.clientWidth - 4;
       const behavior: ScrollBehavior = reduced ? 'auto' : 'smooth';
-      if (dir === 1 && track.scrollLeft >= max) track.scrollTo({ left: 0, behavior });
-      else if (dir === -1 && track.scrollLeft <= 4) track.scrollTo({ left: track.scrollWidth, behavior });
+      if (dir === 1 && track.scrollLeft >= max) wrap(0);
+      else if (dir === -1 && track.scrollLeft <= 4) wrap(track.scrollWidth);
       else track.scrollBy({ left: dir * step(), behavior });
     };
 
