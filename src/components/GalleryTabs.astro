@@ -1,7 +1,8 @@
 ---
 import Photo from './Photo.astro';
+import Icon from './Icon.astro';
 import { gallery, getMedia, type GalleryCategory } from '../data/media';
-import { useT } from '../i18n/ui';
+import { fmt, useT } from '../i18n/ui';
 import type { Lang } from '../i18n/routes';
 
 interface Props { lang: Lang; idPrefix?: string }
@@ -9,6 +10,17 @@ const { lang, idPrefix = 'gal' } = Astro.props;
 const t = useT(lang);
 const cats = Object.keys(gallery) as GalleryCategory[];
 const provisional = cats.some((c) => gallery[c].some((id) => getMedia(id).placeholder));
+// Datos de cada foto para el visor ampliado (la descripción de la foto sirve de pie)
+const items = Object.fromEntries(
+  cats.map((c) => [
+    c,
+    gallery[c].map((id) => {
+      const m = getMedia(id);
+      const large = m.optimized ? m.src.replace(/\.[a-z]+$/i, '-1600.webp') : m.src;
+      return { id, m, large, alt: m.alt[lang] };
+    }),
+  ]),
+) as Record<GalleryCategory, { id: string; m: ReturnType<typeof getMedia>; large: string; alt: string }[]>;
 ---
 <div class="gallery" data-tabs>
   <div class="gallery__tabs" role="tablist" aria-label={t.gallery.tabsLabel}>
@@ -33,14 +45,36 @@ const provisional = cats.some((c) => gallery[c].some((id) => getMedia(id).placeh
       tabindex="0"
     >
       <ul class="gallery__grid" role="list">
-        {gallery[c].map((id) => (
+        {items[c].map((it) => (
           <li class="gallery__item">
-            <Photo id={id} lang={lang} sizes="(min-width: 1024px) 25vw, 50vw" tag={false} />
+            <button
+              type="button"
+              class="gallery__open"
+              data-gal-open
+              data-src={it.large}
+              data-w={it.m.width}
+              data-h={it.m.height}
+              data-alt={it.alt}
+              aria-label={fmt(t.carousel.open, { caption: it.alt })}
+            >
+              <Photo id={it.id} lang={lang} sizes="(min-width: 1024px) 25vw, 50vw" tag={false} />
+            </button>
           </li>
         ))}
       </ul>
     </div>
   ))}
+  <dialog class="lb" data-gal-dialog aria-label={t.gallery.tabsLabel}>
+    <div class="lb__inner">
+      <button type="button" class="lb__close" data-lb-close aria-label={t.carousel.close}><Icon name="close" size={24} /></button>
+      <figure class="lb__figure">
+        <img class="lb__img" data-lb-img src="" alt="" />
+        <figcaption class="lb__caption"><span data-lb-caption></span> <span class="lb__count"><span data-lb-n>1</span> / <span data-lb-total>1</span></span></figcaption>
+      </figure>
+      <button type="button" class="lb__nav lb__nav--prev" data-lb-prev aria-label={t.carousel.prev}><Icon name="left" size={24} /></button>
+      <button type="button" class="lb__nav lb__nav--next" data-lb-next aria-label={t.carousel.next}><Icon name="right" size={24} /></button>
+    </div>
+  </dialog>
   {provisional && <p class="gallery__note small muted">{t.gallery.placeholderNote}</p>}
 </div>
 
@@ -65,6 +99,37 @@ const provisional = cats.some((c) => gallery[c].some((id) => getMedia(id).placeh
   .gallery__item :global(img) { width: 100%; height: 100%; object-fit: cover; transition: transform 400ms var(--ease); }
   @media (prefers-reduced-motion: no-preference) { .gallery__item:hover :global(img) { transform: scale(1.04); } }
   .gallery__note { margin-top: var(--space-md); }
+
+  /* Cada foto abre el visor ampliado */
+  .gallery__open { display: block; width: 100%; height: 100%; padding: 0; border: 0; background: none; cursor: zoom-in; }
+  .gallery__open :global(picture) { display: block; width: 100%; height: 100%; }
+  .gallery__open:focus-visible { outline-offset: -4px; }
+
+  /* Visor ampliado (mismo diseño que el de las cabañas) */
+  .lb {
+    width: 100vw; max-width: 100vw; height: 100dvh; max-height: 100dvh; margin: 0; padding: 0; border: 0;
+    background: rgba(6, 22, 26, 0.96); color: #fff;
+  }
+  .lb::backdrop { background: rgba(6, 22, 26, 0.9); }
+  .lb__inner { position: relative; height: 100%; display: grid; place-items: center; padding: 64px 16px 24px; }
+  @media (min-width: 900px) { .lb__inner { padding: 64px 88px 32px; } }
+  .lb__figure { display: grid; gap: 12px; justify-items: center; max-width: 100%; max-height: 100%; }
+  .lb__img { max-width: 100%; max-height: calc(100dvh - 160px); width: auto; height: auto; object-fit: contain; }
+  .lb__caption { font-size: var(--fs-sm); color: #e3ecec; text-align: center; }
+  .lb__count { margin-left: 8px; color: var(--celeste-soft); font-weight: 700; letter-spacing: 0.1em; }
+  .lb__close, .lb__nav {
+    position: absolute; display: grid; place-items: center; width: 48px; height: 48px; padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.35); border-radius: 50%; background: rgba(255, 255, 255, 0.08); color: #fff; cursor: pointer;
+    transition: background-color 200ms ease, transform 120ms var(--ease-out);
+  }
+  @media (hover: hover) { .lb__close:hover, .lb__nav:hover { background: rgba(255, 255, 255, 0.18); } }
+  .lb__close:active, .lb__nav:active { transform: scale(0.95); }
+  .lb__close:focus-visible, .lb__nav:focus-visible { outline: 3px solid var(--celeste); outline-offset: 2px; }
+  .lb__close { top: 12px; right: 12px; }
+  .lb__nav { top: 50%; translate: 0 -50%; }
+  .lb__nav--prev { left: 12px; }
+  .lb__nav--next { right: 12px; }
+  @media (max-width: 639px) { .lb__nav { top: auto; bottom: 16px; translate: none; } }
 </style>
 
 <script>
@@ -87,6 +152,64 @@ const provisional = cats.some((c) => gallery[c].some((id) => getMedia(id).placeh
         e.preventDefault();
         select(tabs[(map[e.key] + tabs.length) % tabs.length]);
       });
+    });
+
+    // ----- Visor ampliado: navega dentro de la categoría que se está viendo -----
+    const dialog = root.querySelector<HTMLDialogElement>('[data-gal-dialog]');
+    if (!dialog) return;
+    const lbImg = dialog.querySelector<HTMLImageElement>('[data-lb-img]')!;
+    const lbCap = dialog.querySelector('[data-lb-caption]');
+    const lbN = dialog.querySelector('[data-lb-n]');
+    const lbTotal = dialog.querySelector('[data-lb-total]');
+    let items: HTMLButtonElement[] = [];
+    let lbIndex = 0;
+
+    const mod = (i: number) => (i + items.length) % items.length;
+    const show = (i: number) => {
+      lbIndex = mod(i);
+      const s = items[lbIndex].dataset;
+      lbImg.src = s.src ?? '';
+      lbImg.alt = s.alt ?? '';
+      if (s.w) lbImg.width = Number(s.w);
+      if (s.h) lbImg.height = Number(s.h);
+      if (lbCap) lbCap.textContent = s.alt ?? '';
+      if (lbN) lbN.textContent = String(lbIndex + 1);
+    };
+    root.querySelectorAll<HTMLButtonElement>('[data-gal-open]').forEach((b) =>
+      b.addEventListener('click', () => {
+        const panel = b.closest('[role="tabpanel"]') ?? root;
+        items = [...panel.querySelectorAll<HTMLButtonElement>('[data-gal-open]')];
+        if (lbTotal) lbTotal.textContent = String(items.length);
+        show(items.indexOf(b));
+        dialog.showModal();
+        document.documentElement.style.overflow = 'hidden';
+      }),
+    );
+    dialog.querySelector('[data-lb-close]')?.addEventListener('click', () => dialog.close());
+    dialog.querySelector('[data-lb-prev]')?.addEventListener('click', () => show(lbIndex - 1));
+    dialog.querySelector('[data-lb-next]')?.addEventListener('click', () => show(lbIndex + 1));
+    dialog.addEventListener('keydown', (e) => {
+      if (items.length < 2) return;
+      if (e.key === 'ArrowRight') { e.preventDefault(); show(lbIndex + 1); }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); show(lbIndex - 1); }
+    });
+    // Click en la zona oscura (no en la foto ni en un botón) lo cierra
+    dialog.addEventListener('click', (e) => {
+      const el = e.target as HTMLElement;
+      if (el === dialog || el.classList.contains('lb__inner')) dialog.close();
+    });
+    // Deslizar con el dedo a izquierda o derecha
+    let x0: number | null = null;
+    dialog.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse') x0 = e.clientX; });
+    dialog.addEventListener('pointerup', (e) => {
+      if (x0 === null || items.length < 2) return;
+      const dx = e.clientX - x0;
+      x0 = null;
+      if (Math.abs(dx) > 50) show(lbIndex + (dx < 0 ? 1 : -1));
+    });
+    dialog.addEventListener('close', () => {
+      document.documentElement.style.overflow = '';
+      items[lbIndex]?.focus({ preventScroll: true });
     });
   });
 </script>
