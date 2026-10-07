@@ -368,6 +368,20 @@ fieldset.field { border: 0; padding: 0; }
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }
 
+/* Visor ampliado (dialog): entrada y salida suaves */
+.lb {
+  opacity: 0; transform: scale(0.98);
+  transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out), overlay 200ms allow-discrete, display 200ms allow-discrete;
+}
+.lb[open] { opacity: 1; transform: none; }
+@starting-style { .lb[open] { opacity: 0; transform: scale(0.98); } }
+.lb::backdrop {
+  opacity: 0;
+  transition: opacity 200ms ease, overlay 200ms allow-discrete, display 200ms allow-discrete;
+}
+.lb[open]::backdrop { opacity: 1; }
+@starting-style { .lb[open]::backdrop { opacity: 0; } }
+
 @media print {
   .site-header, .wa-float, .site-footer nav { display: none !important; }
 }
