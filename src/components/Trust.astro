@@ -123,9 +123,10 @@ const monthYear = (d?: string) =>
   .rv__btn {
     display: grid; place-items: center; width: 44px; height: 44px; padding: 0; cursor: pointer;
     background: var(--card-bg); color: var(--text); border: 1px solid var(--border); border-radius: 50%;
-    transition: background-color 200ms ease, color 200ms ease;
+    transition: background-color 200ms ease, color 200ms ease, transform 120ms var(--ease-out);
   }
-  .rv__btn:hover { background: var(--petrol); color: #fff; border-color: var(--petrol); }
+  @media (hover: hover) { .rv__btn:hover { background: var(--petrol); color: #fff; border-color: var(--petrol); } }
+  .rv__btn:active { transform: scale(0.95); }
   .rv__btn:focus-visible { outline: 3px solid var(--celeste); outline-offset: 2px; }
   .rv__btn :global(.rv__play) { display: none; }
   .rv__btn[data-paused='true'] :global(.rv__play) { display: block; }

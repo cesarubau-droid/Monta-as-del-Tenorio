@@ -43,6 +43,10 @@ const t = useT(lang);
   .hero__media { position: absolute; inset: 0; z-index: -1; }
   .hero__media :global(picture), .hero__media :global(img) { display: block; width: 100%; height: 100%; }
   .hero__media :global(img) { object-fit: cover; object-position: 50% 60%; }
+  @keyframes hero-settle { from { transform: scale(1.05); } to { transform: scale(1); } }
+  @media (prefers-reduced-motion: no-preference) {
+    .hero__media :global(img) { animation: hero-settle 1400ms var(--ease-out) both; }
+  }
   /* Overlay: arriba oscurece para el header, abajo para que el texto blanco cumpla AA */
   .hero__media::after {
     content: ''; position: absolute; inset: 0; pointer-events: none;
