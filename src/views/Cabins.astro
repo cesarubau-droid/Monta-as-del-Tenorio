@@ -57,6 +57,10 @@ const t = useT(lang);
   .detail-list { display: grid; gap: var(--space-3xl); }
   .detail__media { min-width: 0; }
   .detail__media :global(.cg__caption), .detail__media :global(.cg__thumbs) { padding-inline: var(--gutter); }
+  @media (min-width: 900px) {
+    .detail__media { align-self: start; }
+    .detail.split--bleed > .detail__body { padding-block: 0; }
+  }
   .detail__body { display: grid; gap: var(--space-md); justify-items: start; }
   .detail__body h2 { font-size: var(--fs-h2); }
   .detail__cap { display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--accent); }
