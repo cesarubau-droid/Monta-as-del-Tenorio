@@ -74,7 +74,8 @@
   --container: 1200px;
   --gutter: 1rem;
 
-  --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-out: var(--ease);
   --transition: all 200ms var(--ease);
 
   /* Type scale (mobile) */
@@ -226,7 +227,7 @@ a:hover { text-decoration: underline; }
   transition: background-color 200ms ease, border-color 200ms ease, color 200ms ease, transform 200ms var(--ease), box-shadow 200ms ease;
 }
 .btn:hover { text-decoration: none; background: color-mix(in srgb, var(--btn-bg) 88%, #000); }
-.btn:active { transform: scale(0.98); border-color: color-mix(in srgb, var(--btn-bg) 70%, #000); }
+.btn:active { transform: scale(0.97); border-color: color-mix(in srgb, var(--btn-bg) 70%, #000); }
 .btn:focus-visible { outline: 3px solid color-mix(in srgb, var(--focus) 60%, transparent); outline-offset: 2px; }
 .btn[disabled], .btn[aria-disabled='true'] { background: #cccccc; color: #595959; cursor: not-allowed; }
 .btn svg { width: 20px; height: 20px; flex: none; }
@@ -245,7 +246,7 @@ a:hover { text-decoration: underline; }
 .btn--ghost-light { --btn-bg: rgba(0, 0, 0, 0.2); --btn-fg: #fff; border-color: rgba(255, 255, 255, 0.85); }
 .btn--ghost-light:hover { background: rgba(255, 255, 255, 0.12); }
 .btn--block { width: 100%; }
-@media (prefers-reduced-motion: no-preference) { .btn:hover { transform: translateY(-1px); } }
+@media (prefers-reduced-motion: no-preference) and (hover: hover) { .btn:hover:not(:active) { transform: translateY(-1px); } }
 
 .btn-row { display: flex; flex-wrap: wrap; gap: var(--space-sm); }
 
@@ -257,7 +258,7 @@ a:hover { text-decoration: underline; }
   transition: box-shadow 300ms var(--ease), transform 300ms var(--ease), border-color 300ms var(--ease);
 }
 .card:hover { box-shadow: var(--shadow-md); border-color: color-mix(in srgb, var(--accent) 35%, var(--border)); }
-@media (prefers-reduced-motion: no-preference) { .card:hover { transform: translateY(-4px); } }
+@media (prefers-reduced-motion: no-preference) and (hover: hover) { .card:hover { transform: translateY(-4px); } }
 .card__media { position: relative; aspect-ratio: 3 / 2; background: var(--surface-2); }
 .card__media img { width: 100%; height: 100%; object-fit: cover; }
 .card__body { display: flex; flex-direction: column; gap: var(--space-sm); padding: var(--space-lg); flex: 1; }
@@ -366,6 +367,20 @@ fieldset.field { border: 0; padding: 0; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }
+
+/* Visor ampliado (dialog): entrada y salida suaves */
+.lb {
+  opacity: 0; transform: scale(0.98);
+  transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out), overlay 200ms allow-discrete, display 200ms allow-discrete;
+}
+.lb[open] { opacity: 1; transform: none; }
+@starting-style { .lb[open] { opacity: 0; transform: scale(0.98); } }
+.lb::backdrop {
+  opacity: 0;
+  transition: opacity 200ms ease, overlay 200ms allow-discrete, display 200ms allow-discrete;
+}
+.lb[open]::backdrop { opacity: 1; }
+@starting-style { .lb[open]::backdrop { opacity: 0; } }
 
 @media print {
   .site-header, .wa-float, .site-footer nav { display: none !important; }

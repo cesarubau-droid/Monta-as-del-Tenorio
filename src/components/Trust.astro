@@ -123,9 +123,10 @@ const monthYear = (d?: string) =>
   .rv__btn {
     display: grid; place-items: center; width: 44px; height: 44px; padding: 0; cursor: pointer;
     background: var(--card-bg); color: var(--text); border: 1px solid var(--border); border-radius: 50%;
-    transition: background-color 200ms ease, color 200ms ease;
+    transition: background-color 200ms ease, color 200ms ease, transform 120ms var(--ease-out);
   }
-  .rv__btn:hover { background: var(--petrol); color: #fff; border-color: var(--petrol); }
+  @media (hover: hover) { .rv__btn:hover { background: var(--petrol); color: #fff; border-color: var(--petrol); } }
+  .rv__btn:active { transform: scale(0.95); }
   .rv__btn:focus-visible { outline: 3px solid var(--celeste); outline-offset: 2px; }
   .rv__btn :global(.rv__play) { display: none; }
   .rv__btn[data-paused='true'] :global(.rv__play) { display: block; }
@@ -181,11 +182,25 @@ const monthYear = (d?: string) =>
       if (!slide) return 0;
       return slide.offsetWidth + parseFloat(getComputedStyle(track).columnGap || '0');
     };
+    // Al pasar del último al primero (o al revés): fundido en vez de recorrer todo el carril
+    let wrapping = false;
+    const wrap = (to: number) => {
+      if (reduced) { track.scrollTo({ left: to, behavior: 'auto' }); return; }
+      if (wrapping) return;
+      wrapping = true;
+      track.style.transition = 'opacity 150ms ease';
+      track.style.opacity = '0';
+      window.setTimeout(() => {
+        track.scrollTo({ left: to, behavior: 'auto' });
+        track.style.opacity = '1';
+        window.setTimeout(() => { wrapping = false; }, 150);
+      }, 150);
+    };
     const move = (dir: 1 | -1) => {
       const max = track.scrollWidth - track.clientWidth - 4;
       const behavior: ScrollBehavior = reduced ? 'auto' : 'smooth';
-      if (dir === 1 && track.scrollLeft >= max) track.scrollTo({ left: 0, behavior });
-      else if (dir === -1 && track.scrollLeft <= 4) track.scrollTo({ left: track.scrollWidth, behavior });
+      if (dir === 1 && track.scrollLeft >= max) wrap(0);
+      else if (dir === -1 && track.scrollLeft <= 4) wrap(track.scrollWidth);
       else track.scrollBy({ left: dir * step(), behavior });
     };
 

@@ -34,6 +34,15 @@ const { items, lang, headingLevel: H = 'h3' } = Astro.props;
   :global(.faq__chev) { color: var(--accent); transition: transform 200ms ease; }
   .faq__item[open] :global(.faq__chev) { transform: rotate(180deg); }
   .faq__a { padding-bottom: var(--space-md); max-width: 90%; color: var(--text-2); }
+  /* Celular: la respuesta se despliega con suavidad (en escritorio siempre está abierta) */
+  @media (max-width: 639px) {
+    .faq { interpolate-size: allow-keywords; }
+    .faq__item::details-content {
+      block-size: 0; overflow: clip;
+      transition: block-size 220ms var(--ease-out), content-visibility 220ms allow-discrete;
+    }
+    .faq__item[open]::details-content { block-size: auto; }
+  }
   @media (min-width: 640px) {
     .faq { grid-template-columns: 1fr 1fr; column-gap: var(--space-2xl); border-top: 0; }
     .faq__item { border-bottom: 0; padding-block: var(--space-sm); }

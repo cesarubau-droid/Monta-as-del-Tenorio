@@ -99,9 +99,10 @@ const label = fmt(t.carousel.label, { name });
     display: grid; place-items: center; width: 44px; height: 44px; padding: 0;
     border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 50%;
     background: rgba(10, 42, 48, 0.72); color: #fff; cursor: pointer;
-    transition: background-color 200ms ease;
+    transition: background-color 200ms ease, transform 120ms var(--ease-out);
   }
-  .cg__nav:hover { background: var(--petrol); }
+  @media (hover: hover) { .cg__nav:hover { background: var(--petrol); } }
+  .cg__nav:active { transform: scale(0.95); }
   .cg__nav:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
   .cg__nav--prev { left: 12px; }
   .cg__nav--next { right: 12px; }
@@ -137,8 +138,10 @@ const label = fmt(t.carousel.label, { name });
   .lb__close, .lb__nav {
     position: absolute; display: grid; place-items: center; width: 48px; height: 48px; padding: 0;
     border: 1px solid rgba(255, 255, 255, 0.35); border-radius: 50%; background: rgba(255, 255, 255, 0.08); color: #fff; cursor: pointer;
+    transition: background-color 200ms ease, transform 120ms var(--ease-out);
   }
-  .lb__close:hover, .lb__nav:hover { background: rgba(255, 255, 255, 0.18); }
+  @media (hover: hover) { .lb__close:hover, .lb__nav:hover { background: rgba(255, 255, 255, 0.18); } }
+  .lb__close:active, .lb__nav:active { transform: scale(0.95); }
   .lb__close:focus-visible, .lb__nav:focus-visible { outline: 3px solid var(--celeste); outline-offset: 2px; }
   .lb__close { top: 12px; right: 12px; }
   .lb__nav { top: 50%; translate: 0 -50%; }
@@ -171,17 +174,46 @@ const label = fmt(t.carousel.label, { name });
       if (nEl) nEl.textContent = String(i + 1);
       if (capEl) capEl.textContent = slides[i].dataset.caption ?? '';
       thumbs.forEach((b, k) => (k === i ? b.setAttribute('aria-current', 'true') : b.removeAttribute('aria-current')));
-      thumbs[i]?.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: reduce ? 'auto' : 'smooth' });
+      // Centra la miniatura activa moviendo solo la fila de miniaturas, nunca la página
+      const th = thumbs[i];
+      const bar = th?.parentElement;
+      if (th && bar) {
+        const delta = th.getBoundingClientRect().left - bar.getBoundingClientRect().left - (bar.clientWidth - th.clientWidth) / 2;
+        bar.scrollBy({ left: delta, behavior: reduce ? 'auto' : 'smooth' });
+      }
+    };
+    // Mientras el carrusel se mueve por un botón o miniatura, se ignora lo que reporta el scroll
+    let programmatic = false;
+    let settleTimer = 0;
+    const settle = (ms: number) => {
+      programmatic = true;
+      window.clearTimeout(settleTimer);
+      settleTimer = window.setTimeout(() => { programmatic = false; }, ms);
     };
     const goTo = (i: number) => {
       const target = mod(i);
-      track.scrollTo({ left: target * track.clientWidth, behavior: reduce ? 'auto' : 'smooth' });
+      const left = target * track.clientWidth;
+      const far = Math.abs(target - index) > 1;
       setActive(target);
+      if (far && !reduce) {
+        // Salto largo: fundido, cambio sin animar y vuelve a aparecer
+        settle(300);
+        track.style.transition = 'opacity 120ms ease';
+        track.style.opacity = '0';
+        window.setTimeout(() => {
+          track.scrollTo({ left, behavior: 'instant' });
+          track.style.opacity = '1';
+        }, 120);
+      } else {
+        settle(reduce ? 50 : 600);
+        track.scrollTo({ left, behavior: reduce ? 'instant' : 'smooth' });
+      }
     };
     let raf = 0;
     track.addEventListener('scroll', () => {
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
+        if (programmatic) return;
         const i = Math.round(track.scrollLeft / track.clientWidth);
         if (i !== index && i >= 0 && i < total) setActive(i);
       });
