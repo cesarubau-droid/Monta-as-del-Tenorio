@@ -20,7 +20,7 @@ const wa = whatsappUrl(lang === 'es' ? `¡Hola! Me interesa el tour: ${name}.` :
 <PageHero lang={lang} kicker={t.tours.kicker} title={name} lead={tour.summary[lang]} crumbs={[{ label: t.nav.tours, href: url(lang, 'tours') }, { label: name }]} />
 
 <section class="section">
-  <div class="container split">
+  <div class="container split split--bleed">
     <div class="tour__media">
       <Photo id={tour.image} lang={lang} sizes="(min-width: 900px) 50vw, 100vw" eager />
     </div>
@@ -57,8 +57,9 @@ const wa = whatsappUrl(lang === 'es' ? `¡Hola! Me interesa el tour: ${name}.` :
 <ContactCta lang={lang} showLocation={false} />
 
 <style>
-  .tour__media { position: relative; aspect-ratio: 3 / 2; border-radius: var(--radius-md); overflow: hidden; background: var(--surface-2); }
+  .tour__media { position: relative; aspect-ratio: 3 / 2; overflow: hidden; background: var(--surface-2); }
   .tour__media :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  @media (min-width: 900px) { .tour__media { aspect-ratio: auto; align-self: stretch; min-height: clamp(420px, 40vw, 680px); } }
   .tour__body { display: grid; gap: var(--space-md); justify-items: start; }
   .facts { display: grid; gap: var(--space-sm); width: 100%; padding: var(--space-md); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); }
   .facts div { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 16px; }
