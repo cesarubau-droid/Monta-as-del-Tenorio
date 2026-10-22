@@ -44,6 +44,7 @@ const year = new Date().getFullYear();
       <li><a href={url(lang, 'privacy')}>{t.footer.privacy}</a></li>
       <li><a href={url(lang, 'terms')}>{t.footer.terms}</a></li>
       <li><a href={url(lang, 'policy')}>{t.footer.policy}</a></li>
+      {site.ga4Id && <li><button type="button" class="site-footer__cookies" data-cookie-settings hidden>{t.cookies.settings}</button></li>}
     </ul>
   </div>
 </footer>
@@ -65,4 +66,6 @@ const year = new Date().getFullYear();
   }
   .site-footer__legal { display: flex; flex-wrap: wrap; gap: 0 var(--space-md); }
   .site-footer__legal a { display: inline-flex; min-height: 44px; align-items: center; }
+  .site-footer__cookies { min-height: 44px; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-decoration: inherit; cursor: pointer; }
+  .site-footer__cookies[hidden] { display: none; }
 </style>

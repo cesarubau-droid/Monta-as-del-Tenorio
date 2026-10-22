@@ -18,7 +18,10 @@ const headers = {
   'Referrer-Policy': 'strict-origin-when-cross-origin',
   'X-Frame-Options': 'SAMEORIGIN',
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
-  'Strict-Transport-Security': 'max-age=63072000; includeSubDomains; preload',
+  // No "preload": add it only once the final domain (and all its subdomains) serve HTTPS.
+  'Strict-Transport-Security': 'max-age=63072000; includeSubDomains',
+  // frame-ancestors can't go in the CSP <meta>, so it is sent as a header.
+  'Content-Security-Policy': "frame-ancestors 'self'",
 };
 config.routes.unshift({ src: '/(.*)', headers, continue: true });
 await writeFile(file, JSON.stringify(config, null, '\t'));

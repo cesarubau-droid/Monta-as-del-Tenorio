@@ -12,7 +12,7 @@ const msgs = { ...f.errors, summary: f.errorSummary, sending: f.sending };
 ---
 <form
   class="form"
-  action="/api/inquiry"
+  action="/api/inquiry/"
   method="post"
   novalidate
   data-inquiry-form
@@ -126,8 +126,10 @@ const msgs = { ...f.errors, summary: f.errorSummary, sending: f.sending };
 </form>
 
 <div id="reservation-success" class="form-success" tabindex="-1" hidden>
-  <h3><Icon name="check" size={22} class="icon" /> {f.successTitle}</h3>
+  <h3 data-success-title><Icon name="check" size={22} class="icon" /> {f.successTitle}</h3>
+  <h3 data-not-stored-title hidden>{f.notStoredTitle}</h3>
   <p data-ref>{f.successReservation}</p>
+  <p data-not-stored hidden>{f.notStoredReservation}</p>
   <p data-no-wa hidden>{f.successReservationNoWa}</p>
   <a class="btn btn--lg" data-wa href="#" target="_blank" rel="noopener noreferrer" hidden data-track="whatsapp_click" data-track-location="reservation_success">
     <Icon name="whatsapp" />{f.continueWhatsapp}<span class="sr-only"> {t.newTab}</span>

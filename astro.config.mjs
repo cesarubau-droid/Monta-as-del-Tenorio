@@ -14,8 +14,17 @@ export default defineConfig({
   site,
   output: 'static',
   adapter: vercel(),
-  trailingSlash: 'ignore',
+  // Every URL ends in "/" so canonical, hreflang and sitemap agree.
+  trailingSlash: 'always',
   build: { format: 'directory', inlineStylesheets: 'always' },
+  // CSP as a <meta> tag with hashes of every script and style Astro renders.
+  // Google Analytics (loaded only after cookie consent) is the one external script.
+  security: {
+    csp: {
+      directives: ["object-src 'none'", "base-uri 'self'"],
+      scriptDirective: { resources: ["'self'", 'https://www.googletagmanager.com'] },
+    },
+  },
   prefetch: { prefetchAll: false, defaultStrategy: 'hover' },
   integrations: [
     sitemap({

@@ -10,6 +10,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import WhatsAppFloat from '../components/WhatsAppFloat.astro';
 import BackToTop from '../components/BackToTop.astro';
+import CookieConsent from '../components/CookieConsent.astro';
 import { useT } from '../i18n/ui';
 import { switchLangPath, type Lang, type RouteKey } from '../i18n/routes';
 import { cabins, formatMoney } from '../data/offer';
@@ -31,7 +32,7 @@ const pageTitle = title ?? meta.title;
 const pageDescription = description ?? meta.description;
 
 const siteUrl = Astro.site ?? new URL(Astro.url.origin);
-const path = Astro.url.pathname.replace(/\/+$/, '') || '/';
+const path = Astro.url.pathname.replace(/\/*$/, '/');
 const canonical = new URL(path, siteUrl).href;
 const enHref = new URL(switchLangPath(path, 'en'), siteUrl).href;
 const esHref = new URL(switchLangPath(path, 'es'), siteUrl).href;
@@ -101,19 +102,6 @@ const ga4 = site.ga4Id;
       })();
     </script>
     {structured.map((s) => <script type="application/ld+json" set:html={JSON.stringify(s)} />)}
-    {
-      ga4 && (
-        <>
-          <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${ga4}`} />
-          <script is:inline define:vars={{ ga4 }}>
-            window.dataLayer = window.dataLayer || [];
-            window.gtag = function () { window.dataLayer.push(arguments); };
-            window.gtag('js', new Date());
-            window.gtag('config', ga4, { anonymize_ip: true });
-          </script>
-        </>
-      )
-    }
   </head>
   <body>
     <a class="skip-link" href="#main">{t.skip}</a>
@@ -124,6 +112,7 @@ const ga4 = site.ga4Id;
     <Footer lang={lang} />
     <WhatsAppFloat lang={lang} />
     <BackToTop lang={lang} />
+    {ga4 && <CookieConsent lang={lang} ga4={ga4} />}
     <script>
       import { initClickTracking } from '../scripts/analytics';
       initClickTracking();

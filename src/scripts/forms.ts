@@ -148,6 +148,15 @@ export function initInquiryForms(): void {
           if (ref) ref.textContent = ref.textContent!.replace('{id}', data.reference);
           const wa = success.querySelector<HTMLAnchorElement>('[data-wa]');
           const noWa = success.querySelector<HTMLElement>('[data-no-wa]');
+          const notStored = success.querySelector<HTMLElement>('[data-not-stored]');
+          if (wa && data.whatsappUrl && data.stored === false && notStored) {
+            // Not saved in Sheets: the WhatsApp message is now the only copy, so say so plainly.
+            notStored.textContent = notStored.textContent!.replace('{id}', data.reference);
+            notStored.hidden = false;
+            ref?.setAttribute('hidden', '');
+            success.querySelector('[data-success-title]')?.setAttribute('hidden', '');
+            success.querySelector('[data-not-stored-title]')?.removeAttribute('hidden');
+          }
           if (wa && data.whatsappUrl) { wa.href = data.whatsappUrl; wa.hidden = false; }
           else if (noWa) { noWa.hidden = false; noWa.textContent = noWa.textContent!.replace('{id}', data.reference); ref?.setAttribute('hidden', ''); }
           form.hidden = true;
