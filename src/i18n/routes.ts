@@ -20,16 +20,19 @@ export const routes = {
 } as const;
 export type RouteKey = keyof typeof routes;
 
-/** Localized URL for a page key, e.g. url('es', 'cabins') → /es/cabins */
+/** Adds the trailing slash every URL uses (trailingSlash: 'always'). */
+const slash = (path: string) => (path.endsWith('/') ? path : `${path}/`);
+
+/** Localized URL for a page key, e.g. url('es', 'cabins') → /es/cabins/ */
 export function url(lang: Lang, key: RouteKey, sub = ''): string {
   const parts = [lang === defaultLang ? '' : lang, routes[key], sub].filter(Boolean);
-  return '/' + parts.join('/');
+  return slash('/' + parts.join('/'));
 }
 
 /** Same path in the other language. */
 export function switchLangPath(pathname: string, target: Lang): string {
   const clean = pathname.replace(/\/+$/, '') || '/';
   const bare = clean.replace(/^\/es(?=\/|$)/, '') || '/';
-  if (target === defaultLang) return bare;
-  return bare === '/' ? '/es' : `/es${bare}`;
+  if (target === defaultLang) return slash(bare);
+  return slash(bare === '/' ? '/es' : `/es${bare}`);
 }

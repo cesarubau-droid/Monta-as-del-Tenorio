@@ -189,14 +189,25 @@ export function reservationWhatsapp(ref: string, r: Reservation): string | null 
   return whatsappUrl(lines.join('\n'));
 }
 
-/* Best-effort rate limit per serverless instance (5 requests / 10 min / IP). */
+/* Best-effort rate limit per serverless instance (5 requests / 10 min / IP).
+ * For stronger protection use Vercel Firewall rate limiting or Cloudflare Turnstile. */
+const WINDOW = 600_000;
+const MAX_IPS = 5000;
 const hits = new Map<string, number[]>();
 export function rateLimited(ip: string): boolean {
   const now = Date.now();
-  const recent = (hits.get(ip) ?? []).filter((t) => now - t < 600_000);
+  const recent = (hits.get(ip) ?? []).filter((t) => now - t < WINDOW);
   recent.push(now);
+  hits.delete(ip); // re-insert so the Map stays ordered by last activity
   hits.set(ip, recent);
-  if (hits.size > 5000) hits.clear();
+  if (hits.size > MAX_IPS) {
+    // Drop expired entries, then the least recently seen IPs — never wipe everyone's counters.
+    for (const [key, times] of hits) if (now - times[times.length - 1] >= WINDOW) hits.delete(key);
+    for (const key of hits.keys()) {
+      if (hits.size <= MAX_IPS) break;
+      hits.delete(key);
+    }
+  }
   return recent.length > 5;
 }
 

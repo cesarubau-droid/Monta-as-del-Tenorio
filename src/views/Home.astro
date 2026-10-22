@@ -24,7 +24,7 @@ const highlightIcons = ['eye', 'lookout', 'leaf', 'compass'] as const;
 
 <!-- About / story -->
 <section class="section" aria-labelledby="about-title">
-  <div class="container split">
+  <div class="container split split--bleed">
     <div class="about__media reveal">
       <Photo id="founders" lang={lang} sizes="(min-width: 900px) 50vw, 100vw" />
     </div>
@@ -97,8 +97,9 @@ const highlightIcons = ['eye', 'lookout', 'leaf', 'compass'] as const;
 
 <style>
   .cabins-note { margin-top: var(--space-lg); }
-  .about__media { position: relative; aspect-ratio: 4 / 3; border-radius: var(--radius-md); overflow: hidden; background: var(--surface-2); }
+  .about__media { position: relative; aspect-ratio: 4 / 3; overflow: hidden; background: var(--surface-2); }
   .about__media :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  @media (min-width: 900px) { .about__media { aspect-ratio: auto; align-self: stretch; min-height: clamp(420px, 40vw, 680px); } }
   .about__body { margin-top: var(--space-md); }
   .about__link { margin-top: var(--space-lg); }
   .highlights { margin-top: var(--space-2xl); list-style: none; padding: 0; }

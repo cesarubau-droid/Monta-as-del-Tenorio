@@ -15,9 +15,9 @@ const t = useT(lang);
 <PageHero lang={lang} kicker={t.cabins.kicker} title={t.cabins.title} lead={t.cabins.lead} crumbs={[{ label: t.nav.cabins }]} />
 
 <section class="section">
-  <div class="container detail-list">
+  <div class="detail-list">
     {cabins.map((c, i) => (
-      <article class:list={['split', 'detail', { 'split--reverse': i % 2 === 1 }]} id={c.slug} aria-labelledby={`${c.slug}-title`}>
+      <article class:list={['split', 'split--bleed', 'detail', { 'split--reverse': i % 2 === 1 }]} id={c.slug} aria-labelledby={`${c.slug}-title`}>
         <div class="detail__media">
           <CabinGallery slug={c.slug} name={c.name[lang]} lang={lang} eager={i === 0} />
         </div>
@@ -56,6 +56,11 @@ const t = useT(lang);
 <style>
   .detail-list { display: grid; gap: var(--space-3xl); }
   .detail__media { min-width: 0; }
+  .detail__media :global(.cg__caption), .detail__media :global(.cg__thumbs) { padding-inline: var(--gutter); }
+  @media (min-width: 900px) {
+    .detail__media { align-self: start; }
+    .detail.split--bleed > .detail__body { padding-block: 0; }
+  }
   .detail__body { display: grid; gap: var(--space-md); justify-items: start; }
   .detail__body h2 { font-size: var(--fs-h2); }
   .detail__cap { display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--accent); }

@@ -1,0 +1,90 @@
+---
+/**
+ * Aviso de cookies de analítica.
+ * Google Analytics solo se carga después de que la persona acepta (Ley 8968 / RGPD).
+ * La decisión se guarda en localStorage; el botón [data-cookie-settings] del
+ * footer vuelve a abrir el aviso para cambiarla.
+ */
+import { useT } from '../i18n/ui';
+import { url, type Lang } from '../i18n/routes';
+
+interface Props { lang: Lang; ga4: string }
+const { lang, ga4 } = Astro.props;
+const t = useT(lang);
+---
+<section class="consent" data-consent data-ga4={ga4} aria-label={t.cookies.label} hidden>
+  <p>{t.cookies.text} <a class="text-link" href={url(lang, 'privacy')}>{t.cookies.more}</a>.</p>
+  <div class="consent__actions">
+    <button type="button" class="btn btn--accent" data-consent-choice="granted">{t.cookies.accept}</button>
+    <button type="button" class="btn btn--ghost-light" data-consent-choice="denied">{t.cookies.reject}</button>
+  </div>
+</section>
+
+<style>
+  .consent {
+    position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 95;
+    display: grid; gap: var(--space-sm); max-width: 560px; padding: var(--space-md);
+    background: var(--petrol); color: #fff; border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  }
+  .consent[hidden] { display: none; }
+  .consent p { margin: 0; }
+  .consent .text-link { color: var(--celeste-soft); }
+  .consent__actions { display: flex; flex-wrap: wrap; gap: var(--space-sm); }
+  .consent__actions .btn { flex: 1 1 140px; }
+  @media (min-width: 1024px) { .consent { left: 28px; right: auto; bottom: 28px; } }
+</style>
+
+<script>
+  const KEY = 'analytics-consent';
+  const box = document.querySelector<HTMLElement>('[data-consent]');
+
+  const read = () => { try { return localStorage.getItem(KEY); } catch { return null; } };
+  const save = (v: string) => { try { localStorage.setItem(KEY, v); } catch { /* modo privado */ } };
+
+  function loadGa(id: string) {
+    if (window.gtag) return;
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function () { window.dataLayer.push(arguments as unknown as Record<string, unknown>); };
+    window.gtag('js', new Date());
+    window.gtag('config', id, { anonymize_ip: true });
+    const s = document.createElement('script');
+    s.async = true;
+    s.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(id)}`;
+    document.head.appendChild(s);
+  }
+
+  function clearGaCookies() {
+    const host = location.hostname.split('.');
+    const domains = host.map((_, i) => host.slice(i).join('.'));
+    document.cookie.split(';').map((c) => c.split('=')[0].trim()).filter((n) => n.startsWith('_ga')).forEach((n) => {
+      document.cookie = `${n}=; Max-Age=0; path=/`;
+      domains.forEach((d) => (document.cookie = `${n}=; Max-Age=0; path=/; domain=.${d}`));
+    });
+  }
+
+  if (box) {
+    const id = box.dataset.ga4!;
+    const choice = read();
+    if (choice === 'granted') loadGa(id);
+    else if (choice !== 'denied') box.hidden = false;
+
+    box.addEventListener('click', (e) => {
+      const v = (e.target as Element).closest<HTMLElement>('[data-consent-choice]')?.dataset.consentChoice;
+      if (!v) return;
+      const before = read();
+      save(v);
+      box.hidden = true;
+      if (v === 'granted') loadGa(id);
+      else if (before === 'granted') { clearGaCookies(); location.reload(); }
+    });
+
+    document.querySelectorAll<HTMLElement>('[data-cookie-settings]').forEach((btn) => {
+      btn.hidden = false;
+      btn.addEventListener('click', () => {
+        box.hidden = false;
+        box.querySelector<HTMLElement>('[data-consent-choice]')?.focus();
+      });
+    });
+  }
+</script>

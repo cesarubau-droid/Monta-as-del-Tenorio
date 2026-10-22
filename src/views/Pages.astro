@@ -103,14 +103,14 @@ const updatedLabel = lang === 'es' ? 'Última actualización' : 'Last updated';
   <>
     <PageHero lang={lang} kicker={t.about.kicker} title={t.about.title} crumbs={[{ label: t.footer.story }]} />
     <section class="section">
-      <div class="container split">
+      <div class="container split split--bleed">
         <div class="media-43"><Photo id="founders" lang={lang} sizes="(min-width: 900px) 50vw, 100vw" eager /></div>
         <div class="prose">
           <h2>{lang === 'es' ? 'Por qué existe Montañas del Tenorio' : 'Why Montañas del Tenorio exists'}</h2>
           {t.about.body.map((para) => <p>{para}</p>)}
         </div>
       </div>
-      <div class="container split split--reverse story-2">
+      <div class="container split split--bleed split--reverse story-2">
         <div class="media-43"><Photo id="lookout" lang={lang} sizes="(min-width: 900px) 50vw, 100vw" /></div>
         <div>
           <h2>{t.highlights.title}</h2>
@@ -198,8 +198,9 @@ const updatedLabel = lang === 'es' ? 'Última actualización' : 'Last updated';
     background: var(--teal-ink); color: #fff; font-weight: 700;
   }
   .steps__list span { font-size: var(--fs-sm); color: var(--text-2); }
-  .media-43 { position: relative; aspect-ratio: 4 / 3; border-radius: var(--radius-md); overflow: hidden; background: var(--surface-2); }
+  .media-43 { position: relative; aspect-ratio: 4 / 3; overflow: hidden; background: var(--surface-2); }
   .media-43 :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  @media (min-width: 900px) { .media-43 { aspect-ratio: auto; align-self: stretch; min-height: clamp(420px, 40vw, 680px); } }
   .story-2 { margin-top: var(--space-3xl); }
   .check-list { list-style: none; padding: 0; display: grid; gap: var(--space-sm); margin-top: var(--space-md); }
   .check-list li { display: flex; gap: 10px; }
