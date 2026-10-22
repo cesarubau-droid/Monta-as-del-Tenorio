@@ -15,9 +15,23 @@ Sitio oficial de **Montañas del Tenorio**: cabañas familiares y tours (tubing,
 | `@astrojs/vercel` | Adaptador de Vercel; una sola función serverless (`/api/inquiry`) |
 | `@astrojs/sitemap` | `sitemap-index.xml` con alternativas `hreflang` EN/ES |
 | CSS propio | Tokens de diseño de la especificación (sin frameworks) |
+| `@fontsource-variable/fraunces`, `@fontsource/work-sans` | Tipografías del sitio, servidas desde el propio dominio |
 | `sharp` (dev) | Generar imágenes provisionales y optimizar fotos finales |
 
-Sin fuentes web (fuentes del sistema según la especificación), sin librerías de UI y sin dependencias en el navegador.
+Sin librerías de UI y sin dependencias en el navegador.
+
+## Tipografía
+
+| Uso | Tipografía | Variable CSS |
+|---|---|---|
+| Títulos (h1–h3), logo y precios | **Fraunces** (variable, con tamaño óptico; normal e itálica) | `--font-serif` |
+| Texto, botones, formularios y etiquetas | **Work Sans** (400, 500, 600 y 700) | `--font-sans` |
+
+- Se definen en `src/styles/global.css` y se importan en `src/layouts/Base.astro`.
+- Se sirven desde el propio sitio con Fontsource: no hay peticiones a Google Fonts y no hace falta aviso de cookies por ellas.
+- Ambas tienen licencia SIL Open Font License (uso comercial permitido) e incluyen ñ y tildes.
+- Si una fuente no carga, se usan Georgia (títulos) y las fuentes del sistema (texto).
+- Para cambiar de tipografía basta con sustituir los imports de `Base.astro` y los valores de `--font-serif` y `--font-sans`.
 
 ## Requisitos
 
