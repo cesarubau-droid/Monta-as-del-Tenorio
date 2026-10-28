@@ -80,6 +80,8 @@ const items = Object.fromEntries(
 
 <style>
   .gallery__tabs { display: flex; gap: 4px; overflow-x: auto; border-bottom: 1px solid var(--border); margin-bottom: var(--space-lg); scrollbar-width: thin; }
+  /* Centradas bajo el título; "safe" evita cortar pestañas si no caben */
+  @media (min-width: 900px) { .gallery__tabs { justify-content: safe center; } }
   .gallery__tab {
     flex: none; min-height: 48px; padding: 8px 16px;
     background: transparent; border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px;

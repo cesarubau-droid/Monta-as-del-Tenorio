@@ -23,10 +23,9 @@ const t = useT(lang);
         {t.hero.title}
       </h1>
       <p class="hero__subtitle">{t.hero.subtitle}</p>
-      <p class="hero__tagline">{t.hero.tagline}</p>
       <div class="btn-row hero__ctas">
         <a href={url(lang, 'reserve')} class="btn btn--lg btn--accent" data-track="reservation_start" data-track-location="hero">{t.hero.ctaPrimary}</a>
-        <a href={url(lang, 'tours')} class="btn btn--lg btn--ghost-light" data-track="tour_click" data-track-location="hero">{t.hero.ctaSecondary}</a>
+        <a href="#cabins" class="btn btn--lg btn--ghost-light" data-track="cabin_click" data-track-location="hero">{t.hero.ctaSecondary}</a>
       </div>
     </div>
   </div>
@@ -56,14 +55,13 @@ const t = useT(lang);
       linear-gradient(90deg, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0) 65%);
   }
   .hero__content { width: 100%; padding-block: calc(var(--header-h) + var(--space-2xl)) var(--space-3xl); }
-  .hero h1 { color: #fff; max-width: 14ch; font-size: var(--fs-display); line-height: 1; text-shadow: 0 2px 16px rgba(0, 0, 0, 0.35); }
+  .hero h1 { color: #fff; max-width: 19ch; font-size: clamp(2.4rem, 5.2vw, 4.25rem); line-height: 1.04; text-shadow: 0 2px 16px rgba(0, 0, 0, 0.35); }
   .hero__eyebrow {
     display: block; margin-bottom: var(--space-md); max-width: 40ch;
     font-family: var(--font-sans); font-size: var(--fs-label); font-weight: 700; letter-spacing: 0.2em; line-height: 1.6; text-transform: uppercase;
     color: var(--celeste-soft); text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
   }
-  .hero__subtitle { font-size: var(--fs-lg); font-weight: 600; margin-top: var(--space-md); }
-  .hero__tagline { font-size: var(--fs-lg); line-height: 1.6; max-width: 46ch; margin-top: var(--space-xs); color: #f1f1f1; }
+  .hero__subtitle { font-size: var(--fs-lg); line-height: 1.6; max-width: 52ch; margin-top: var(--space-md); color: #f1f1f1; }
   .hero__ctas { margin-top: var(--space-lg); flex-direction: column; }
   .hero__ctas .btn { width: 100%; }
   @media (min-width: 640px) { .hero__ctas { flex-direction: row; } .hero__ctas .btn { width: auto; } }
