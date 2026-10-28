@@ -42,7 +42,7 @@ const highlightIcons = ['eye', 'lookout', 'leaf', 'compass'] as const;
 <!-- Cabins -->
 <section class="section" id="cabins" aria-labelledby="cabins-title">
   <div class="container">
-    <SectionHead kicker={t.cabins.kicker} title={t.cabins.title} lead={t.cabins.lead} center id="cabins-title" />
+    <SectionHead title={t.cabins.title} lead={t.cabins.lead} center id="cabins-title" />
     <div class="grid grid--3">
       {cabins.map((c) => <CabinCard cabin={c} lang={lang} />)}
     </div>
@@ -53,7 +53,7 @@ const highlightIcons = ['eye', 'lookout', 'leaf', 'compass'] as const;
 <!-- Tours -->
 <section class="section section--surface" id="tours" aria-labelledby="tours-title">
   <div class="container">
-    <SectionHead kicker={t.tours.kicker} title={t.tours.title} lead={t.tours.lead} center id="tours-title" />
+    <SectionHead title={t.tours.title} lead={t.tours.lead} center id="tours-title" />
     <div class="grid grid--3">
       {tours.map((tour) => <TourCard tour={tour} lang={lang} />)}
     </div>
@@ -70,7 +70,6 @@ const highlightIcons = ['eye', 'lookout', 'leaf', 'compass'] as const;
       <Photo id="founders" lang={lang} sizes="(min-width: 900px) 50vw, 100vw" />
     </div>
     <div class="reveal">
-      <p class="kicker">{t.about.kicker}</p>
       <h2 id="about-title">{t.about.title}</h2>
       <div class="prose about__body">
         {t.about.body.map((p) => <p>{p}</p>)}
@@ -93,7 +92,7 @@ const highlightIcons = ['eye', 'lookout', 'leaf', 'compass'] as const;
 <!-- Gallery -->
 <section class="section" aria-labelledby="gallery-title">
   <div class="container">
-    <SectionHead kicker={t.gallery.kicker} title={t.gallery.title} lead={t.gallery.lead} center id="gallery-title" />
+    <SectionHead title={t.gallery.title} lead={t.gallery.lead} center id="gallery-title" />
     <GalleryTabs lang={lang} idPrefix="home-gal" />
     <div class="section-foot"><a class="btn btn--outline" href={url(lang, 'gallery')}>{t.gallery.seeAll}</a></div>
   </div>
@@ -102,7 +101,7 @@ const highlightIcons = ['eye', 'lookout', 'leaf', 'compass'] as const;
 <!-- FAQ -->
 <section class="section section--surface" aria-labelledby="faq-title">
   <div class="container">
-    <SectionHead kicker={t.faq.kicker} title={t.faq.title} center id="faq-title" />
+    <SectionHead title={t.faq.title} center id="faq-title" />
     <FaqList items={faqs.filter((f) => f.home)} lang={lang} />
     <div class="section-foot"><a class="btn btn--outline" href={url(lang, 'faq')}>{t.faq.viewAll}</a></div>
   </div>

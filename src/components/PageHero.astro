@@ -2,8 +2,8 @@
 import { useT } from '../i18n/ui';
 import { url, type Lang } from '../i18n/routes';
 
-interface Props { lang: Lang; title: string; lead?: string; kicker?: string; crumbs?: { label: string; href?: string }[] }
-const { lang, title, lead, kicker, crumbs = [] } = Astro.props;
+interface Props { lang: Lang; title: string; lead?: string; crumbs?: { label: string; href?: string }[] }
+const { lang, title, lead, crumbs = [] } = Astro.props;
 const t = useT(lang);
 const trail = [{ label: t.nav.home, href: url(lang, 'home') }, ...crumbs];
 ---
@@ -16,7 +16,6 @@ const trail = [{ label: t.nav.home, href: url(lang, 'home') }, ...crumbs];
         ))}
       </ol>
     </nav>
-    {kicker && <p class="kicker">{kicker}</p>}
     <h1>{title}</h1>
     {lead && <p class="lead">{lead}</p>}
     <slot />
