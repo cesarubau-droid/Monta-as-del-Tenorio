@@ -17,7 +17,7 @@ const name = tour.name[lang];
 const others = tours.filter((x) => x.slug !== tour.slug);
 const wa = whatsappUrl(lang === 'es' ? `¡Hola! Me interesa el tour: ${name}.` : `Hi! I'm interested in the ${name}.`);
 ---
-<PageHero lang={lang} kicker={t.tours.kicker} title={name} lead={tour.summary[lang]} crumbs={[{ label: t.nav.tours, href: url(lang, 'tours') }, { label: name }]} />
+<PageHero lang={lang} title={name} lead={tour.summary[lang]} crumbs={[{ label: t.nav.tours, href: url(lang, 'tours') }, { label: name }]} />
 
 <section class="section">
   <div class="container split split--bleed">

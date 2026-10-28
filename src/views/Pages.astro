@@ -30,7 +30,7 @@ const updatedLabel = lang === 'es' ? 'Última actualización' : 'Last updated';
 ---
 {kind === 'gallery' && (
   <>
-    <PageHero lang={lang} kicker={t.gallery.kicker} title={t.gallery.title} lead={t.gallery.lead} crumbs={[{ label: t.nav.gallery }]} />
+    <PageHero lang={lang} title={t.gallery.title} lead={t.gallery.lead} crumbs={[{ label: t.nav.gallery }]} />
     <section class="section" aria-label={t.gallery.title}>
       <div class="container"><GalleryTabs lang={lang} idPrefix="gal" /></div>
     </section>
@@ -40,7 +40,7 @@ const updatedLabel = lang === 'es' ? 'Última actualización' : 'Last updated';
 
 {kind === 'contact' && (
   <>
-    <PageHero lang={lang} kicker={t.contact.kicker} title={t.contact.title} lead={t.contact.quote} crumbs={[{ label: t.nav.contact }]} />
+    <PageHero lang={lang} title={t.contact.title} lead={t.contact.quote} crumbs={[{ label: t.nav.contact }]} />
     <section class="section">
       <div class="container contact-grid">
         <div>
@@ -67,7 +67,7 @@ const updatedLabel = lang === 'es' ? 'Última actualización' : 'Last updated';
 
 {kind === 'reserve' && (
   <>
-    <PageHero lang={lang} kicker={t.reserve.kicker} title={t.reserve.title} lead={t.reserve.lead} crumbs={[{ label: t.nav.reserve }]} />
+    <PageHero lang={lang} title={t.reserve.title} lead={t.reserve.lead} crumbs={[{ label: t.nav.reserve }]} />
     <section class="section">
       <div class="container reserve-grid">
         <div class="reserve-form">
@@ -91,7 +91,7 @@ const updatedLabel = lang === 'es' ? 'Última actualización' : 'Last updated';
 
 {kind === 'faq' && (
   <>
-    <PageHero lang={lang} kicker={t.faq.kicker} title={t.faq.title} crumbs={[{ label: t.footer.faq }]} />
+    <PageHero lang={lang} title={t.faq.title} crumbs={[{ label: t.footer.faq }]} />
     <section class="section">
       <div class="container"><FaqList items={faqs} lang={lang} headingLevel="h2" /></div>
     </section>
@@ -101,7 +101,7 @@ const updatedLabel = lang === 'es' ? 'Última actualización' : 'Last updated';
 
 {kind === 'story' && (
   <>
-    <PageHero lang={lang} kicker={t.about.kicker} title={t.about.title} crumbs={[{ label: t.footer.story }]} />
+    <PageHero lang={lang} title={t.about.title} crumbs={[{ label: t.footer.story }]} />
     <section class="section">
       <div class="container split split--bleed">
         <div class="media-43"><Photo id="founders" lang={lang} sizes="(min-width: 900px) 50vw, 100vw" eager /></div>
@@ -129,7 +129,7 @@ const updatedLabel = lang === 'es' ? 'Última actualización' : 'Last updated';
 
 {kind === 'sustainability' && (
   <>
-    <PageHero lang={lang} kicker={t.sustainability.kicker} title={t.sustainability.title} lead={`“${t.sustainability.quote}”`} crumbs={[{ label: t.footer.sustainability }]} />
+    <PageHero lang={lang} title={t.sustainability.title} lead={`“${t.sustainability.quote}”`} crumbs={[{ label: t.footer.sustainability }]} />
     <section class="section">
       <div class="container grid grid--3">
         {sustainability.map((s) => (
@@ -147,7 +147,7 @@ const updatedLabel = lang === 'es' ? 'Última actualización' : 'Last updated';
 
 {kind === 'deposit' && (
   <>
-    <PageHero lang={lang} kicker={t.reserve.kicker} title={t.deposit.title} lead={fmt(t.deposit.lead, { p })} crumbs={[{ label: t.deposit.title }]} />
+    <PageHero lang={lang} title={t.deposit.title} lead={fmt(t.deposit.lead, { p })} crumbs={[{ label: t.deposit.title }]} />
     <section class="section">
       <div class="container narrow">
         <DepositBox lang={lang} />
