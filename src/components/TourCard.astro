@@ -22,15 +22,15 @@ const name = tour.name[lang];
       <li><Icon name="compass" size={18} />{t.tours.guide}</li>
     </ul>
     <p class="card__text">{tour.summary[lang]}</p>
-    <PriceTag price={tour.price} lang={lang} kind="tour" />
-    <div class="card__actions">
-      <a
-        class="btn btn--outline"
-        href={url(lang, 'tours', tour.slug)}
-        data-track="tour_click"
-        data-track-tour={tour.slug}
-        data-track-action="details"
-      >{t.tours.details}<span class="sr-only">: {name}</span></a>
+    <a
+      class="card__more"
+      href={url(lang, 'tours', tour.slug)}
+      data-track="tour_click"
+      data-track-tour={tour.slug}
+      data-track-action="details"
+    >{t.tours.details}<span class="sr-only">: {name}</span> →</a>
+    <div class="card__foot">
+      <PriceTag price={tour.price} lang={lang} kind="tour" />
       <a
         class="btn"
         href={`${url(lang, 'reserve')}?tour=${tour.slug}`}

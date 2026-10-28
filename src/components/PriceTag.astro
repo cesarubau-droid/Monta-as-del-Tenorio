@@ -56,7 +56,8 @@ const notes = price ? [...(price.notes?.[lang] ?? []), t.cabins.taxIncluded] : [
 )}
 
 <style>
-  .price { margin-top: auto; }
+  .price { margin-top: auto; flex: 1 1 8rem; min-width: 0; }
+  :global(.card__foot) .price { margin-top: 0; }
   .price .card__price { margin-top: 0; }
   .price__from {
     display: block; margin-bottom: 2px;

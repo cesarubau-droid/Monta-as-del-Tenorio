@@ -8,10 +8,9 @@ import TourCard from '../components/TourCard.astro';
 import GalleryTabs from '../components/GalleryTabs.astro';
 import Trust from '../components/Trust.astro';
 import FaqList from '../components/FaqList.astro';
-import Sustainability from '../components/Sustainability.astro';
 import ContactCta from '../components/ContactCta.astro';
 import { cabins, tours } from '../data/offer';
-import { faqs } from '../data/content';
+import { faqs, sustainability } from '../data/content';
 import { useT } from '../i18n/ui';
 import { url, type Lang } from '../i18n/routes';
 
@@ -22,8 +21,50 @@ const highlightIcons = ['eye', 'lookout', 'leaf', 'compass'] as const;
 ---
 <Hero lang={lang} />
 
-<!-- About / story -->
-<section class="section" aria-labelledby="about-title">
+<!-- Trust strip: why stay with us, right under the hero -->
+<section class="strip section--surface" aria-labelledby="strip-title">
+  <div class="container">
+    <h2 id="strip-title" class="sr-only">{t.highlights.title}</h2>
+    <ul class="strip__list" role="list">
+      {t.highlights.items.map((h, i) => (
+        <li class="strip__item">
+          <span class="strip__icon"><Icon name={highlightIcons[i]} size={22} /></span>
+          <span>
+            <strong class="strip__title">{h.title}</strong>
+            <span class="strip__text">{h.text}</span>
+          </span>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<!-- Cabins -->
+<section class="section" id="cabins" aria-labelledby="cabins-title">
+  <div class="container">
+    <SectionHead kicker={t.cabins.kicker} title={t.cabins.title} lead={t.cabins.lead} center id="cabins-title" />
+    <div class="grid grid--3">
+      {cabins.map((c) => <CabinCard cabin={c} lang={lang} />)}
+    </div>
+    <p class="small muted cabins-note">{t.cabins.seasonNote}</p>
+  </div>
+</section>
+
+<!-- Tours -->
+<section class="section section--surface" id="tours" aria-labelledby="tours-title">
+  <div class="container">
+    <SectionHead kicker={t.tours.kicker} title={t.tours.title} lead={t.tours.lead} center id="tours-title" />
+    <div class="grid grid--3">
+      {tours.map((tour) => <TourCard tour={tour} lang={lang} />)}
+    </div>
+  </div>
+</section>
+
+<!-- Reviews: social proof while the visitor is deciding -->
+<Trust lang={lang} />
+
+<!-- About / story, with sustainability folded in -->
+<section class="section section--surface" aria-labelledby="about-title">
   <div class="container split split--bleed">
     <div class="about__media reveal">
       <Photo id="founders" lang={lang} sizes="(min-width: 900px) 50vw, 100vw" />
@@ -34,75 +75,64 @@ const highlightIcons = ['eye', 'lookout', 'leaf', 'compass'] as const;
       <div class="prose about__body">
         {t.about.body.map((p) => <p>{p}</p>)}
       </div>
+      <h3 class="about__sus-title">{t.sustainability.title}</h3>
+      <ul class="about__sus" role="list">
+        {sustainability.map((s) => (
+          <li>
+            <a href={`${url(lang, 'sustainability')}#${s.id}`}>
+              <Icon name={s.icon as 'leaf'} size={18} />{s.title[lang]}
+            </a>
+          </li>
+        ))}
+      </ul>
       <a href={url(lang, 'story')} class="btn btn--outline about__link">{t.about.link}<Icon name="arrow" size={18} /></a>
-    </div>
-  </div>
-  <div class="container">
-    <h3 class="sr-only">{t.highlights.title}</h3>
-    <ul class="highlights grid grid--4" role="list">
-      {t.highlights.items.map((h, i) => (
-        <li class="highlight reveal">
-          <span class="icon-circle"><Icon name={highlightIcons[i]} /></span>
-          <h4>{h.title}</h4>
-          <p class="small muted">{h.text}</p>
-        </li>
-      ))}
-    </ul>
-  </div>
-</section>
-
-<!-- Cabins -->
-<section class="section section--surface" id="cabins" aria-labelledby="cabins-title">
-  <div class="container">
-    <SectionHead kicker={t.cabins.kicker} title={t.cabins.title} lead={t.cabins.lead} id="cabins-title" />
-    <div class="grid grid--3">
-      {cabins.map((c) => <CabinCard cabin={c} lang={lang} />)}
-    </div>
-    <p class="small muted cabins-note">{t.cabins.seasonNote}</p>
-  </div>
-</section>
-
-<!-- Tours -->
-<section class="section band-petrol" id="tours" aria-labelledby="tours-title">
-  <div class="container">
-    <SectionHead kicker={t.tours.kicker} title={t.tours.title} lead={t.tours.lead} id="tours-title" />
-    <div class="grid grid--3">
-      {tours.map((tour) => <TourCard tour={tour} lang={lang} />)}
     </div>
   </div>
 </section>
 
 <!-- Gallery -->
-<section class="section section--surface" aria-labelledby="gallery-title">
+<section class="section" aria-labelledby="gallery-title">
   <div class="container">
-    <SectionHead kicker={t.gallery.kicker} title={t.gallery.title} lead={t.gallery.lead} id="gallery-title" />
+    <SectionHead kicker={t.gallery.kicker} title={t.gallery.title} lead={t.gallery.lead} center id="gallery-title" />
     <GalleryTabs lang={lang} idPrefix="home-gal" />
     <div class="section-foot"><a class="btn btn--outline" href={url(lang, 'gallery')}>{t.gallery.seeAll}</a></div>
   </div>
 </section>
 
-<Trust lang={lang} />
-
 <!-- FAQ -->
 <section class="section section--surface" aria-labelledby="faq-title">
   <div class="container">
-    <SectionHead kicker={t.faq.kicker} title={t.faq.title} id="faq-title" />
+    <SectionHead kicker={t.faq.kicker} title={t.faq.title} center id="faq-title" />
     <FaqList items={faqs.filter((f) => f.home)} lang={lang} />
     <div class="section-foot"><a class="btn btn--outline" href={url(lang, 'faq')}>{t.faq.viewAll}</a></div>
   </div>
 </section>
 
-<Sustainability lang={lang} />
 <ContactCta lang={lang} />
 
 <style>
+  .strip { padding-block: var(--space-xl); border-bottom: 1px solid var(--border); }
+  .strip__list { display: grid; gap: var(--space-md) var(--space-xl); list-style: none; padding: 0; }
+  @media (min-width: 640px) { .strip__list { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1024px) { .strip__list { grid-template-columns: repeat(4, 1fr); } }
+  .strip__item { display: flex; gap: 12px; align-items: flex-start; }
+  .strip__icon { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--card-bg); color: var(--accent); }
+  .strip__title { display: block; font-size: var(--fs-sm); font-weight: 600; color: var(--text); }
+  .strip__text { display: block; font-size: var(--fs-sm); line-height: 1.5; color: var(--text-2); margin-top: 2px; }
+
   .cabins-note { margin-top: var(--space-lg); }
   .about__media { position: relative; aspect-ratio: 4 / 3; overflow: hidden; background: var(--surface-2); }
   .about__media :global(img) { width: 100%; height: 100%; object-fit: cover; }
   @media (min-width: 900px) { .about__media { aspect-ratio: auto; align-self: stretch; min-height: clamp(420px, 40vw, 680px); } }
   .about__body { margin-top: var(--space-md); }
+  .about__sus-title { font-size: var(--fs-h4); font-family: var(--font-sans); font-weight: 600; margin-top: var(--space-xl); }
+  .about__sus { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0; margin-top: var(--space-sm); }
+  .about__sus a {
+    display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 6px 14px;
+    font-size: var(--fs-sm); color: var(--text); background: var(--card-bg);
+    border: 1px solid var(--border); border-radius: var(--radius-pill);
+  }
+  .about__sus a:hover { text-decoration: none; border-color: var(--accent); }
+  .about__sus :global(svg) { color: var(--accent); }
   .about__link { margin-top: var(--space-lg); }
-  .highlights { margin-top: var(--space-2xl); list-style: none; padding: 0; }
-  .highlight { display: flex; flex-direction: column; gap: 8px; }
-  .highlight h4 { margin-top: 4px; }
 </style>
