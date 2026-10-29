@@ -30,7 +30,7 @@ const updatedLabel = lang === 'es' ? 'Última actualización' : 'Last updated';
 ---
 {kind === 'gallery' && (
   <>
-    <PageHero lang={lang} title={t.gallery.title} lead={t.gallery.lead} crumbs={[{ label: t.nav.gallery }]} />
+    <PageHero lang={lang} title={t.gallery.title} lead={t.gallery.lead} crumbs={[{ label: t.nav.gallery }]} photo="gallery" />
     <section class="section" aria-label={t.gallery.title}>
       <div class="container"><GalleryTabs lang={lang} idPrefix="gal" /></div>
     </section>
@@ -40,7 +40,7 @@ const updatedLabel = lang === 'es' ? 'Última actualización' : 'Last updated';
 
 {kind === 'contact' && (
   <>
-    <PageHero lang={lang} title={t.contact.title} lead={t.contact.quote} crumbs={[{ label: t.nav.contact }]} />
+    <PageHero lang={lang} title={t.contact.title} lead={t.contact.quote} crumbs={[{ label: t.nav.contact }]} photo="contact" />
     <section class="section">
       <div class="container contact-grid">
         <div>

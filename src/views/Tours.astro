@@ -10,7 +10,7 @@ interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = useT(lang);
 ---
-<PageHero lang={lang} title={t.tours.title} lead={t.tours.lead} crumbs={[{ label: t.nav.tours }]} />
+<PageHero lang={lang} title={t.tours.title} lead={t.tours.lead} crumbs={[{ label: t.nav.tours }]} photo="tours" />
 <section class="section" aria-labelledby="tours-list-title">
   <div class="container">
     <h2 id="tours-list-title" class="sr-only">{t.nav.tours}</h2>

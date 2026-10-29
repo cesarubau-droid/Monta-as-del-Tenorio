@@ -234,7 +234,7 @@ Vercel → Project → **Settings → Domains → Add** → escribe el dominio �
 
 Nada de esto se inventó; el sitio muestra una alternativa neutral hasta que se complete:
 
-- **Foto del encabezado de la página Cabañas temporal** → `public/images/sections/cabins-bg-*.webp` es una imagen de referencia; reemplazarla por una foto real (panorámica, unos 2000 × 560 px).
+- **Fotos de los encabezados de Cabañas, Tours, Galería y Contacto temporales** → `public/images/sections/*-bg-*.webp` son imágenes de referencia; reemplazarlas por fotos reales (panorámicas, unos 2000 × 560 px).
 - **Foto de portada temporal** → `public/images/hero/hero-forest-river.*` es una imagen de referencia, no del lugar. Antes del lanzamiento, reemplazarla por una foto real (ver "Fotografías").
 - **Precios** de cabañas y tours → `priceUSD` en `src/data/offer.ts` (hoy: "Tarifa a consultar").
 - **Testimonios reales** → `testimonials` en `src/data/content.ts` (la sección aparece sola al agregarlos).
