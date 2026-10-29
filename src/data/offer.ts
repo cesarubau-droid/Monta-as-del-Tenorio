@@ -35,6 +35,8 @@ export interface Cabin {
   summary: L;
   description: L;
   features: Record<Lang, string[]>;
+  /** Three short highlights for the home cards (taken from `features`). */
+  highlights: Record<Lang, [string, string, string]>;
 }
 
 export const cabins: Cabin[] = [
@@ -66,6 +68,10 @@ export const cabins: Cabin[] = [
       en: ['2 bedrooms: double bed + bunk bed in each', '2 bathrooms', 'Rustic rancho with wood-fired grill', 'TV', 'Easy access for guests with disabilities', 'Equipped for cooking', 'Up to 7 guests'],
       es: ['2 habitaciones: cama matrimonial + camarote en cada una', '2 baños', 'Rancho rústico con parrilla de leña', 'TV', 'Fácil acceso para personas con discapacidad', 'Equipada para cocinar', 'Hasta 7 personas'],
     },
+    highlights: {
+      en: ['2 bedrooms · 2 bathrooms', 'Wood-fired grill rancho', 'Easy access'],
+      es: ['2 habitaciones · 2 baños', 'Rancho con parrilla de leña', 'Fácil acceso'],
+    },
   },
   {
     slug: 'colibri',
@@ -94,6 +100,10 @@ export const cabins: Cabin[] = [
     features: {
       en: ['2 bedrooms with a double bed', 'Terrace with chairs and forest view', 'TV and fridge', 'Hot water', 'Equipped for cooking', 'Up to 4 guests'],
       es: ['2 habitaciones con cama matrimonial', 'Terraza con sillas y vista al bosque', 'TV y refrigeradora', 'Agua caliente', 'Equipada para cocinar', 'Hasta 4 personas'],
+    },
+    highlights: {
+      en: ['Terrace facing the forest', '2 bedrooms', 'Hot water'],
+      es: ['Terraza frente al bosque', '2 habitaciones', 'Agua caliente'],
     },
   },
   {
@@ -124,6 +134,10 @@ export const cabins: Cabin[] = [
     features: {
       en: ['Double bed + sofa bed', 'Accessible (Law 7600)', 'Forest view, ideal for birdwatching', 'Hot water', 'Equipped for cooking'],
       es: ['Cama matrimonial + sofá cama', 'Accesible (Ley 7600)', 'Vista al bosque, ideal para observar aves', 'Agua caliente', 'Equipada para cocinar'],
+    },
+    highlights: {
+      en: ['Accessible (Law 7600)', 'Birdwatching views', 'Hot water'],
+      es: ['Accesible (Ley 7600)', 'Vista para observar aves', 'Agua caliente'],
     },
   },
 ];

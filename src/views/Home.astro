@@ -40,7 +40,7 @@ const highlightIcons = ['eye', 'lookout', 'leaf', 'compass'] as const;
 </section>
 
 <!-- Cabins -->
-<section class="section" id="cabins" aria-labelledby="cabins-title">
+<section class="section cabins-sec" id="cabins" aria-labelledby="cabins-title">
   <div class="container">
     <SectionHead title={t.cabins.title} lead={t.cabins.lead} center id="cabins-title" />
     <div class="grid grid--3">
@@ -109,6 +109,24 @@ const highlightIcons = ['eye', 'lookout', 'leaf', 'compass'] as const;
 <ContactCta lang={lang} />
 
 <style>
+  /* Cabins: forest photo as a band behind the heading, fading into the page under the cards */
+  .cabins-sec { position: relative; isolation: isolate; }
+  .cabins-sec::before {
+    content: ''; position: absolute; inset: 0 0 auto; z-index: -1; height: clamp(460px, 46vw, 700px);
+    background:
+      linear-gradient(180deg, rgba(10, 42, 48, 0.62) 0%, rgba(10, 42, 48, 0.38) 45%, rgba(10, 42, 48, 0) 70%),
+      linear-gradient(180deg, transparent 60%, var(--bg) 100%),
+      url('/images/sections/cabins-bg-2000.webp') center 60% / cover no-repeat;
+  }
+  @media (max-width: 899px) {
+    .cabins-sec::before {
+      background:
+        linear-gradient(180deg, rgba(10, 42, 48, 0.62) 0%, rgba(10, 42, 48, 0.38) 45%, rgba(10, 42, 48, 0) 70%),
+        linear-gradient(180deg, transparent 60%, var(--bg) 100%),
+        url('/images/sections/cabins-bg-1000.webp') 30% 60% / cover no-repeat;
+    }
+  }
+  .cabins-sec :global(.section-head :is(h2, p)) { color: #fff; text-shadow: 0 2px 14px rgba(0, 0, 0, 0.45); }
   .strip { padding-block: var(--space-xl); border-bottom: 1px solid var(--border); }
   .strip__list { display: grid; gap: var(--space-md) var(--space-xl); list-style: none; padding: 0; }
   @media (min-width: 640px) { .strip__list { grid-template-columns: repeat(2, 1fr); } }
