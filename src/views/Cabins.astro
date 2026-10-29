@@ -12,7 +12,7 @@ interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = useT(lang);
 ---
-<PageHero lang={lang} title={t.cabins.title} lead={t.cabins.lead} crumbs={[{ label: t.nav.cabins }]} />
+<PageHero lang={lang} title={t.cabins.title} lead={t.cabins.lead} crumbs={[{ label: t.nav.cabins }]} photo="cabins" />
 
 <section class="section">
   <div class="detail-list">

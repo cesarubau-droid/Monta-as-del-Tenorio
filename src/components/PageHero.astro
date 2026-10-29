@@ -2,12 +2,19 @@
 import { useT } from '../i18n/ui';
 import { url, type Lang } from '../i18n/routes';
 
-interface Props { lang: Lang; title: string; lead?: string; crumbs?: { label: string; href?: string }[] }
-const { lang, title, lead, crumbs = [] } = Astro.props;
+interface Props {
+  lang: Lang;
+  title: string;
+  lead?: string;
+  crumbs?: { label: string; href?: string }[];
+  /** Background photo instead of the plain petrol color (see styles below). */
+  photo?: 'cabins';
+}
+const { lang, title, lead, crumbs = [], photo } = Astro.props;
 const t = useT(lang);
 const trail = [{ label: t.nav.home, href: url(lang, 'home') }, ...crumbs];
 ---
-<section class="page-hero">
+<section class:list={['page-hero', photo && `page-hero--photo page-hero--${photo}`]}>
   <div class="container">
     <nav class="breadcrumb" aria-label="Breadcrumb">
       <ol>
@@ -21,3 +28,17 @@ const trail = [{ label: t.nav.home, href: url(lang, 'home') }, ...crumbs];
     <slot />
   </div>
 </section>
+
+<style>
+  /* Photo heroes: the image sits under a dark petrol layer so the white text keeps its contrast */
+  .page-hero--photo { position: relative; isolation: isolate; padding-block: clamp(4rem, 10vw, 8rem); }
+  .page-hero--photo::before {
+    content: ''; position: absolute; inset: 0; z-index: -1;
+    background: linear-gradient(90deg, rgba(10, 42, 48, 0.82) 0%, rgba(10, 42, 48, 0.55) 55%, rgba(10, 42, 48, 0.3) 100%),
+      var(--page-hero-photo) center 55% / cover no-repeat;
+  }
+  .page-hero--photo :global(:is(h1, p, li, a, span)) { text-shadow: 0 1px 10px rgba(0, 0, 0, 0.35); }
+  /* Temporary reference photo — replace public/images/sections/cabins-bg-*.webp with a real one */
+  .page-hero--cabins { --page-hero-photo: url('/images/sections/cabins-bg-2000.webp'); }
+  @media (max-width: 899px) { .page-hero--cabins { --page-hero-photo: url('/images/sections/cabins-bg-1000.webp'); } }
+</style>
