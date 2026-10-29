@@ -19,6 +19,11 @@ const switchHref = switchLangPath(Astro.url.pathname, other);
 ---
 <header class:list={['site-header', { 'site-header--overlay': current === 'home' }]} data-header>
   <div class="container site-header__inner">
+    {current !== 'home' && (
+      <button type="button" class="back-btn" data-go-back data-home={url(lang, 'home')} aria-label={t.goBack} title={t.goBack}>
+        <Icon name="left" size={22} />
+      </button>
+    )}
     <a href={url(lang, 'home')} class="brand">
       <Logo inverse />
     </a>
@@ -107,6 +112,22 @@ const switchHref = switchLangPath(Astro.url.pathname, other);
     transition: background-color 200ms ease, text-shadow 250ms ease;
   }
   .tool-btn:hover { background: rgba(255, 255, 255, 0.1); text-decoration: none; }
+  /* "Go back": same look as the "Back to top" button (BackToTop.astro) */
+  .back-btn {
+    flex: none; display: grid; place-items: center; width: 48px; height: 48px; padding: 0; margin-right: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.18); border-radius: 50%;
+    background: var(--petrol); color: var(--celeste-soft); cursor: pointer;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+    transition: background-color 200ms ease, color 200ms ease;
+  }
+  .back-btn:hover { background: var(--petrol-mid); color: #fff; }
+  .back-btn:focus-visible { outline: 3px solid var(--celeste); outline-offset: 3px; }
+  :global(:root[data-theme='dark']) .back-btn { background: var(--petrol-mid); color: #fff; }
+  @media (max-width: 639px) { .back-btn { width: 44px; height: 44px; margin-right: 2px; } }
+  /* Small phones: with the back button there's no room for the name, the logo mark stays */
+  @media (max-width: 429px) {
+    .back-btn + .brand :global(.logo__text) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  }
   .cart-link { position: relative; }
   .cart-link__count {
     position: absolute; top: 4px; right: 2px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px;
@@ -170,6 +191,16 @@ const switchHref = switchLangPath(Astro.url.pathname, other);
 </style>
 
 <script>
+  // "Volver atrás": regresa a la página anterior del sitio; si se llegó desde fuera
+  // (Google, un enlace de WhatsApp…) o directo, lleva a la portada en lugar de salir del sitio.
+  document.querySelector<HTMLButtonElement>('[data-go-back]')?.addEventListener('click', (e) => {
+    const btn = e.currentTarget as HTMLButtonElement;
+    let fromSite = false;
+    try { fromSite = !!document.referrer && new URL(document.referrer).origin === location.origin; } catch { /* sin referrer */ }
+    if (fromSite && history.length > 1) history.back();
+    else location.href = btn.dataset.home || '/';
+  });
+
   // Header transparente en la portada: sólido en cuanto la persona baja un poco
   const header = document.querySelector<HTMLElement>('[data-header].site-header--overlay');
   if (header) {
