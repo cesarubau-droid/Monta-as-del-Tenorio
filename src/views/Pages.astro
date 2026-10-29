@@ -54,9 +54,9 @@ const updatedLabel = lang === 'es' ? 'Última actualización' : 'Last updated';
               <li><a class="btn btn--lg btn--block" href={wa} target="_blank" rel="noopener noreferrer" data-track="whatsapp_click" data-track-location="contact_page"><Icon name="whatsapp" />{t.contact.whatsapp}<span class="sr-only"> {t.newTab}</span></a></li>
             )}
             {site.email && (
-              <li><a class="btn btn--lg btn--block btn--blue" href={`mailto:${site.email}`} data-track="email_click" data-track-location="contact_page"><Icon name="mail" />{site.email}</a></li>
+              <li><a class="btn btn--lg btn--block btn--outline" href={`mailto:${site.email}`} data-track="email_click" data-track-location="contact_page"><Icon name="mail" />{site.email}</a></li>
             )}
-            <li><a class="btn btn--lg btn--block btn--outline" href={url(lang, 'reserve')} data-track="reservation_start" data-track-location="contact_page"><Icon name="calendar" />{t.nav.reserve}</a></li>
+            <li><a class="btn btn--lg btn--block btn--accent" href={url(lang, 'reserve')} data-track="reservation_start" data-track-location="contact_page"><Icon name="calendar" />{t.nav.reserve}</a></li>
           </ul>
           <Location lang={lang} />
         </aside>
@@ -118,7 +118,7 @@ const updatedLabel = lang === 'es' ? 'Última actualización' : 'Last updated';
             {t.highlights.items.map((h) => <li><Icon name="check" size={22} /><span><strong>{h.title}.</strong> {h.text}</span></li>)}
           </ul>
           <div class="btn-row story-ctas">
-            <a class="btn btn--lg" href={url(lang, 'reserve')} data-track="reservation_start" data-track-location="story">{t.nav.reserve}</a>
+            <a class="btn btn--lg btn--accent" href={url(lang, 'reserve')} data-track="reservation_start" data-track-location="story">{t.nav.reserve}</a>
             <a class="btn btn--lg btn--outline" href={url(lang, 'cabins')}>{t.nav.cabins}</a>
           </div>
         </div>
@@ -170,7 +170,7 @@ const updatedLabel = lang === 'es' ? 'Última actualización' : 'Last updated';
           </>
         ))}
         {kind === 'policy' && (
-          <p class="policy-cta"><a class="btn btn--lg" href={url(lang, 'reserve')} data-track="reservation_start" data-track-location="policy">{t.nav.reserve}</a></p>
+          <p class="policy-cta"><a class="btn btn--lg btn--accent" href={url(lang, 'reserve')} data-track="reservation_start" data-track-location="policy">{t.nav.reserve}</a></p>
         )}
       </div>
     </section>

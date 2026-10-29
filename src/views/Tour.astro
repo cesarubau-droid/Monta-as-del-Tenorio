@@ -34,7 +34,7 @@ const wa = whatsappUrl(lang === 'es' ? `¡Hola! Me interesa el tour: ${name}.` :
       </dl>
       <p class="muted">{t.tours.askUs}</p>
       <div class="btn-row">
-        <a class="btn btn--lg" href={`${url(lang, 'reserve')}?tour=${tour.slug}`} data-add-tour={tour.slug} data-track="tour_click" data-track-tour={tour.slug} data-track-action="add_to_cart">{t.cart.add}</a>
+        <a class="btn btn--lg btn--accent" href={`${url(lang, 'reserve')}?tour=${tour.slug}`} data-add-tour={tour.slug} data-track="tour_click" data-track-tour={tour.slug} data-track-action="add_to_cart">{t.cart.add}</a>
         {wa && (
           <a class="btn btn--lg btn--outline" href={wa} target="_blank" rel="noopener noreferrer" data-track="whatsapp_click" data-track-location="tour_page" data-track-tour={tour.slug}>
             <Icon name="whatsapp" />WhatsApp<span class="sr-only"> {t.newTab}</span>

@@ -15,7 +15,7 @@ const t = useT(lang);
     <div><dt>{t.deposit.amount}</dt><dd data-amount>—</dd></div>
   </dl>
   <p class="deposit__note"><Icon name="shield" size={20} />{t.deposit.note}</p>
-  <a class="btn btn--lg" href="#" hidden data-pay target="_blank" rel="noopener noreferrer" data-track="deposit_click">{t.deposit.pay}<span class="sr-only"> {t.newTab}</span></a>
+  <a class="btn btn--lg btn--accent" href="#" hidden data-pay target="_blank" rel="noopener noreferrer" data-track="deposit_click">{t.deposit.pay}<span class="sr-only"> {t.newTab}</span></a>
   <p class="muted" data-not-ready>{t.deposit.notReady}</p>
   <p class="small"><a class="text-link" href={url(lang, 'policy')}>{t.reserve.policyLink}</a></p>
 </div>

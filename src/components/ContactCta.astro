@@ -18,6 +18,9 @@ const formHref = `${url(lang, 'contact')}#contact-form`;
       <h2 id="cta-title">{t.contact.title}</h2>
       <p class="lead cta__quote">{t.contact.quote}</p>
       <div class="cta__buttons">
+        <a class="btn btn--lg btn--accent" href={url(lang, 'reserve')} data-track="reservation_start" data-track-location="contact_section">
+          <Icon name="calendar" />{t.nav.reserve}
+        </a>
         {
           wa ? (
             <a class="btn btn--lg" href={wa} target="_blank" rel="noopener noreferrer" data-track="whatsapp_click" data-track-location="contact_section">
@@ -47,8 +50,8 @@ const formHref = `${url(lang, 'contact')}#contact-form`;
   .cta__box { text-align: center; }
   .cta__box h2 { font-size: var(--fs-display); line-height: 1; }
   .cta__quote { margin: var(--space-md) auto 0; max-width: 52ch; }
-  .cta__buttons { display: grid; gap: var(--space-lg); margin-top: var(--space-xl); }
+  .cta__buttons { display: grid; gap: var(--space-sm); margin-top: var(--space-xl); }
   @media (min-width: 640px) { .cta__buttons { display: flex; justify-content: center; flex-wrap: wrap; } }
-  @media (min-width: 1024px) { .cta__buttons { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 240px); justify-content: center; } }
+  @media (min-width: 1024px) { .cta__buttons { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 220px); justify-content: center; } }
   .cta__social { display: flex; justify-content: center; margin-top: var(--space-lg); color: var(--text); }
 </style>

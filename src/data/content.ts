@@ -179,6 +179,11 @@ export interface Review {
   source: ReviewSource;
   /** Original language when the text shown is the platform's own translation. */
   translatedFrom?: 'en' | 'fr' | 'de' | 'pt';
+  /**
+   * The guest's own words, in the `translatedFrom` language (copy it from the listing).
+   * When it matches the page language it is shown instead of the translation.
+   */
+  original?: string;
 }
 /**
  * Real reviews from the Airbnb listing (export of 2 Oct 2026, public comments only).

@@ -31,7 +31,7 @@ const t = useT(lang);
           </ul>
           <PriceTag price={c.price} lang={lang} kind="cabin" slug={c.slug} class="detail__price" />
           <div class="btn-row">
-            <a class="btn btn--lg" href={`${url(lang, 'reserve')}?cabin=${c.slug}`} data-add-cabin={c.slug} data-track="cabin_click" data-track-cabin={c.slug} data-track-action="add_to_cart">
+            <a class="btn btn--lg btn--accent" href={`${url(lang, 'reserve')}?cabin=${c.slug}`} data-add-cabin={c.slug} data-track="cabin_click" data-track-cabin={c.slug} data-track-action="add_to_cart">
               {t.cart.add}<span class="sr-only">: {c.name[lang]}</span>
             </a>
           </div>
