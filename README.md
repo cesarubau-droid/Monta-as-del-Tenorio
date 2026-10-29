@@ -234,6 +234,7 @@ Vercel → Project → **Settings → Domains → Add** → escribe el dominio �
 
 Nada de esto se inventó; el sitio muestra una alternativa neutral hasta que se complete:
 
+- **Foto de portada temporal** → `public/images/hero/hero-forest-river.*` es una imagen de referencia, no del lugar. Antes del lanzamiento, reemplazarla por una foto real (ver "Fotografías").
 - **Precios** de cabañas y tours → `priceUSD` en `src/data/offer.ts` (hoy: "Tarifa a consultar").
 - **Testimonios reales** → `testimonials` en `src/data/content.ts` (la sección aparece sola al agregarlos).
 - **ICT, Tripadvisor y calificaciones** de Booking/Airbnb → `trustBadges` en `src/data/content.ts` (`enabled: true`, `rating`).

@@ -59,7 +59,7 @@ function photo(folder: string, id: string, ratio: Ratio, en: string, es: string)
 
 export const media: Record<string, MediaItem> = Object.fromEntries([
   // HERO (16:9) — per wireframe: forest/river + couple at cabin + family tubing + wildlife
-  photo('hero', 'hero-forest-river', '16:9', 'Río Celeste flowing between mossy rocks in the rainforest', 'El Río Celeste corriendo entre rocas con musgo en el bosque'),
+  photo('hero', 'hero-forest-river', '16:9', 'Wooden cabins among the rainforest beside the turquoise Río Celeste at sunset', 'Cabañas de madera entre el bosque junto al turquesa Río Celeste al atardecer'),
   photo('hero', 'hero-cabin-couple', '16:9', 'Wooden balcony of the Tenorio Cabin with rocking chairs and a view of the garden', 'Balcón de madera de la Cabaña Tenorio con mecedoras y vista al jardín'),
   photo('hero', 'hero-family-tubing', '16:9', 'Guests with helmets tubing down the rapids of Río Celeste', 'Huéspedes con casco bajando los rápidos del Río Celeste en tubing'),
   photo('hero', 'hero-wildlife', '16:9', 'Keel-billed toucan perched on a branch near the cabins', 'Tucán pico iris posado en una rama cerca de las cabañas'),
