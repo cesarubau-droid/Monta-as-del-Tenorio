@@ -1,0 +1,84 @@
+---
+/** Layout of the admin panel (Spanish only, never indexed). */
+import '@fontsource-variable/fraunces/opsz.css';
+import '@fontsource/work-sans/400.css';
+import '@fontsource/work-sans/600.css';
+import '../styles/global.css';
+import { hasDatabase } from '../lib/db';
+
+interface Props { title: string; current?: 'reservas' | 'fechas' | 'precios'; nav?: boolean }
+const { title, current, nav = true } = Astro.props;
+const links = [
+  { key: 'reservas', href: '/admin/', label: 'Reservas' },
+  { key: 'fechas', href: '/admin/fechas/', label: 'Fechas bloqueadas' },
+  { key: 'precios', href: '/admin/precios/', label: 'Precios y cupos' },
+] as const;
+---
+<!doctype html>
+<html lang="es" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>{title} · Panel Montañas del Tenorio</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body class="adm">
+    <header class="adm__bar">
+      <a class="adm__brand" href="/admin/">Panel · Montañas del Tenorio</a>
+      {nav && (
+        <nav aria-label="Panel">
+          <ul role="list">
+            {links.map((l) => <li><a href={l.href} aria-current={current === l.key ? 'page' : undefined}>{l.label}</a></li>)}
+          </ul>
+        </nav>
+      )}
+      {nav && (
+        <form method="post" action="/admin/logout/"><button type="submit" class="adm__out">Salir</button></form>
+      )}
+    </header>
+    <main class="adm__main container">
+      <h1 class="adm__title">{title}</h1>
+      {!hasDatabase() && (
+        <p class="adm__alert" role="alert">
+          Falta conectar la base de datos: crea Neon en Vercel → Storage y vuelve a desplegar. Hasta entonces el panel no puede guardar nada.
+        </p>
+      )}
+      <slot />
+    </main>
+  </body>
+</html>
+
+<style is:global>
+  .adm { background: var(--bg); color: var(--text); font-family: var(--font-sans); }
+  .adm__bar { display: flex; align-items: center; gap: var(--space-md); flex-wrap: wrap; padding: 12px var(--gutter); background: var(--petrol); color: #fff; }
+  .adm__bar a { color: #fff; }
+  .adm__brand { font-weight: 600; margin-right: auto; }
+  .adm__bar ul { display: flex; gap: 4px; flex-wrap: wrap; list-style: none; padding: 0; }
+  .adm__bar nav a { display: inline-block; padding: 8px 12px; border-radius: 999px; }
+  .adm__bar nav a[aria-current='page'] { background: rgba(255, 255, 255, 0.16); }
+  .adm__out { min-height: 40px; padding: 6px 14px; border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 999px; background: none; color: #fff; font: inherit; cursor: pointer; }
+  .adm__main { padding-block: var(--space-xl) var(--space-3xl); }
+  .adm__title { font-size: clamp(1.8rem, 3vw, 2.4rem); margin-bottom: var(--space-lg); }
+  .adm__alert, .adm__ok, .adm__err { padding: var(--space-sm) var(--space-md); border-radius: var(--radius-md); margin-bottom: var(--space-lg); }
+  .adm__alert, .adm__err { background: var(--error-bg); color: var(--error-text); border: 1px solid var(--error); }
+  .adm__ok { background: #eef6e6; color: var(--success-ink); border: 1px solid var(--success); }
+  .adm-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: var(--space-lg); }
+  .adm-grid { display: grid; gap: var(--space-md); }
+  .adm-table { width: 100%; border-collapse: collapse; font-size: var(--fs-sm); }
+  .adm-table th, .adm-table td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .adm-table th { font-weight: 600; color: var(--text-2); }
+  .adm-inline { display: flex; gap: var(--space-sm); flex-wrap: wrap; align-items: end; }
+  .adm-inline .field { min-width: 140px; }
+  .adm-badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: var(--fs-label); font-weight: 700; }
+  .adm-badge--new { background: #fff3d6; color: #6b4a00; }
+  .adm-badge--confirmed { background: #e3f1d3; color: var(--success-ink); }
+  .adm-badge--cancelled { background: #eee; color: #555; }
+  .adm .btn { min-height: 40px; padding: 8px 18px; font-size: var(--fs-sm); }
+  .adm-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: var(--space-lg); }
+  .adm-tabs a { padding: 6px 14px; border: 1px solid var(--border); border-radius: 999px; color: var(--text); }
+  .adm-tabs a[aria-current='true'] { background: var(--petrol); border-color: var(--petrol); color: #fff; }
+  .adm h2 { font-size: var(--fs-h3); margin: var(--space-xl) 0 var(--space-sm); }
+  .adm fieldset { border: 1px solid var(--border); border-radius: var(--radius-md); padding: var(--space-md); }
+  .adm legend { padding: 0 6px; font-weight: 600; }
+</style>

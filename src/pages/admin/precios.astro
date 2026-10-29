@@ -1,0 +1,128 @@
+---
+/** Cabin prices (with seasons), tour prices and spots per time of day. */
+import Admin from '../../layouts/Admin.astro';
+import { guard, triggerRebuild } from '../../lib/admin-auth';
+import { hasDatabase } from '../../lib/db';
+import { getPricing, isDate, savePricing, SLOTS, type Pricing, type Season } from '../../lib/booking';
+import { cabins, tours } from '../../data/offer';
+import { useT } from '../../i18n/ui';
+
+export const prerender = false;
+
+const blocked = guard(Astro);
+if (blocked) return blocked;
+
+const t = useT('es');
+const EMPTY_SEASONS = 2; // blank rows to add new seasons
+let problems: string[] = [];
+
+if (Astro.request.method === 'POST' && hasDatabase()) {
+  const fd = await Astro.request.formData();
+  const num = (k: string) => Number(String(fd.get(k) ?? '').replace(',', '.'));
+  const current = await getPricing();
+  const next: Pricing = structuredClone(current);
+
+  for (const c of cabins) {
+    const name = c.name.es;
+    const base = num(`${c.slug}.base`), included = num(`${c.slug}.included`), extra = num(`${c.slug}.extra`), max = num(`${c.slug}.max`);
+    if (!(base > 0) || !(included >= 1) || !(extra >= 0) || !(max >= included) || ![base, included, extra, max].every(Number.isFinite)) {
+      problems.push(`${name}: revisa el precio, las personas incluidas y el máximo (el máximo no puede ser menor que las incluidas).`);
+      continue;
+    }
+    const seasons: Season[] = [];
+    for (let i = 0; fd.has(`${c.slug}.season.${i}.from`); i++) {
+      const from = String(fd.get(`${c.slug}.season.${i}.from`) ?? '');
+      const to = String(fd.get(`${c.slug}.season.${i}.to`) ?? '');
+      const sb = num(`${c.slug}.season.${i}.base`);
+      if (!from && !to && !String(fd.get(`${c.slug}.season.${i}.base`) ?? '')) continue; // empty row
+      if (!isDate(from) || !isDate(to) || to < from || !(sb > 0)) { problems.push(`${name}: hay una temporada con fechas o precio inválidos.`); continue; }
+      seasons.push({ from, to, base: sb });
+    }
+    next.cabins[c.slug] = { base, included: Math.trunc(included), extra, max: Math.trunc(max), seasons: seasons.sort((a, b) => a.from.localeCompare(b.from)) };
+  }
+
+  for (const x of tours) {
+    const name = x.name.es;
+    const adult = num(`${x.slug}.adult`), child = num(`${x.slug}.child`), minimum = num(`${x.slug}.minimum`);
+    const capacity = Object.fromEntries(SLOTS.map((s) => [s, Math.trunc(num(`${x.slug}.cap.${s}`))])) as Pricing['tours'][string]['capacity'];
+    if (!(adult > 0) || !(child >= 0) || !(minimum >= 0) || Object.values(capacity).some((n) => !(n >= 0))) {
+      problems.push(`${name}: revisa los precios y los cupos (usa 0 en los horarios que no se ofrecen).`);
+      continue;
+    }
+    next.tours[x.slug] = { adult, child, minimum, capacity };
+  }
+
+  if (!problems.length) {
+    await savePricing(next);
+    const rebuilt = await triggerRebuild();
+    return Astro.redirect(`/admin/precios/?ok=${rebuilt ? 'rebuild' : '1'}`);
+  }
+}
+
+const pricing = await getPricing();
+const ok = Astro.url.searchParams.get('ok');
+---
+<Admin title="Precios y cupos" current="precios">
+  {ok === 'rebuild' && <p class="adm__ok" role="status">Precios guardados. El carrito ya usa los precios nuevos; las tarjetas del sitio se actualizan en 1 o 2 minutos.</p>}
+  {ok === '1' && <p class="adm__ok" role="status">Precios guardados. El carrito ya usa los precios nuevos. Para que las tarjetas del sitio también cambien, configura VERCEL_DEPLOY_HOOK_URL o vuelve a desplegar.</p>}
+  {problems.length > 0 && (
+    <div class="adm__err" role="alert"><p><strong>No se guardó nada.</strong></p><ul>{problems.map((p) => <li>{p}</li>)}</ul></div>
+  )}
+  <p class="muted">Todos los precios son en dólares, con IVA incluido.</p>
+
+  <form method="post" class="form prices">
+    <h2>Cabañas</h2>
+    {cabins.map((c) => {
+      const p = pricing.cabins[c.slug];
+      const rows = [...p.seasons, ...Array.from({ length: EMPTY_SEASONS }, () => null)];
+      return (
+        <fieldset>
+          <legend>{c.name.es}</legend>
+          <div class="adm-inline">
+            <div class="field"><label for={`${c.slug}-base`}>Precio por noche ($)</label><input id={`${c.slug}-base`} name={`${c.slug}.base`} type="number" min="1" step="0.01" value={p.base} required /></div>
+            <div class="field"><label for={`${c.slug}-inc`}>Personas incluidas</label><input id={`${c.slug}-inc`} name={`${c.slug}.included`} type="number" min="1" step="1" value={p.included} required /></div>
+            <div class="field"><label for={`${c.slug}-extra`}>Persona adicional por noche ($)</label><input id={`${c.slug}-extra`} name={`${c.slug}.extra`} type="number" min="0" step="0.01" value={p.extra} required /></div>
+            <div class="field"><label for={`${c.slug}-max`}>Máximo de personas</label><input id={`${c.slug}-max`} name={`${c.slug}.max`} type="number" min="1" step="1" value={p.max} required /></div>
+          </div>
+          <p class="small muted season-help">Temporadas: precio por noche distinto entre dos fechas (ambas noches incluidas). Deja la fila vacía para borrarla.</p>
+          {rows.map((s, i) => (
+            <div class="adm-inline season">
+              <div class="field"><label for={`${c.slug}-s${i}-from`}>Desde</label><input id={`${c.slug}-s${i}-from`} name={`${c.slug}.season.${i}.from`} type="date" value={s?.from ?? ''} /></div>
+              <div class="field"><label for={`${c.slug}-s${i}-to`}>Hasta (última noche)</label><input id={`${c.slug}-s${i}-to`} name={`${c.slug}.season.${i}.to`} type="date" value={s?.to ?? ''} /></div>
+              <div class="field"><label for={`${c.slug}-s${i}-base`}>Precio por noche ($)</label><input id={`${c.slug}-s${i}-base`} name={`${c.slug}.season.${i}.base`} type="number" min="1" step="0.01" value={s?.base ?? ''} /></div>
+            </div>
+          ))}
+        </fieldset>
+      );
+    })}
+
+    <h2>Tours</h2>
+    {tours.map((x) => {
+      const p = pricing.tours[x.slug];
+      return (
+        <fieldset>
+          <legend>{x.name.es}</legend>
+          <div class="adm-inline">
+            <div class="field"><label for={`${x.slug}-adult`}>Adulto ($)</label><input id={`${x.slug}-adult`} name={`${x.slug}.adult`} type="number" min="1" step="0.01" value={p.adult} required /></div>
+            <div class="field"><label for={`${x.slug}-child`}>Menor de 10 años ($)</label><input id={`${x.slug}-child`} name={`${x.slug}.child`} type="number" min="0" step="0.01" value={p.child} required /></div>
+            <div class="field"><label for={`${x.slug}-min`}>Mínimo por grupo ($)</label><input id={`${x.slug}-min`} name={`${x.slug}.minimum`} type="number" min="0" step="0.01" value={p.minimum} required /></div>
+          </div>
+          <div class="adm-inline">
+            {SLOTS.map((s) => (
+              <div class="field"><label for={`${x.slug}-cap-${s}`}>Cupo {t.cart.slots[s].toLowerCase()}</label><input id={`${x.slug}-cap-${s}`} name={`${x.slug}.cap.${s}`} type="number" min="0" step="1" value={p.capacity[s]} required /></div>
+            ))}
+          </div>
+          <p class="small muted">Cupo = máximo de personas por horario y día. 0 = ese horario no se ofrece.</p>
+        </fieldset>
+      );
+    })}
+
+    <div><button type="submit" class="btn btn--lg">Guardar precios y cupos</button></div>
+  </form>
+</Admin>
+
+<style>
+  .prices { gap: var(--space-lg); }
+  .prices fieldset { display: grid; gap: var(--space-sm); }
+  .season-help { margin-top: var(--space-sm); }
+</style>

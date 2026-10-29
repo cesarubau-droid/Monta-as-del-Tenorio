@@ -29,5 +29,6 @@ const { inverse = false } = Astro.props;
   @media (min-width: 640px) and (max-width: 899px) {
     .logo__text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   }
-  @media (max-width: 379px) { .logo__name { font-size: 0.9375rem; } .logo__sub { display: none; } }
+  /* Small phones: leave room for the header tools (language, theme, cart, menu) */
+  @media (max-width: 429px) { .logo__name { font-size: 0.9375rem; white-space: normal; } .logo__sub { display: none; } }
 </style>

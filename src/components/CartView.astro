@@ -1,0 +1,121 @@
+---
+/**
+ * Cart page (/reserve): selected cabins and tours, total, customer details and submit.
+ * The list is drawn by scripts/cart.ts from the cart saved in the browser.
+ */
+import Icon from './Icon.astro';
+import { whatsappUrl } from '../data/site';
+import { useT } from '../i18n/ui';
+import { url, type Lang } from '../i18n/routes';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+const c = t.cart;
+const f = t.form;
+const wa = whatsappUrl(t.whatsappGreeting);
+---
+<div class="cartp" data-cart-page>
+  <div data-cart-main>
+    <div class="cartp__head">
+      <h2 class="cartp__title">{c.itemsTitle}</h2>
+      <div class="btn-row">
+        <a class="btn btn--outline" href="?cabin" data-add-cabin data-add-pick><Icon name="plus" size={18} />{c.addCabin}</a>
+        <a class="btn btn--outline" href="?tour" data-add-tour data-add-pick><Icon name="plus" size={18} />{c.addTour}</a>
+      </div>
+    </div>
+
+    <noscript><p class="cartp__empty">{c.noscript} {wa && <a class="text-link" href={wa}>WhatsApp</a>}</p></noscript>
+
+    <div class="cartp__empty" data-cart-empty hidden>
+      <p class="cartp__empty-title">{c.emptyTitle}</p>
+      <p class="muted">{c.empty}</p>
+    </div>
+
+    <ul class="citems" role="list" data-cart-items aria-live="polite"></ul>
+    <p class="cartp__total"><span>{c.total}</span> <strong data-cart-total>—</strong></p>
+    <p class="small muted">{c.payNote}</p>
+
+    <form class="form cartp__form" novalidate data-cart-form hidden>
+      <h2 class="cartp__title">{c.yourDetails}</h2>
+      <input type="hidden" name="lang" value={lang} />
+      <div class="hp" aria-hidden="true">
+        <label for="cart-website">Website</label>
+        <input id="cart-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+      </div>
+      <div class="form-row form-row--2">
+        <div class="field">
+          <label for="cart-name">{f.name}<span class="req" aria-hidden="true"> *</span></label>
+          <input id="cart-name" name="name" type="text" autocomplete="name" required maxlength="100" aria-describedby="cart-name-err" />
+          <p class="error" id="cart-name-err" data-error-for="name"></p>
+        </div>
+        <div class="field">
+          <label for="cart-email">{f.email}<span class="req" aria-hidden="true"> *</span></label>
+          <input id="cart-email" name="email" type="email" autocomplete="email" required maxlength="200" aria-describedby="cart-email-err" />
+          <p class="error" id="cart-email-err" data-error-for="email"></p>
+        </div>
+      </div>
+      <div class="form-row form-row--2">
+        <div class="field">
+          <label for="cart-phone">{f.phone}<span class="req" aria-hidden="true"> *</span></label>
+          <input id="cart-phone" name="phone" type="tel" autocomplete="tel" required maxlength="40" aria-describedby="cart-phone-hint cart-phone-err" />
+          <p class="hint" id="cart-phone-hint">{f.phoneHint}</p>
+          <p class="error" id="cart-phone-err" data-error-for="phone"></p>
+        </div>
+        <div class="field">
+          <label for="cart-country">{f.country}</label>
+          <input id="cart-country" name="country" type="text" autocomplete="country-name" maxlength="60" />
+        </div>
+      </div>
+      <div class="field">
+        <label for="cart-message">{f.messageOptional}</label>
+        <textarea id="cart-message" name="message" rows="3" maxlength="2000"></textarea>
+      </div>
+      <div class="field">
+        <label class="check" for="cart-consent">
+          <input id="cart-consent" type="checkbox" name="consent" required aria-describedby="cart-consent-err" />
+          <span>{f.consent} <a href={url(lang, 'privacy')} class="text-link">{f.privacy}</a>.<span class="req" aria-hidden="true"> *</span></span>
+        </label>
+        <p class="error" id="cart-consent-err" data-error-for="consent"></p>
+      </div>
+      <p class="form-status form-status--error" role="alert" tabindex="-1" data-cart-status></p>
+      <button type="submit" class="btn btn--lg btn--block">{c.send}</button>
+    </form>
+  </div>
+
+  <div class="form-success" data-cart-success tabindex="-1" hidden>
+    <h2 class="cartp__title"><Icon name="check" size={22} /> {c.successTitle}</h2>
+    <p data-cart-success-text></p>
+    <a class="btn btn--lg" data-cart-wa href="#" target="_blank" rel="noopener noreferrer" hidden data-track="whatsapp_click" data-track-location="cart_success">
+      <Icon name="whatsapp" />{c.openWhatsapp}<span class="sr-only"> {t.newTab}</span>
+    </a>
+  </div>
+</div>
+
+<style>
+  .cartp { display: grid; gap: var(--space-lg); }
+  .cartp__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-md); flex-wrap: wrap; margin-bottom: var(--space-md); }
+  .cartp__title { font-size: var(--fs-h3); }
+  .cartp__empty { padding: var(--space-xl) var(--space-lg); text-align: center; background: var(--surface); border: 1px dashed var(--border); border-radius: var(--radius-md); }
+  .cartp__empty-title { font-family: var(--font-serif); font-size: var(--fs-h4); margin-bottom: 4px; }
+  .citems { display: grid; gap: var(--space-sm); list-style: none; padding: 0; }
+  .citems :global(.citem) {
+    display: flex; justify-content: space-between; gap: var(--space-md); padding: var(--space-md) var(--space-lg);
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-md);
+  }
+  .citems :global(.citem.has-error) { border-color: var(--error); }
+  .citems :global(.citem__name) { font-weight: 600; }
+  .citems :global(.citem__detail) { font-size: var(--fs-sm); color: var(--text-2); margin-top: 2px; }
+  .citems :global(.citem__error) { font-size: var(--fs-sm); font-weight: 600; color: var(--error-text); margin-top: 6px; }
+  .citems :global(.citem__side) { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex: none; }
+  .citems :global(.citem__amount) { font-family: var(--font-serif); font-size: 1.25rem; }
+  .citems :global(.citem__btns) { display: flex; gap: 4px; }
+  .citems :global(.citem__btn) {
+    min-width: 44px; min-height: 36px; padding: 4px 12px; border: 1px solid var(--border); border-radius: var(--radius-pill);
+    background: none; color: var(--text); font: inherit; font-size: var(--fs-sm); cursor: pointer;
+  }
+  .citems :global(.citem__btn:hover) { border-color: var(--accent); }
+  .cartp__total { display: flex; justify-content: space-between; align-items: baseline; padding-top: var(--space-md); border-top: 1px solid var(--border); font-size: var(--fs-lg); }
+  .cartp__total strong { font-family: var(--font-serif); font-size: 1.75rem; font-weight: 400; }
+  .cartp__form { margin-top: var(--space-xl); }
+</style>

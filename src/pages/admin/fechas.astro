@@ -1,0 +1,90 @@
+---
+/** Dates blocked by hand (maintenance, bookings from Airbnb/Booking, family use…). */
+import Admin from '../../layouts/Admin.astro';
+import { guard } from '../../lib/admin-auth';
+import { hasDatabase } from '../../lib/db';
+import { addBlock, deleteBlock, isDate, listBlocks, todayCR } from '../../lib/booking';
+import { cabins } from '../../data/offer';
+
+export const prerender = false;
+
+const blocked = guard(Astro);
+if (blocked) return blocked;
+
+if (Astro.request.method === 'POST' && hasDatabase()) {
+  const fd = await Astro.request.formData();
+  if (fd.get('action') === 'delete') {
+    await deleteBlock(Number(fd.get('id')));
+    return Astro.redirect('/admin/fechas/?ok=borrado');
+  }
+  const cabin = String(fd.get('cabin') ?? '');
+  const from = String(fd.get('from') ?? '');
+  const last = String(fd.get('to') ?? '');
+  if (!cabins.some((c) => c.slug === cabin) || !isDate(from) || !isDate(last) || last < from) {
+    return Astro.redirect('/admin/fechas/?err=1');
+  }
+  // The form asks for the last blocked night; the database stores the day after (exclusive end).
+  const to = new Date(Date.parse(`${last}T00:00:00Z`) + 86_400_000).toISOString().slice(0, 10);
+  await addBlock(cabin, from, to, String(fd.get('note') ?? ''));
+  return Astro.redirect('/admin/fechas/?ok=agregado');
+}
+
+const blocks = hasDatabase() ? await listBlocks() : [];
+const ok = Astro.url.searchParams.get('ok');
+const err = Astro.url.searchParams.get('err');
+const name = (s: string) => cabins.find((c) => c.slug === s)?.name.es ?? s;
+const d = (iso: string) => new Intl.DateTimeFormat('es-CR', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${iso}T00:00:00Z`));
+const lastNight = (end: string) => new Date(Date.parse(`${end}T00:00:00Z`) - 86_400_000).toISOString().slice(0, 10);
+const today = todayCR();
+---
+<Admin title="Fechas bloqueadas" current="fechas">
+  {ok && <p class="adm__ok" role="status">Listo: bloqueo {ok}.</p>}
+  {err && <p class="adm__err" role="alert">Revisa la cabaña y las fechas: la última noche no puede ser antes de la primera.</p>}
+  <p class="muted">Las reservas confirmadas ya bloquean sus fechas solas. Usa esto para cerrar noches por otros motivos: mantenimiento, reservas de Airbnb o Booking, uso familiar…</p>
+
+  <h2>Bloquear noches</h2>
+  <form method="post" class="adm-card adm-inline">
+    <div class="field">
+      <label for="cabin">Cabaña</label>
+      <select id="cabin" name="cabin" required>{cabins.map((c) => <option value={c.slug}>{c.name.es}</option>)}</select>
+    </div>
+    <div class="field">
+      <label for="from">Primera noche</label>
+      <input id="from" name="from" type="date" min={today} required />
+    </div>
+    <div class="field">
+      <label for="to">Última noche</label>
+      <input id="to" name="to" type="date" min={today} required />
+    </div>
+    <div class="field">
+      <label for="note">Nota (opcional)</label>
+      <input id="note" name="note" type="text" maxlength="200" placeholder="Reserva de Airbnb" />
+    </div>
+    <button type="submit" class="btn">Bloquear</button>
+  </form>
+
+  <h2>Bloqueos activos</h2>
+  {blocks.length === 0 ? <p class="muted">No hay noches bloqueadas a mano.</p> : (
+    <div class="adm-card">
+      <table class="adm-table">
+        <thead><tr><th>Cabaña</th><th>Noches</th><th>Nota</th><th><span class="sr-only">Acciones</span></th></tr></thead>
+        <tbody>
+          {blocks.map((b) => (
+            <tr>
+              <td>{name(b.cabin)}</td>
+              <td>{d(b.from)} → {d(lastNight(b.to))}</td>
+              <td>{b.note}</td>
+              <td>
+                <form method="post">
+                  <input type="hidden" name="action" value="delete" />
+                  <input type="hidden" name="id" value={b.id} />
+                  <button type="submit" class="btn btn--outline">Quitar</button>
+                </form>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )}
+</Admin>

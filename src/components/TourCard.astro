@@ -30,14 +30,15 @@ const name = tour.name[lang];
       data-track-action="details"
     >{t.tours.details}<span class="sr-only">: {name}</span> →</a>
     <div class="card__foot">
-      <PriceTag price={tour.price} lang={lang} kind="tour" />
+      <PriceTag price={tour.price} lang={lang} kind="tour" slug={tour.slug} />
       <a
         class="btn"
         href={`${url(lang, 'reserve')}?tour=${tour.slug}`}
+        data-add-tour={tour.slug}
         data-track="tour_click"
         data-track-tour={tour.slug}
-        data-track-action="add_to_trip"
-      >{t.tours.addToTrip}<span class="sr-only">: {name}</span></a>
+        data-track-action="add_to_cart"
+      ><Icon name="cart" size={18} />{t.cart.addShort}<span class="sr-only"> — {t.cart.add}: {name}</span></a>
     </div>
   </div>
 </article>

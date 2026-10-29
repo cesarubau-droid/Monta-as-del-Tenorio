@@ -61,7 +61,10 @@ npm run dev               # http://localhost:4321
 src/
 ├── pages/
 │   ├── [...path].astro      # Router único: todas las páginas EN (/) y ES (/es)
-│   ├── api/inquiry.ts       # POST reservas y contacto → Google Sheets → WhatsApp
+│   ├── api/inquiry.ts       # POST contacto → Google Sheets
+│   ├── api/cart.ts          # POST carrito → base de datos + Google Sheets → WhatsApp
+│   ├── api/booking.ts       # GET precios y disponibilidad para el carrito
+│   ├── admin/               # Panel: reservas, fechas bloqueadas, precios y cupos
 │   ├── 404.astro            # 404 bilingüe
 │   └── robots.txt.ts
 ├── views/                   # Home, Cabins, Tours, Tour, Pages (galería, contacto, reserva, FAQ, legales…)
@@ -112,18 +115,41 @@ Todas están documentadas en [`.env.example`](.env.example). Las `PUBLIC_*` se i
 | `PUBLIC_PAYPAL_ME_URL` | Para adelantos | `https://paypal.me/usuario` |
 | `PUBLIC_GA4_ID` | Opcional | `G-XXXXXXXXXX` |
 
-## Flujo de reservas (MVP)
+## Flujo de reservas: carrito + panel
 
 ```
-Formulario (/reserve) ─► /api/inquiry ─► Google Sheets (pestaña Reservations)
-                                   └──► Mensaje de WhatsApp prellenado con todos los datos y la referencia MT-AAMMDD-XXXX
-Dueños confirman disponibilidad por WhatsApp ─► envían enlace de adelanto del 30 % (PayPal)
+Tarjeta "Agregar" ─► ventana con calendario (fechas ocupadas en gris) ─► carrito (/reserve, guardado en el navegador)
+Carrito ─► /api/cart ─► recalcula precios y disponibilidad ─► base de datos (panel) + Google Sheets (aviso por correo)
+                                                         └──► WhatsApp con el resumen, el total y la referencia MT-AAMMDD-XXXX
+Dueños confirman en /admin ─► las fechas y cupos quedan bloqueados para los demás clientes
 ```
 
-- Validación en el navegador **y** en el servidor, honeypot anti-spam, límite de envíos por IP, protección contra fórmulas en Sheets.
-- Funciona sin JavaScript (el formulario hace POST normal y redirige a WhatsApp).
-- Si Google Sheets falla o no está configurado, la reserva **no se pierde**: el visitante continúa por WhatsApp con todos los datos. El formulario de contacto muestra un error si no puede guardarse.
-- **Escalar a calendario:** el almacenamiento está aislado en `storeInquiry()` (`src/lib/inquiry.ts`). Para un sistema de disponibilidad se reemplaza esa función (o el formulario de `ReservationForm.astro`) sin tocar el resto del sitio.
+- **Cabañas:** llegada, salida y personas. Precio por noche según temporada + persona adicional.
+- **Tours:** fecha, horario (mañana, tarde o noche), adultos y menores de 10 años. Cada horario tiene un cupo máximo; se pueden reservar tours sin cabaña.
+- Solo las reservas **confirmadas** y los bloqueos manuales ocupan fechas y cupos. Al confirmar, el panel vuelve a comprobar la disponibilidad para no vender dos veces lo mismo.
+- El servidor nunca confía en los precios del navegador: recalcula todo al recibir el carrito.
+- **Pago en línea (pendiente):** cuando esté aprobada la pasarela, `/api/cart` cobrará el total en lugar de abrir WhatsApp.
+
+### Panel de administración (`/admin`)
+
+| Sección | Para qué sirve |
+|---|---|
+| Reservas | Ver las reservas, confirmarlas, cancelarlas o devolverlas a "nueva". |
+| Fechas bloqueadas | Cerrar noches de una cabaña (mantenimiento, reservas de Airbnb/Booking, uso familiar). |
+| Precios y cupos | Precio por noche, personas incluidas, persona adicional, máximo y temporadas de cada cabaña; precio adulto/niño, mínimo y cupo por horario de cada tour. |
+
+Al guardar precios, el carrito los usa de inmediato y el sitio se vuelve a publicar solo (si `VERCEL_DEPLOY_HOOK_URL` está definido) para que las tarjetas muestren los precios nuevos.
+
+### Configuración en Vercel (una sola vez)
+
+1. **Base de datos:** Vercel → Project → **Storage → Create Database → Neon (Postgres)** → conectar al proyecto (Production y Preview). Esto crea `DATABASE_URL`; las tablas se crean solas en el primer uso.
+2. **Contraseña del panel:** Settings → Environment Variables → `ADMIN_PASSWORD` (mínimo 8 caracteres, mejor 16 o más).
+3. **Publicar al guardar precios:** Settings → Git → **Deploy Hooks** → crear uno para la rama `main` → copiar la URL a `VERCEL_DEPLOY_HOOK_URL`.
+4. **Redeploy.** Luego entra a `https://<tu-dominio>/admin/`, revisa los precios y cupos y guárdalos una vez.
+
+Sin `DATABASE_URL` el carrito sigue funcionando con los precios de `src/data/offer.ts`, sin bloquear fechas, y todo se confirma por WhatsApp.
+
+**En local:** `npm run dev` sin `DATABASE_URL` crea una base de prueba en `.pglite/` (no se sube a git). Define `ADMIN_PASSWORD` en `.env` para entrar al panel.
 
 ### Google Sheets
 

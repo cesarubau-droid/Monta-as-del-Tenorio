@@ -56,6 +56,10 @@ const switchHref = switchLangPath(Astro.url.pathname, other);
         <Icon name="moon" size={20} class="icon theme-toggle__moon" />
         <Icon name="sun" size={20} class="icon theme-toggle__sun" />
       </button>
+      <a href={url(lang, 'reserve')} class="tool-btn cart-link" data-cart-link data-label={t.cart.linkLabel} aria-label={t.cart.linkLabel.replace('{n}', '0')}>
+        <Icon name="cart" size={22} />
+        <span class="cart-link__count" data-cart-count hidden>0</span>
+      </a>
       <a href={url(lang, 'reserve')} class="btn btn--accent header-cta" data-track="reservation_start" data-track-location="header">
         {t.nav.reserve}
       </a>
@@ -103,6 +107,12 @@ const switchHref = switchLangPath(Astro.url.pathname, other);
     transition: background-color 200ms ease, text-shadow 250ms ease;
   }
   .tool-btn:hover { background: rgba(255, 255, 255, 0.1); text-decoration: none; }
+  .cart-link { position: relative; }
+  .cart-link__count {
+    position: absolute; top: 4px; right: 2px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px;
+    background: var(--celeste); color: var(--petrol-deep); font-size: 0.6875rem; font-weight: 700; line-height: 18px; text-align: center; text-shadow: none;
+  }
+  .cart-link__count[hidden] { display: none; }
   :global(.theme-toggle__sun) { display: none; }
   :global(:root[data-theme='dark']) :global(.theme-toggle__sun) { display: block; }
   :global(:root[data-theme='dark']) :global(.theme-toggle__moon) { display: none; }
@@ -114,6 +124,7 @@ const switchHref = switchLangPath(Astro.url.pathname, other);
   @media (max-width: 639px) {
     .lang-switch :global(.icon) { display: none; }
     .site-header__tools { gap: 0; }
+    .tool-btn { min-width: 40px; padding: 0 6px; }
     .site-header__inner { gap: 4px; }
   }
 

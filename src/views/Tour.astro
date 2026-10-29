@@ -30,11 +30,11 @@ const wa = whatsappUrl(lang === 'es' ? `¡Hola! Me interesa el tour: ${name}.` :
       <dl class="facts">
         <div><dt><Icon name="clock" size={20} />{t.tours.duration}</dt><dd>{fmt(t.tours.hours, { n: formatHours(tour.hours, lang) })}</dd></div>
         <div><dt><Icon name="compass" size={20} />{t.tours.guide}</dt><dd>{t.tours.included}</dd></div>
-        <div><dt><Icon name="calendar" size={20} />{t.tours.priceLabel}</dt><dd><PriceTag price={tour.price} lang={lang} kind="tour" variant="inline" /></dd></div>
+        <div><dt><Icon name="calendar" size={20} />{t.tours.priceLabel}</dt><dd><PriceTag price={tour.price} lang={lang} kind="tour" slug={tour.slug} variant="inline" /></dd></div>
       </dl>
       <p class="muted">{t.tours.askUs}</p>
       <div class="btn-row">
-        <a class="btn btn--lg" href={`${url(lang, 'reserve')}?tour=${tour.slug}`} data-track="tour_click" data-track-tour={tour.slug} data-track-action="add_to_trip">{t.tours.addToTrip}</a>
+        <a class="btn btn--lg" href={`${url(lang, 'reserve')}?tour=${tour.slug}`} data-add-tour={tour.slug} data-track="tour_click" data-track-tour={tour.slug} data-track-action="add_to_cart">{t.cart.add}</a>
         {wa && (
           <a class="btn btn--lg btn--outline" href={wa} target="_blank" rel="noopener noreferrer" data-track="whatsapp_click" data-track-location="tour_page" data-track-tour={tour.slug}>
             <Icon name="whatsapp" />WhatsApp<span class="sr-only"> {t.newTab}</span>

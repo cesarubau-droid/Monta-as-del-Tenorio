@@ -1,0 +1,44 @@
+---
+import Admin from '../../layouts/Admin.astro';
+import { adminConfigured, checkPassword, isAdmin, sameOrigin, startSession } from '../../lib/admin-auth';
+import { rateLimited } from '../../lib/inquiry';
+
+export const prerender = false;
+
+if (isAdmin(Astro)) return Astro.redirect('/admin/');
+
+let error = '';
+if (Astro.request.method === 'POST') {
+  let ip = 'unknown';
+  try { ip = Astro.clientAddress; } catch { /* dev */ }
+  if (!sameOrigin(Astro)) return new Response('Forbidden', { status: 403 });
+  if (rateLimited(`login:${ip}`)) {
+    error = 'Demasiados intentos. Espera 10 minutos y vuelve a intentarlo.';
+  } else {
+    const fd = await Astro.request.formData();
+    if (checkPassword(String(fd.get('password') ?? ''))) {
+      startSession(Astro);
+      return Astro.redirect('/admin/');
+    }
+    error = 'Contraseña incorrecta.';
+  }
+}
+---
+<Admin title="Entrar al panel" nav={false}>
+  {!adminConfigured() ? (
+    <p class="adm__alert" role="alert">El panel está desactivado: falta definir ADMIN_PASSWORD (mínimo 8 caracteres) en Vercel.</p>
+  ) : (
+    <form method="post" class="form adm-card login">
+      {error && <p class="adm__err" role="alert">{error}</p>}
+      <div class="field">
+        <label for="password">Contraseña</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required autofocus />
+      </div>
+      <button type="submit" class="btn">Entrar</button>
+    </form>
+  )}
+</Admin>
+
+<style>
+  .login { max-width: 380px; }
+</style>

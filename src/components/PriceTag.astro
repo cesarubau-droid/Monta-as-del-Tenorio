@@ -8,6 +8,7 @@
  * variant="inline": texto simple (por ejemplo dentro de un <dd>).
  */
 import { formatMoney, type Price } from '../data/offer';
+import { livePrice } from '../lib/live-prices';
 import { useT } from '../i18n/ui';
 import type { Lang } from '../i18n/routes';
 
@@ -15,10 +16,13 @@ interface Props {
   price: Price | null;
   lang: Lang;
   kind: 'cabin' | 'tour';
+  /** Cabin or tour slug: when given, the price saved in the admin panel is shown. */
+  slug?: string;
   variant?: 'card' | 'inline';
   class?: string;
 }
-const { price, lang, kind, variant = 'card', class: extra } = Astro.props;
+const { price: base, lang, kind, slug, variant = 'card', class: extra } = Astro.props;
+const price = slug ? await livePrice(kind, slug, base) : base;
 const t = useT(lang);
 
 const unit = price

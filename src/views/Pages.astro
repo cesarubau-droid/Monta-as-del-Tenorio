@@ -10,7 +10,7 @@ import GalleryTabs from '../components/GalleryTabs.astro';
 import FaqList from '../components/FaqList.astro';
 import ContactCta from '../components/ContactCta.astro';
 import ContactForm from '../components/ContactForm.astro';
-import ReservationForm from '../components/ReservationForm.astro';
+import CartView from '../components/CartView.astro';
 import Location from '../components/Location.astro';
 import DepositBox from '../components/DepositBox.astro';
 import { faqs, sustainability } from '../data/content';
@@ -72,7 +72,7 @@ const updatedLabel = lang === 'es' ? 'Última actualización' : 'Last updated';
       <div class="container reserve-grid">
         <div class="reserve-form">
           <h2 class="sr-only">{t.reserve.title}</h2>
-          <ReservationForm lang={lang} />
+          <CartView lang={lang} />
         </div>
         <aside aria-labelledby="steps-title" class="steps">
           <h2 id="steps-title" class="h-sub">{t.reserve.stepsTitle}</h2>
