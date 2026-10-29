@@ -8,7 +8,7 @@ interface Props {
   lead?: string;
   crumbs?: { label: string; href?: string }[];
   /** Background photo instead of the plain petrol color (see styles below). */
-  photo?: 'cabins';
+  photo?: 'cabins' | 'tours' | 'gallery' | 'contact';
 }
 const { lang, title, lead, crumbs = [], photo } = Astro.props;
 const t = useT(lang);
@@ -38,7 +38,13 @@ const trail = [{ label: t.nav.home, href: url(lang, 'home') }, ...crumbs];
       var(--page-hero-photo) center 55% / cover no-repeat;
   }
   .page-hero--photo :global(:is(h1, p, li, a, span)) { text-shadow: 0 1px 10px rgba(0, 0, 0, 0.35); }
-  /* Temporary reference photo — replace public/images/sections/cabins-bg-*.webp with a real one */
+  /* Temporary reference photos — replace public/images/sections/<name>-bg-*.webp with real ones */
   .page-hero--cabins { --page-hero-photo: url('/images/sections/cabins-bg-2000.webp'); }
   @media (max-width: 899px) { .page-hero--cabins { --page-hero-photo: url('/images/sections/cabins-bg-1000.webp'); } }
+  .page-hero--tours { --page-hero-photo: url('/images/sections/tours-bg-2000.webp'); }
+  @media (max-width: 899px) { .page-hero--tours { --page-hero-photo: url('/images/sections/tours-bg-1000.webp'); } }
+  .page-hero--gallery { --page-hero-photo: url('/images/sections/gallery-bg-2000.webp'); }
+  @media (max-width: 899px) { .page-hero--gallery { --page-hero-photo: url('/images/sections/gallery-bg-1000.webp'); } }
+  .page-hero--contact { --page-hero-photo: url('/images/sections/contact-bg-2000.webp'); }
+  @media (max-width: 899px) { .page-hero--contact { --page-hero-photo: url('/images/sections/contact-bg-1000.webp'); } }
 </style>
