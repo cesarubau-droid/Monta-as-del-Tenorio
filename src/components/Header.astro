@@ -124,9 +124,10 @@ const switchHref = switchLangPath(Astro.url.pathname, other);
   .back-btn:focus-visible { outline: 3px solid var(--celeste); outline-offset: 3px; }
   :global(:root[data-theme='dark']) .back-btn { background: var(--petrol-mid); color: #fff; }
   @media (max-width: 639px) { .back-btn { width: 44px; height: 44px; margin-right: 2px; } }
-  /* Small phones: with the back button there's no room for the name, the logo mark stays */
+  /* Small phones: with the back button the name stays and the round mark steps aside
+     (two circles side by side read as two buttons) */
   @media (max-width: 429px) {
-    .back-btn + .brand :global(.logo__text) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    .back-btn + .brand :global(.logo__mark) { display: none; }
   }
   .cart-link { position: relative; }
   .cart-link__count {

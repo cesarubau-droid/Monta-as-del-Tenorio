@@ -97,12 +97,22 @@ const highlightIcons = ['eye', 'lookout', 'leaf', 'compass'] as const;
   </div>
 </section>
 
-<!-- FAQ -->
-<section class="section section--surface" aria-labelledby="faq-title">
+<!-- FAQ: a compact bar the visitor opens only if they want to -->
+<section class="faq-bar section--surface" aria-labelledby="faq-title">
   <div class="container">
-    <SectionHead title={t.faq.title} center id="faq-title" />
-    <FaqList items={faqs.filter((f) => f.home)} lang={lang} />
-    <div class="section-foot"><a class="btn btn--outline" href={url(lang, 'faq')}>{t.faq.viewAll}</a></div>
+    <details class="faq-bar__box">
+      <summary class="faq-bar__sum">
+        <span>
+          <h2 id="faq-title" class="faq-bar__title">{t.faq.title}</h2>
+          <span class="faq-bar__hint">{t.faq.hint}</span>
+        </span>
+        <span class="faq-bar__chev"><Icon name="chevron" size={22} /></span>
+      </summary>
+      <div class="faq-bar__body">
+        <FaqList items={faqs.filter((f) => f.home)} lang={lang} />
+        <div class="section-foot"><a class="btn btn--outline" href={url(lang, 'faq')}>{t.faq.viewAll}</a></div>
+      </div>
+    </details>
   </div>
 </section>
 
@@ -132,4 +142,27 @@ const highlightIcons = ['eye', 'lookout', 'leaf', 'compass'] as const;
   .about__sus a:hover { text-decoration: none; border-color: var(--accent); }
   .about__sus :global(svg) { color: var(--accent); }
   .about__link { margin-top: var(--space-lg); }
+
+  .faq-bar { padding-block: var(--space-xl); }
+  .faq-bar__box { border-block: 1px solid var(--border); interpolate-size: allow-keywords; }
+  .faq-bar__sum {
+    display: flex; align-items: center; justify-content: space-between; gap: var(--space-md);
+    min-height: 72px; padding: var(--space-md) 0; cursor: pointer; list-style: none;
+  }
+  .faq-bar__sum::-webkit-details-marker { display: none; }
+  .faq-bar__title { font-size: var(--fs-h3); }
+  .faq-bar__hint { display: block; margin-top: 2px; font-size: var(--fs-sm); color: var(--text-2); }
+  .faq-bar__chev {
+    flex: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%;
+    border: 1px solid var(--border); background: var(--card-bg); color: var(--accent);
+    transition: transform 200ms var(--ease), background-color 200ms ease;
+  }
+  .faq-bar__sum:hover .faq-bar__chev { background: var(--surface-2); }
+  .faq-bar__box[open] .faq-bar__chev { transform: rotate(180deg); }
+  .faq-bar__body { padding: var(--space-sm) 0 var(--space-xl); }
+  .faq-bar__box::details-content {
+    block-size: 0; overflow: clip;
+    transition: block-size 260ms var(--ease-out), content-visibility 260ms allow-discrete;
+  }
+  .faq-bar__box[open]::details-content { block-size: auto; }
 </style>

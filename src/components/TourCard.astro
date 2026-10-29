@@ -11,7 +11,7 @@ const { tour, lang } = Astro.props;
 const t = useT(lang);
 const name = tour.name[lang];
 ---
-<article class="card">
+<article class="card tour-card">
   <div class="card__media">
     <Photo id={tour.image} lang={lang} />
   </div>
@@ -32,13 +32,20 @@ const name = tour.name[lang];
     <div class="card__foot">
       <PriceTag price={tour.price} lang={lang} kind="tour" slug={tour.slug} />
       <a
-        class="btn"
+        class="btn btn--accent"
         href={`${url(lang, 'reserve')}?tour=${tour.slug}`}
         data-add-tour={tour.slug}
         data-track="tour_click"
         data-track-tour={tour.slug}
         data-track-action="add_to_cart"
-      ><Icon name="cart" size={18} />{t.cart.addShort}<span class="sr-only"> — {t.cart.add}: {name}</span></a>
+      ><Icon name="calendar" size={18} />{t.cart.addShort}<span class="sr-only">: {name}</span></a>
     </div>
   </div>
 </article>
+
+<style>
+  /* Como en las cabañas: solo el precio en la tarjeta; niños, mínimos e IVA en la página del tour.
+     Así los tres pies de tarjeta miden lo mismo y los botones quedan alineados. */
+  .tour-card .card__foot { align-items: center; }
+  .tour-card .card__foot :global(.price__notes) { display: none; }
+</style>

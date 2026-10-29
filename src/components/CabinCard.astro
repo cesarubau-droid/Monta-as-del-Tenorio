@@ -39,13 +39,13 @@ const name = cabin.name[lang];
     <div class="card__foot">
       <PriceTag price={cabin.price} lang={lang} kind="cabin" slug={cabin.slug} />
       <a
-        class="btn cabin-card__add"
+        class="btn btn--accent cabin-card__add"
         href={`${url(lang, 'reserve')}?cabin=${cabin.slug}`}
         data-add-cabin={cabin.slug}
         data-track="cabin_click"
         data-track-cabin={cabin.slug}
         data-track-action="add_to_cart"
-      ><Icon name="cart" size={18} />{t.cart.addShort}<span class="sr-only"> — {t.cart.add}: {name}</span></a>
+      ><Icon name="calendar" size={18} />{t.cart.addShort}<span class="sr-only">: {name}</span></a>
     </div>
   </div>
 </article>

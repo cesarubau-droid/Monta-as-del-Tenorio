@@ -51,10 +51,26 @@ const el = <K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, text?: 
 
 /* ---------- Storage + header badge ---------- */
 
+const localToday = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
+
 export function readCart(): Cart {
   try {
     const v = JSON.parse(localStorage.getItem(KEY) || 'null');
-    if (v && Array.isArray(v.cabins) && Array.isArray(v.tours)) return v;
+    if (v && Array.isArray(v.cabins) && Array.isArray(v.tours)) {
+      // Items whose date already passed are dropped instead of showing an error on return
+      const today = localToday();
+      const cabins = v.cabins.filter((i: CabinItem) => i.checkIn >= today);
+      const tours = v.tours.filter((i: { date: string }) => i.date >= today);
+      if (cabins.length !== v.cabins.length || tours.length !== v.tours.length) {
+        const fresh = { ...v, cabins, tours };
+        try { localStorage.setItem(KEY, JSON.stringify(fresh)); } catch { /* storage blocked */ }
+        return fresh;
+      }
+      return v;
+    }
   } catch { /* storage blocked */ }
   return { cabins: [], tours: [] };
 }

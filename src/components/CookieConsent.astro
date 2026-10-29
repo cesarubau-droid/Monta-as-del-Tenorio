@@ -15,7 +15,7 @@ const t = useT(lang);
 <section class="consent" data-consent data-ga4={ga4} aria-label={t.cookies.label} hidden>
   <p>{t.cookies.text} <a class="text-link" href={url(lang, 'privacy')}>{t.cookies.more}</a>.</p>
   <div class="consent__actions">
-    <button type="button" class="btn btn--accent" data-consent-choice="granted">{t.cookies.accept}</button>
+    <button type="button" class="btn btn--ghost-light" data-consent-choice="granted">{t.cookies.accept}</button>
     <button type="button" class="btn btn--ghost-light" data-consent-choice="denied">{t.cookies.reject}</button>
   </div>
 </section>

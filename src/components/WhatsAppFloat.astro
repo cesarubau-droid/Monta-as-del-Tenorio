@@ -35,5 +35,7 @@ const href = whatsappUrl(t.whatsappGreeting);
   }
   .wa-float:hover { background: var(--teal-deep); }
   @media (prefers-reduced-motion: no-preference) { .wa-float:hover { transform: scale(1.06); } }
+  /* Móvil: más compacto para tapar menos contenido */
+  @media (max-width: 639px) { .wa-float { width: 52px; height: 52px; right: 14px; bottom: 14px; } }
   @media (min-width: 1024px) { .wa-float { right: 24px; bottom: 24px; } }
 </style>

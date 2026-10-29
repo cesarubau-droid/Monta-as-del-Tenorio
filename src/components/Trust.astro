@@ -21,11 +21,26 @@ const rated = trustBadges.find((b) => b.enabled && b.rating !== null && b.review
 // Otras plataformas donde también estamos (Airbnb queda fuera a propósito)
 const others = trustBadges.filter((b) => b.enabled && b.kind === 'listing' && b.id !== 'airbnb' && b.url);
 
+// Idioma de cada reseña en esta página: el texto original si está en el idioma de la página,
+// si no, la traducción al español de Airbnb con una nota honesta. Las que se leen en el idioma
+// de la página van primero.
+const shown = reviews
+  .map((r) => {
+    const original = r.original && r.translatedFrom === lang;
+    const text = original ? (r.original as string) : r.text;
+    const textLang = original ? lang : r.lang;
+    let note = '';
+    if (textLang !== lang) note = fmt(t.trust.shownIn, { lang: t.trust.langs[textLang] });
+    else if (!original && r.translatedFrom) note = fmt(t.trust.translatedFrom, { lang: t.trust.langs[r.translatedFrom] });
+    return { ...r, text, textLang, note };
+  })
+  .sort((a, b) => Number(b.textLang === lang) - Number(a.textLang === lang));
+
 const num = (n: number) => new Intl.NumberFormat(lang === 'es' ? 'es-CR' : 'en-US', { maximumFractionDigits: 2 }).format(n);
 const monthYear = (d?: string) =>
   d ? new Intl.DateTimeFormat(lang === 'es' ? 'es-CR' : 'en-US', { month: 'long', year: 'numeric' }).format(new Date(`${d}-15`)) : '';
 ---
-<section class="section trust-sec" aria-labelledby="trust-title">
+<section class="section trust-sec band-petrol" aria-labelledby="trust-title">
   <div class="container">
     <SectionHead title={t.trust.title} center id="trust-title" />
 
@@ -44,7 +59,7 @@ const monthYear = (d?: string) =>
       ))}
     </ul>
 
-    {reviews.length > 0 && (
+    {shown.length > 0 && (
       <div class="rv" data-reviews role="region" aria-roledescription="carousel" aria-label={t.trust.carouselLabel}>
         <div class="rv__head">
           <h3 class="rv__title">{t.trust.reviewsTitle}</h3>
@@ -59,21 +74,21 @@ const monthYear = (d?: string) =>
         </div>
 
         <ul class="rv__track" role="list" data-rv-track aria-live="off" tabindex="0" aria-label={t.trust.carouselLabel}>
-          {reviews.map((r, i) => (
-            <li class="rv__slide" aria-roledescription="slide" aria-label={`${i + 1} / ${reviews.length}`}>
+          {shown.map((r, i) => (
+            <li class="rv__slide" aria-roledescription="slide" aria-label={`${i + 1} / ${shown.length}`}>
               <figure class="review">
                 {r.rating && (
                   <span class="review__stars" role="img" aria-label={fmt(t.testimonials.rating, { n: r.rating })}>
                     {Array.from({ length: Math.round(r.rating) }, () => <Icon name="star" size={14} />)}
                   </span>
                 )}
-                <blockquote lang={r.lang} id={`rv-text-${i}`}><p>“{r.text}”</p></blockquote>
+                <blockquote lang={r.textLang} id={`rv-text-${i}`}><p>“{r.text}”</p></blockquote>
                 <button type="button" class="review__more" data-rv-more aria-expanded="false" aria-controls={`rv-text-${i}`} data-label-more={t.trust.readMore} data-label-less={t.trust.readLess} hidden>{t.trust.readMore}</button>
                 <figcaption>
                   <strong>{r.name}</strong>
                   <span class="review__meta">
                     {monthYear(r.date)}
-                    {r.translatedFrom && ` · ${fmt(t.trust.translatedFrom, { lang: t.trust.langs[r.translatedFrom] })}`}
+                    {r.note && ` · ${r.note}`}
                   </span>
                 </figcaption>
               </figure>
@@ -98,9 +113,9 @@ const monthYear = (d?: string) =>
 </section>
 
 <style>
-  .trust-sec { padding-block: clamp(48px, 7vw, 80px); }
+  /* Banda petróleo: la prueba social tiene su propio momento en la página */
   .trust-sec :global(.section-head) { margin-bottom: var(--space-lg); }
-  .trust-sec :global(.section-head h2) { font-size: clamp(1.9rem, 4vw, 2.6rem); }
+  .trust-sec :focus-visible { outline-color: #fff; }
 
   /* Fila compacta de datos */
   .facts { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 12px; list-style: none; padding: 0; }
@@ -118,14 +133,14 @@ const monthYear = (d?: string) =>
   /* Carrusel */
   .rv { margin-top: var(--space-2xl); }
   .rv__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-md); margin-bottom: var(--space-md); }
-  .rv__title { font-size: clamp(1.25rem, 2.2vw, 1.6rem); }
+  .rv__title { font-size: clamp(1.25rem, 2.2vw, 1.6rem); color: #fff; }
   .rv__controls { display: flex; gap: 6px; flex: none; }
   .rv__btn {
     display: grid; place-items: center; width: 44px; height: 44px; padding: 0; cursor: pointer;
     background: var(--card-bg); color: var(--text); border: 1px solid var(--border); border-radius: 50%;
     transition: background-color 200ms ease, color 200ms ease, transform 120ms var(--ease-out);
   }
-  @media (hover: hover) { .rv__btn:hover { background: var(--petrol); color: #fff; border-color: var(--petrol); } }
+  @media (hover: hover) { .rv__btn:hover { background: var(--celeste); color: var(--petrol-deep); border-color: var(--celeste); } }
   .rv__btn:active { transform: scale(0.95); }
   .rv__btn:focus-visible { outline: 3px solid var(--celeste); outline-offset: 2px; }
   .rv__btn :global(.rv__play) { display: none; }
@@ -146,11 +161,11 @@ const monthYear = (d?: string) =>
 
   .review {
     width: 100%; display: flex; flex-direction: column; gap: 12px; padding: var(--space-lg);
-    background: var(--card-bg); border: 1px solid var(--border); border-top: 3px solid var(--celeste);
+    background: var(--card-bg); border: 1px solid transparent; border-radius: var(--radius-md);
   }
   .review__stars { display: inline-flex; gap: 2px; color: var(--clay); }
   /* Textos largos: 6 líneas y "Leer más"; así todas las tarjetas miden lo mismo */
-  .review blockquote { font-family: var(--font-serif); font-size: 1rem; line-height: 1.55; color: var(--text); flex: 1; min-height: calc(6 * 1.55em); }
+  .review blockquote { font-family: var(--font-serif); font-size: 1.0625rem; line-height: 1.55; color: var(--text); flex: 1; min-height: calc(6 * 1.55em); }
   .review blockquote p { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 6; line-clamp: 6; overflow: hidden; }
   .review.is-open blockquote p { display: block; -webkit-line-clamp: unset; line-clamp: none; }
   .review__more {
@@ -160,8 +175,8 @@ const monthYear = (d?: string) =>
   .review figcaption { font-size: var(--fs-sm); color: var(--text); display: grid; gap: 2px; }
   .review__meta { color: var(--text-2); }
 
-  .also { margin-top: var(--space-lg); text-align: center; font-size: var(--fs-sm); color: var(--text-2); }
-  .also a { display: inline-flex; align-items: center; min-height: 44px; text-decoration: underline; color: var(--text); }
+  .also { margin-top: var(--space-lg); text-align: center; font-size: var(--fs-sm); color: #e3ecec; }
+  .also a { display: inline-flex; align-items: center; min-height: 44px; text-decoration: underline; color: #fff; }
 </style>
 
 <script>

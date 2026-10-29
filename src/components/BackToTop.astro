@@ -33,6 +33,8 @@ const t = useT(lang);
   }
   .to-top:hover { background: var(--petrol-mid); color: #fff; }
   .to-top:focus-visible { outline: 3px solid var(--celeste); outline-offset: 3px; }
+  /* Móvil: más pequeño y centrado sobre el botón de WhatsApp (52px) */
+  @media (max-width: 639px) { .to-top { width: 40px; height: 40px; right: 20px; bottom: 76px; } }
   @media (min-width: 1024px) { .to-top { right: 28px; bottom: 92px; } }
   :global(:root[data-theme='dark']) .to-top { background: var(--petrol-mid); color: #fff; }
 </style>
