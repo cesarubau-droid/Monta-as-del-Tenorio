@@ -12,7 +12,7 @@ interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = useT(lang);
 ---
-<PageHero lang={lang} title={t.cabins.title} lead={t.cabins.lead} crumbs={[{ label: t.nav.cabins }]} />
+<PageHero lang={lang} title={t.cabins.title} lead={t.cabins.lead} crumbs={[{ label: t.nav.cabins }]} photo="cabins" />
 
 <section class="section">
   <div class="detail-list">
@@ -30,7 +30,6 @@ const t = useT(lang);
             {c.features[lang].map((f) => <li class="chip">{f}</li>)}
           </ul>
           <PriceTag price={c.price} lang={lang} kind="cabin" slug={c.slug} class="detail__price" />
-          <p class="small muted">{t.cabins.seasonNote}</p>
           <div class="btn-row">
             <a class="btn btn--lg" href={`${url(lang, 'reserve')}?cabin=${c.slug}`} data-add-cabin={c.slug} data-track="cabin_click" data-track-cabin={c.slug} data-track-action="add_to_cart">
               {t.cart.add}<span class="sr-only">: {c.name[lang]}</span>

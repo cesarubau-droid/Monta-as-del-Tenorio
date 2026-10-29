@@ -51,8 +51,8 @@ export const faqs: Faq[] = [
     home: true,
     q: { en: 'Can we cook in the cabins?', es: '¿Podemos cocinar en las cabañas?' },
     a: {
-      en: 'Yes. All cabins are equipped for cooking and you are welcome to bring your own food. Breakfast is also available as a separate service.',
-      es: 'Sí. Todas las cabañas están equipadas para cocinar y puedes traer tus propios alimentos. El desayuno también está disponible como servicio aparte.',
+      en: 'Yes. All cabins are equipped for cooking and you are welcome to bring your own food. Breakfast is included with every stay.',
+      es: 'Sí. Todas las cabañas están equipadas para cocinar y puedes traer tus propios alimentos. El desayuno está incluido en toda estadía.',
     },
   },
   {
@@ -183,8 +183,7 @@ export interface Review {
 /**
  * Real reviews from the Airbnb listing (export of 2 Oct 2026, public comments only).
  * Airbnb exports them already translated to Spanish; the text is kept exactly as exported.
- * Shown in the reviews carousel, in this order. Picked: 5 stars, no mention of
- * breakfast being included (breakfast is a separate service), no complaints.
+ * Shown in the reviews carousel, in this order. Picked: 5 stars, no complaints.
  */
 export const reviews: Review[] = [
   {

@@ -73,7 +73,7 @@ export const legal: Record<'privacy' | 'terms' | 'policy', Record<Lang, LegalDoc
         { h: 'Availability', p: ['Availability is shared privately. We will always confirm your dates before asking for any payment.'] },
         { h: 'Balance', p: ['How and when to pay the remaining balance is confirmed with you in writing together with your reservation.'] },
         { h: 'Changes and cancellations', p: ['The conditions for changes, cancellations and refunds of the deposit are shared with you in writing before you pay it. If you have questions, write to us before booking.'] },
-        { h: 'Tours and extras', p: ['Tours are not included with the cabins and are booked separately. Breakfast is available as a separate service.'] },
+        { h: 'Tours and extras', p: ['Tours are not included with the cabins and are booked separately. Breakfast is included with every stay.'] },
       ],
     },
     es: {
@@ -83,7 +83,7 @@ export const legal: Record<'privacy' | 'terms' | 'policy', Record<Lang, LegalDoc
         { h: 'Disponibilidad', p: ['La disponibilidad se comparte de forma privada. Siempre confirmamos tus fechas antes de pedir cualquier pago.'] },
         { h: 'Saldo', p: ['Cómo y cuándo pagar el saldo restante se confirma contigo por escrito junto con tu reserva.'] },
         { h: 'Cambios y cancelaciones', p: ['Las condiciones de cambios, cancelaciones y reembolso del adelanto se te comparten por escrito antes de pagarlo. Si tienes dudas, escríbenos antes de reservar.'] },
-        { h: 'Tours y extras', p: ['Los tours no están incluidos con las cabañas y se reservan aparte. El desayuno está disponible como servicio aparte.'] },
+        { h: 'Tours y extras', p: ['Los tours no están incluidos con las cabañas y se reservan aparte. El desayuno está incluido en toda estadía.'] },
       ],
     },
   },
