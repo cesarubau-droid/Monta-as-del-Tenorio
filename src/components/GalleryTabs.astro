@@ -5,8 +5,13 @@ import { gallery, getMedia, type GalleryCategory } from '../data/media';
 import { fmt, useT } from '../i18n/ui';
 import type { Lang } from '../i18n/routes';
 
-interface Props { lang: Lang; idPrefix?: string }
-const { lang, idPrefix = 'gal' } = Astro.props;
+interface Props {
+  lang: Lang;
+  idPrefix?: string;
+  /** "tabs": one category at a time (home). "mosaic": every photo at once with filters (gallery page). */
+  variant?: 'tabs' | 'mosaic';
+}
+const { lang, idPrefix = 'gal', variant = 'tabs' } = Astro.props;
 const t = useT(lang);
 const cats = Object.keys(gallery) as GalleryCategory[];
 const provisional = cats.some((c) => gallery[c].some((id) => getMedia(id).placeholder));
@@ -21,7 +26,49 @@ const items = Object.fromEntries(
     }),
   ]),
 ) as Record<GalleryCategory, { id: string; m: ReturnType<typeof getMedia>; large: string; alt: string }[]>;
+
+// Mosaic: categories interleaved (forest, river, wildlife, night, forest…) so the mix looks varied.
+const longest = Math.max(...cats.map((c) => items[c].length));
+const mixed = Array.from({ length: longest }, (_, i) => cats.flatMap((c) => (items[c][i] ? [{ ...items[c][i], cat: c }] : []))).flat();
 ---
+{variant === 'mosaic' ? (
+<div class="gallery gallery--mosaic" data-mosaic>
+  <div class="gallery__tabs" role="group" aria-label={t.gallery.tabsLabel}>
+    <button type="button" class="gallery__tab" aria-pressed="true" data-filter="all">{t.gallery.all}</button>
+    {cats.map((c) => <button type="button" class="gallery__tab" aria-pressed="false" data-filter={c}>{t.gallery.categories[c]}</button>)}
+  </div>
+  <ul class="mosaic" role="list" aria-live="polite">
+    {mixed.map((it) => (
+      <li class="gallery__item mosaic__item" data-cat={it.cat}>
+        <button
+          type="button"
+          class="gallery__open"
+          data-gal-open
+          data-src={it.large}
+          data-w={it.m.width}
+          data-h={it.m.height}
+          data-alt={it.alt}
+          aria-label={fmt(t.carousel.open, { caption: it.alt })}
+        >
+          <Photo id={it.id} lang={lang} sizes="(min-width: 1024px) 50vw, 100vw" tag={false} />
+        </button>
+      </li>
+    ))}
+  </ul>
+  <dialog class="lb" data-gal-dialog aria-label={t.gallery.tabsLabel}>
+    <div class="lb__inner">
+      <button type="button" class="lb__close" data-lb-close aria-label={t.carousel.close}><Icon name="close" size={24} /></button>
+      <figure class="lb__figure">
+        <img class="lb__img" data-lb-img src="" alt="" />
+        <figcaption class="lb__caption"><span data-lb-caption></span> <span class="lb__count"><span data-lb-n>1</span> / <span data-lb-total>1</span></span></figcaption>
+      </figure>
+      <button type="button" class="lb__nav lb__nav--prev" data-lb-prev aria-label={t.carousel.prev}><Icon name="left" size={24} /></button>
+      <button type="button" class="lb__nav lb__nav--next" data-lb-next aria-label={t.carousel.next}><Icon name="right" size={24} /></button>
+    </div>
+  </dialog>
+  {provisional && <p class="gallery__note small muted">{t.gallery.placeholderNote}</p>}
+</div>
+) : (
 <div class="gallery" data-tabs>
   <div class="gallery__tabs" role="tablist" aria-label={t.gallery.tabsLabel}>
     {cats.map((c, i) => (
@@ -77,9 +124,12 @@ const items = Object.fromEntries(
   </dialog>
   {provisional && <p class="gallery__note small muted">{t.gallery.placeholderNote}</p>}
 </div>
+)}
 
 <style>
-  .gallery__tabs { display: flex; gap: 4px; overflow-x: auto; border-bottom: 1px solid var(--border); margin-bottom: var(--space-lg); scrollbar-width: thin; }
+  /* Scrolls sideways on phones; the scrollbar is hidden (it showed up as a stray mark next to the tabs) */
+  .gallery__tabs { display: flex; gap: 4px; overflow-x: auto; border-bottom: 1px solid var(--border); margin-bottom: var(--space-lg); scrollbar-width: none; }
+  .gallery__tabs::-webkit-scrollbar { display: none; }
   /* Centradas bajo el título; "safe" evita cortar pestañas si no caben */
   @media (min-width: 900px) { .gallery__tabs { justify-content: safe center; } }
   .gallery__tab {
@@ -101,6 +151,15 @@ const items = Object.fromEntries(
   .gallery__item :global(img) { width: 100%; height: 100%; object-fit: cover; transition: transform 400ms var(--ease); }
   @media (prefers-reduced-motion: no-preference) { .gallery__item:hover :global(img) { transform: scale(1.04); } }
   .gallery__note { margin-top: var(--space-md); }
+
+  /* Gallery page: every photo at once. Tiles keep the photos' own 4:3 shape, so nothing is cut off. */
+  .gallery__tab[aria-pressed='true'] { color: var(--accent); border-bottom-color: var(--accent); }
+  .mosaic { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-sm); list-style: none; padding: 0; }
+  @media (min-width: 640px) { .mosaic { gap: var(--space-md); } }
+  @media (min-width: 1024px) { .mosaic { grid-template-columns: repeat(4, 1fr); } }
+  /* One category (4 photos): bigger, two per row */
+  @media (min-width: 640px) { .mosaic.is-filtered { grid-template-columns: repeat(2, 1fr); gap: var(--space-lg); } }
+  .mosaic__item[hidden] { display: none; }
 
   /* Cada foto abre el visor ampliado */
   .gallery__open { display: block; width: 100%; height: 100%; padding: 0; border: 0; background: none; cursor: zoom-in; }
@@ -135,7 +194,20 @@ const items = Object.fromEntries(
 </style>
 
 <script>
-  document.querySelectorAll<HTMLElement>('[data-tabs]').forEach((root) => {
+  // Gallery page filters: show one category (bigger, two per row) or all of them.
+  document.querySelectorAll<HTMLElement>('[data-mosaic]').forEach((root) => {
+    const buttons = [...root.querySelectorAll<HTMLButtonElement>('[data-filter]')];
+    const grid = root.querySelector<HTMLElement>('.mosaic');
+    const tiles = [...root.querySelectorAll<HTMLElement>('.mosaic__item')];
+    buttons.forEach((btn) => btn.addEventListener('click', () => {
+      const f = btn.dataset.filter;
+      buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+      grid?.classList.toggle('is-filtered', f !== 'all');
+      tiles.forEach((tile) => { tile.hidden = f !== 'all' && tile.dataset.cat !== f; });
+    }));
+  });
+
+  document.querySelectorAll<HTMLElement>('[data-tabs], [data-mosaic]').forEach((root) => {
     const tabs = [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
     const select = (tab: HTMLButtonElement, focus = true) => {
       tabs.forEach((t) => {
@@ -180,7 +252,8 @@ const items = Object.fromEntries(
     root.querySelectorAll<HTMLButtonElement>('[data-gal-open]').forEach((b) =>
       b.addEventListener('click', () => {
         const panel = b.closest('[role="tabpanel"]') ?? root;
-        items = [...panel.querySelectorAll<HTMLButtonElement>('[data-gal-open]')];
+        // Only the photos currently shown (mosaic filters hide the others)
+        items = [...panel.querySelectorAll<HTMLButtonElement>('[data-gal-open]')].filter((x) => !x.closest('[hidden]'));
         if (lbTotal) lbTotal.textContent = String(items.length);
         show(items.indexOf(b));
         dialog.showModal();

@@ -32,7 +32,7 @@ const updatedLabel = lang === 'es' ? 'Última actualización' : 'Last updated';
   <>
     <PageHero lang={lang} title={t.gallery.title} lead={t.gallery.lead} crumbs={[{ label: t.nav.gallery }]} photo="gallery" />
     <section class="section" aria-label={t.gallery.title}>
-      <div class="container"><GalleryTabs lang={lang} idPrefix="gal" /></div>
+      <div class="container"><GalleryTabs lang={lang} idPrefix="gal" variant="mosaic" /></div>
     </section>
     <ContactCta lang={lang} showLocation={false} />
   </>
