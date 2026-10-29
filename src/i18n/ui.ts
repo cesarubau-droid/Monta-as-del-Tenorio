@@ -315,6 +315,7 @@ const en = {
   },
   whatsappFloat: 'Chat with us on WhatsApp',
   backToTop: 'Back to top',
+  goBack: 'Go back',
   whatsappGreeting: "Hi Montañas del Tenorio! I'd like some information about a stay.",
   newTab: '(opens in a new tab)',
   cookies: {
@@ -691,6 +692,7 @@ const es: Dict = {
   },
   whatsappFloat: 'Escríbenos por WhatsApp',
   backToTop: 'Volver arriba',
+  goBack: 'Volver atrás',
   whatsappGreeting: '¡Hola Montañas del Tenorio! Me gustaría información sobre una estadía.',
   newTab: '(se abre en una pestaña nueva)',
   cookies: {
