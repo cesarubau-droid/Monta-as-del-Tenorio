@@ -32,14 +32,15 @@ const name = cabin.name[lang];
       data-track-action="details"
     >{t.cabins.learnMore}<span class="sr-only">: {name}</span> →</a>
     <div class="card__foot">
-      <PriceTag price={cabin.price} lang={lang} kind="cabin" />
+      <PriceTag price={cabin.price} lang={lang} kind="cabin" slug={cabin.slug} />
       <a
         class="btn"
         href={`${url(lang, 'reserve')}?cabin=${cabin.slug}`}
+        data-add-cabin={cabin.slug}
         data-track="cabin_click"
         data-track-cabin={cabin.slug}
-        data-track-action="book"
-      >{t.cabins.book}<span class="sr-only">: {name}</span></a>
+        data-track-action="add_to_cart"
+      ><Icon name="cart" size={18} />{t.cart.addShort}<span class="sr-only"> — {t.cart.add}: {name}</span></a>
     </div>
   </div>
 </article>

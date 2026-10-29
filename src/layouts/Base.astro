@@ -11,6 +11,7 @@ import Footer from '../components/Footer.astro';
 import WhatsAppFloat from '../components/WhatsAppFloat.astro';
 import BackToTop from '../components/BackToTop.astro';
 import CookieConsent from '../components/CookieConsent.astro';
+import CartUI from '../components/CartUI.astro';
 import { useT } from '../i18n/ui';
 import { switchLangPath, type Lang, type RouteKey } from '../i18n/routes';
 import { cabins, formatMoney } from '../data/offer';
@@ -112,6 +113,7 @@ const ga4 = site.ga4Id;
     <Footer lang={lang} />
     <WhatsAppFloat lang={lang} />
     <BackToTop lang={lang} />
+    <CartUI lang={lang} />
     {ga4 && <CookieConsent lang={lang} ga4={ga4} />}
     <script>
       import { initClickTracking } from '../scripts/analytics';

@@ -114,6 +114,25 @@ export function parseInquiry(raw: Fields): { data?: Reservation | Contact; error
   return { data: Object.keys(errors).length ? undefined : data, errors, spam };
 }
 
+/** Contact details sent with a cart (same rules as the reservation form). */
+export function parseCustomer(raw: Fields): { data?: { lang: Lang; name: string; email: string; phone: string; country: string; message: string }; errors: Errors; spam: boolean } {
+  const errors: Errors = {};
+  const spam = str(raw.website) !== '';
+  const lang: Lang = raw.lang === 'es' ? 'es' : 'en';
+  const name = str(raw.name, 100);
+  const email = str(raw.email, 200).toLowerCase();
+  const phone = str(raw.phone, 40);
+  const digits = phone.replace(/\D/g, '');
+  if (name.length < 2) errors.name = 'required';
+  if (!email) errors.email = 'required';
+  else if (!EMAIL_RE.test(email)) errors.email = 'email';
+  if (!phone) errors.phone = 'required';
+  else if (digits.length < 7 || digits.length > 15 || /[^\d\s+()\-.]/.test(phone)) errors.phone = 'phone';
+  if (!['on', 'true', '1', 'yes'].includes(str(raw.consent))) errors.consent = 'consent';
+  const data = { lang, name, email, phone, country: str(raw.country, 60), message: str(raw.message, 2000) };
+  return { data: Object.keys(errors).length ? undefined : data, errors, spam };
+}
+
 export function makeReference(): string {
   const d = new Date(Date.now() - 6 * 3600_000).toISOString().slice(2, 10).replace(/-/g, '');
   const rand = Math.random().toString(36).slice(2, 6).toUpperCase();

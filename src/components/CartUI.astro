@@ -1,0 +1,141 @@
+---
+/**
+ * Shared cart pieces, rendered once per page (see Base.astro):
+ * the config the cart script reads, the "add to cart" dialog and the "added" toast.
+ */
+import Icon from './Icon.astro';
+import { cabins, tours } from '../data/offer';
+import { useT } from '../i18n/ui';
+import { url, type Lang } from '../i18n/routes';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+const config = {
+  lang,
+  cartUrl: url(lang, 'reserve'),
+  cabins: cabins.map((c) => ({ slug: c.slug, name: c.name[lang], max: c.capacity })),
+  tours: tours.map((x) => ({ slug: x.slug, name: x.name[lang] })),
+  t: t.cart,
+  form: { errors: t.form.errors, summary: t.form.errorSummary },
+};
+---
+<div hidden data-cart-config={JSON.stringify(config)}></div>
+
+<dialog class="cdlg" data-cart-dialog aria-labelledby="cdlg-title">
+  <form class="cdlg__form" novalidate>
+    <div class="cdlg__head">
+      <h2 id="cdlg-title" class="cdlg__title" data-cdlg-title></h2>
+      <button type="button" class="cdlg__x" data-cdlg-close aria-label={t.cart.close}><Icon name="close" size={22} /></button>
+    </div>
+
+    <div class="field" data-cdlg-pick hidden>
+      <label for="cdlg-item" data-cdlg-pick-label></label>
+      <select id="cdlg-item" data-cdlg-item></select>
+    </div>
+
+    <p class="cdlg__hint" data-cdlg-hint aria-live="polite"></p>
+    <div class="cal" data-cdlg-cal></div>
+
+    <div class="field" data-cdlg-cabin>
+      <label for="cdlg-guests">{t.cart.guests}</label>
+      <input id="cdlg-guests" type="number" min="1" max="7" step="1" inputmode="numeric" value="2" data-cdlg-guests aria-describedby="cdlg-guests-hint" />
+      <p class="hint" id="cdlg-guests-hint" data-cdlg-guests-hint></p>
+    </div>
+
+    <div data-cdlg-tour hidden>
+      <fieldset class="field">
+        <legend>{t.cart.slot}</legend>
+        <div class="cdlg__slots" data-cdlg-slots></div>
+      </fieldset>
+      <div class="form-row form-row--2">
+        <div class="field">
+          <label for="cdlg-adults">{t.cart.adults}</label>
+          <input id="cdlg-adults" type="number" min="1" max="50" step="1" inputmode="numeric" value="2" data-cdlg-adults />
+        </div>
+        <div class="field">
+          <label for="cdlg-children">{t.cart.children}</label>
+          <input id="cdlg-children" type="number" min="0" max="50" step="1" inputmode="numeric" value="0" data-cdlg-children />
+        </div>
+      </div>
+    </div>
+
+    <p class="cdlg__price" data-cdlg-price aria-live="polite"></p>
+    <p class="cdlg__error" data-cdlg-error role="alert"></p>
+
+    <div class="cdlg__actions">
+      <button type="button" class="btn btn--outline" data-cdlg-close>{t.cart.cancel}</button>
+      <button type="submit" class="btn" data-cdlg-submit>{t.cart.confirmAdd}</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="cart-toast" data-cart-toast role="status" hidden>
+  <span data-cart-toast-text></span>
+  <a class="btn btn--accent" href={url(lang, 'reserve')}>{t.cart.viewCart}</a>
+  <button type="button" class="cart-toast__x" data-cart-toast-close aria-label={t.cart.close}><Icon name="close" size={18} /></button>
+</div>
+
+<script>
+  import '../scripts/cart';
+</script>
+
+<style>
+  .cdlg {
+    margin: auto; /* the global reset removes the browser's centering */
+    width: min(440px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); padding: 0;
+    border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--card-bg); color: var(--text);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  }
+  .cdlg::backdrop { background: rgba(10, 42, 48, 0.55); }
+  .cdlg__form { display: grid; gap: var(--space-md); padding: var(--space-lg); }
+  .cdlg__head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-sm); }
+  .cdlg__title { font-size: var(--fs-h3); }
+  .cdlg__x, .cart-toast__x { display: grid; place-items: center; width: 44px; height: 44px; margin: -8px -8px 0 0; border: 0; border-radius: 50%; background: none; color: inherit; cursor: pointer; }
+  .cdlg__x:hover, .cart-toast__x:hover { background: var(--surface); }
+  .cdlg__hint { font-size: var(--fs-sm); color: var(--text-2); min-height: 1.5em; }
+  .cdlg__slots { display: grid; gap: 8px; }
+  /* Slot options are created by scripts/cart.ts, so they need :global */
+  .cdlg__slots :global(.cdlg__slot) {
+    display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 8px 14px;
+    border: 1px solid var(--border); border-radius: var(--radius-md); cursor: pointer;
+  }
+  .cdlg__slots :global(.cdlg__slot:has(input:checked)) { border-color: var(--accent); background: var(--surface-2); }
+  .cdlg__slots :global(.cdlg__slot:has(input:disabled)) { opacity: 0.55; cursor: not-allowed; }
+  .cdlg__slots :global(.cdlg__slot input) { width: 18px; height: 18px; min-height: 0; padding: 0; margin: 0; flex: none; accent-color: var(--teal-ink); }
+  .cdlg__slots :global(.cdlg__slot-name) { font-weight: 600; }
+  .cdlg__slots :global(.cdlg__slot-left) { margin-left: auto; font-size: var(--fs-sm); color: var(--text-2); }
+  .cdlg__price { font-family: var(--font-serif); font-size: 1.35rem; }
+  .cdlg__price:empty, .cdlg__error:empty { display: none; }
+  .cdlg__error { font-size: var(--fs-sm); font-weight: 600; color: var(--error-text); }
+  .cdlg__actions { display: flex; justify-content: flex-end; gap: var(--space-sm); flex-wrap: wrap; }
+
+  /* Calendar (markup built by scripts/cart.ts) */
+  .cal :global(.cal__head) { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .cal :global(.cal__month) { font-weight: 600; }
+  .cal :global(.cal__nav) { width: 44px; height: 44px; border: 1px solid var(--border); border-radius: 50%; background: none; color: inherit; font-size: 1.4rem; cursor: pointer; }
+  .cal :global(.cal__nav:disabled) { opacity: 0.35; cursor: not-allowed; }
+  .cal :global(.cal__grid) { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center; }
+  .cal :global(.cal__wd) { font-size: var(--fs-label); font-weight: 600; color: var(--text-2); padding: 4px 0; text-transform: uppercase; }
+  .cal :global(.cal__day) {
+    aspect-ratio: 1; min-height: 40px; border: 0; border-radius: 10px; background: none; color: var(--text);
+    font: inherit; font-size: var(--fs-sm); cursor: pointer;
+  }
+  .cal :global(.cal__day:hover:not(:disabled)) { background: var(--surface-2); }
+  .cal :global(.cal__day:disabled) { color: var(--text-3); opacity: 0.45; cursor: not-allowed; }
+  .cal :global(.cal__day.is-busy) { text-decoration: line-through; }
+  .cal :global(.cal__day.in-range) { background: var(--surface-2); border-radius: 0; }
+  .cal :global(.cal__day.is-start), .cal :global(.cal__day.is-end) { background: var(--petrol); color: #fff; font-weight: 700; opacity: 1; }
+  :global(:root[data-theme='dark']) .cal :global(.cal__day.is-start), :global(:root[data-theme='dark']) .cal :global(.cal__day.is-end) { background: var(--celeste); color: var(--petrol-deep); }
+
+  .cart-toast {
+    position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 96; max-width: 460px;
+    display: flex; align-items: center; gap: var(--space-sm); flex-wrap: wrap; padding: var(--space-sm) var(--space-sm) var(--space-sm) var(--space-md);
+    background: var(--petrol); color: #fff; border-radius: var(--radius-md); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  }
+  .cart-toast[hidden] { display: none; }
+  .cart-toast span { flex: 1 1 180px; }
+  .cart-toast__x { margin: 0; color: #fff; }
+  .cart-toast__x:hover { background: rgba(255, 255, 255, 0.12); }
+  @media (min-width: 1024px) { .cart-toast { left: auto; right: 28px; bottom: 28px; } }
+</style>

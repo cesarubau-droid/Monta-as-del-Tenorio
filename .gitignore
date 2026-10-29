@@ -20,3 +20,6 @@ package-lock.json
 
 # Archivos comprimidos (fotos crudas, entregas) — no se versionan
 *.zip
+
+# Local test database (PGlite)
+.pglite/
